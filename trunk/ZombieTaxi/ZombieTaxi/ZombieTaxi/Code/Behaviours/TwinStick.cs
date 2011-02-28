@@ -77,56 +77,73 @@ namespace ZombieTaxi.Behaviour
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
-        {            
+        {
+            // Grab the current state of the gamepad.
             GamePadState g = InputManager.pInstance.pActiveGamePadState;
 
+            // The character will move at this rate in the direction of the Left Analog Stick.
             Vector2 dir1 = new Vector2(mMoveSpeed, -mMoveSpeed);
             dir1 *= g.ThumbSticks.Left;
             mParentGOH.pOrientation.mPosition += dir1;
 
+            // Convert the direction of the right analog stick into an angle so that it can be used to set the rotation of
+            // the sprite.
             Double angle = Math.Atan2(-g.ThumbSticks.Right.Y, g.ThumbSticks.Right.X);
             if (angle < 0)
             {
                 angle += 2 * Math.PI;
             }
 
-            Single deg = MathHelper.ToDegrees((Single)angle);
-
 #if ALLOW_GARBAGE
+            Single deg = MathHelper.ToDegrees((Single)angle);
             DebugMessageDisplay.pInstance.AddDynamicMessage("Angle: " + deg);
             DebugMessageDisplay.pInstance.AddDynamicMessage("X: " + g.ThumbSticks.Right.X);
             DebugMessageDisplay.pInstance.AddDynamicMessage("Y: " + g.ThumbSticks.Right.Y);
-#endif
+#endif // ALLOW_GARBAGE
 
+            // The gun should be just outside the player sprite in the direction the player is pressing the
+            // right analog stick.
+            // Start by placing it at the position of the player.
             mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+
+            // Place the sprite 32 pixels off in the direction of the right analog stick.
             Vector2 dir = new Vector2(32.0f, -32.0f);
             dir *= Vector2.Normalize(g.ThumbSticks.Right);
             mGun.pOrientation.mPosition += dir;
             mGun.pOrientation.mRotation = (Single)angle;
 
-            //if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2, true))
-            if (dir.X != 0 && dir.Y != 0)
+            // If the user is pressing the right analog stick, then they need to fire a bullet.
+            if (!Single.IsNaN(dir.X) && !Single.IsNaN(dir.Y))
             {
+                // We want some slight randomness to the bullets fired.  This is the randomness in radians.
                 Single spread = 0.1f;
+
+                // If they are holding R2, then the spread is even larger.
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2, false))
                 {
                     spread = 0.5f;
                 }
-                mBullets[mCurrentBullet].pOrientation.mPosition = mGun.pOrientation.mPosition;
-                mBullets[mCurrentBullet].pOrientation.mRotation = mGun.pOrientation.mRotation;
 
+                // Offset by a random amount within the spread range.
                 Single offset = ((Single)RandomManager.pInstance.RandomPercent() * spread) - (spread * 0.5f);
                 angle += offset;
+
+                // Convert the angle back into a vector so that it can be used to move the bullet.
                 Vector2 finalDir = new Vector2((Single)Math.Cos(angle), (Single)Math.Sin(angle));
                 finalDir.Y *= -1;
 
+                // Update the game object with all the new data.
+                mBullets[mCurrentBullet].pOrientation.mPosition = mGun.pOrientation.mPosition;
+                mBullets[mCurrentBullet].pOrientation.mRotation = (Single)angle;
                 mBullets[mCurrentBullet].pDirection.mForward = finalDir;
 
                 // The screen's y direction is opposite the controller.
                 mBullets[mCurrentBullet].pDirection.mForward.Y *= -1;
 
+                // Next time fire a new bullet.
                 mCurrentBullet++;
 
+                // Make sure the array gets looped around.
                 if (mCurrentBullet >= mBullets.Length)
                 {
                     mCurrentBullet = 0;

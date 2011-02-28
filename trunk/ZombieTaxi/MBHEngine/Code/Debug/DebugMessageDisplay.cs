@@ -39,10 +39,12 @@ namespace MBHEngine.Debug
         /// </summary>
         private int mMaxConstMsgs = 20;
 
+#if ALLOW_GARBAGE
         /// <summary>
         /// This will keep track of the current message number.
         /// </summary>
         private int mCurMsgNum = 0;
+#endif // ALLOW_GARBAGE
 
         /// <summary>
         /// The font object we use for rendering.
