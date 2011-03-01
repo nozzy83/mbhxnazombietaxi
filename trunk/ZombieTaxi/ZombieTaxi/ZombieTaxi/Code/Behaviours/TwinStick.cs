@@ -140,6 +140,9 @@ namespace ZombieTaxi.Behaviour
                 // The screen's y direction is opposite the controller.
                 mBullets[mCurrentBullet].pDirection.mForward.Y *= -1;
 
+                // By default the bullets have their renderer turned off.
+                mBullets[mCurrentBullet].pDoRender = true;
+
                 // Next time fire a new bullet.
                 mCurrentBullet++;
 

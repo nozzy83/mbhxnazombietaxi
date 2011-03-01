@@ -32,6 +32,16 @@ namespace ZombieTaxi
         SamplerState mSpriteSamplerState; // Keep the sprites looking Crisp.
 
         /// <summary>
+        /// This will defined as a multiply blend state.
+        /// </summary>
+        BlendState mMultiply;
+
+        /// <summary>
+        /// Graphic for the vingette.
+        /// </summary>
+        GameObject mVingetting;
+
+        /// <summary>
         /// Constuctor
         /// </summary>
         /// <param name="args">Command-line arguments passed to the executable.</param>
@@ -82,6 +92,10 @@ namespace ZombieTaxi
             mSpriteRasterState = new RasterizerState();
             mSpriteSamplerState = new SamplerState();
 
+            mMultiply = new BlendState();
+            mMultiply.ColorSourceBlend = Blend.Zero;
+            mMultiply.ColorDestinationBlend = Blend.SourceColor;
+
             // Prevent the edge of the sprite showing garabage.
             mSpriteRasterState.MultiSampleAntiAlias = false;
 
@@ -97,6 +111,9 @@ namespace ZombieTaxi
             MBHEngine.Behaviour.Behaviour t = new TwinStick(player, null);
             player.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(player);
+
+            mVingetting = new GameObject("Vingette\\Vingette");
+            //GameObjectManager.pInstance.Add(ving);
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
@@ -143,12 +160,24 @@ namespace ZombieTaxi
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // First draw all the objects managed by the game object manager.
             mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-
             // Keep the sprites looking crisp.
             mSpriteBatch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
             mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
             GameObjectManager.pInstance.Render(mSpriteBatch);
+            mSpriteBatch.End();
+
+            // Cheap hack for now to add Vingetting around the edge of the screen.  Ultimatly we will need a more
+            // formal way to sort by render stlyes while still respecting render priority.
+            mSpriteBatch.Begin(SpriteSortMode.Immediate, mMultiply);
+            mVingetting.Render(mSpriteBatch);
+            mSpriteBatch.End();
+
+            // We need to go back to standard alpha blend before drawing the debug layer.
+            mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            mSpriteBatch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+            mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
             DebugMessageDisplay.pInstance.Render(mSpriteBatch);
             mSpriteBatch.End();
 
