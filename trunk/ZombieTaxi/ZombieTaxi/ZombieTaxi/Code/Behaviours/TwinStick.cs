@@ -9,6 +9,7 @@ using MBHEngine.Input;
 using Microsoft.Xna.Framework.Input;
 using MBHEngine.Debug;
 using MBHEngine.Math;
+using MBHEngine.Render;
 
 namespace ZombieTaxi.Behaviour
 {
@@ -152,6 +153,8 @@ namespace ZombieTaxi.Behaviour
                     mCurrentBullet = 0;
                 }
             }
+
+            CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
         }
 
         /// <summary>
