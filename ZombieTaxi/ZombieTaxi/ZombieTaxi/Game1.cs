@@ -13,6 +13,7 @@ using MBHEngine.Math;
 using MBHEngine.GameObject;
 using MBHEngine.Input;
 using MBHEngine.Debug;
+using MBHEngine.Render;
 using ZombieTaxi.Behaviour;
 
 namespace ZombieTaxi
@@ -148,6 +149,7 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Update(gameTime);
             PhysicsManager.pInstance.Update(gameTime);
             InputManager.pInstance.UpdateEnd();
+            CameraManager.pInstance.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -161,7 +163,7 @@ namespace ZombieTaxi
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // First draw all the objects managed by the game object manager.
-            mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, CameraManager.pInstance.pFinalTransform);
             // Keep the sprites looking crisp.
             mSpriteBatch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
             mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
