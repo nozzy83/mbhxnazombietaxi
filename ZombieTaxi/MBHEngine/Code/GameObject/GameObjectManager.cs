@@ -66,6 +66,11 @@ namespace MBHEngine.GameObject
         private GraphicsDeviceManager mGraphics;
 
         /// <summary>
+        /// Special case handling for the player object.  This is just to make things easier and quicker.
+        /// </summary>
+        private GameObject mPlayer;
+
+        /// <summary>
         /// We make the constructor private so that no one accidentally creates
         /// an instance of the class.
         /// </summary>
@@ -323,6 +328,27 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// The player object.  Not guarenteed to be defined during start up.
+        /// </summary>
+        public GameObject pPlayer
+        {
+            get
+            {
+                return mPlayer;
+            }
+
+            set
+            {
+                if (mPlayer != null)
+                {
+                    throw new Exception("Setting Player more than once.  If this is intentional this exception should be removed.");
+                }
+
+                mPlayer = value;
+            }
+        }
+
+        /// <summary>
         /// Accessor to the pInstance property.
         /// </summary>
         public static GameObjectManager pInstance
@@ -341,6 +367,5 @@ namespace MBHEngine.GameObject
                 return mInstance;
             }
         }
-
     }
 }

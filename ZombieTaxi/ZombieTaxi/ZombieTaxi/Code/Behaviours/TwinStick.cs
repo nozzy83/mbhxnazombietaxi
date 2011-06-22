@@ -11,7 +11,7 @@ using MBHEngine.Debug;
 using MBHEngine.Math;
 using MBHEngine.Render;
 
-namespace ZombieTaxi.Behaviour
+namespace ZombieTaxi.Behaviours
 {
     /// <summary>
     /// A class to handle the controls of a twin stick shooter.

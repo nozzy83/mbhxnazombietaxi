@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code\Behaviour\Behaviour.cs" />
+    <Compile Include="Code\Behaviour\BehaviourCreator.cs" />
     <Compile Include="Code\Behaviour\BehaviourMessage.cs" />
     <Compile Include="Code\Behaviour\FrameRateDisplay.cs" />
     <Compile Include="Code\Behaviour\SimulatedPhysics.cs" />

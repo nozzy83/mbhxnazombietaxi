@@ -8,13 +8,13 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using MBHEngine.GameObject;
 using MBHEngine.IO;
 using MBHEngine.Math;
-using MBHEngine.GameObject;
 using MBHEngine.Input;
 using MBHEngine.Debug;
 using MBHEngine.Render;
-using ZombieTaxi.Behaviour;
+using ZombieTaxi.Behaviours;
 
 namespace ZombieTaxi
 {
@@ -77,6 +77,7 @@ namespace ZombieTaxi
 
             GameObjectManager.pInstance.Initialize(Content, mGraphics);
             PhysicsManager.pInstance.Initialize(mGraphics, mSpriteBatch);
+            GameObject.AddBehaviourCreator(new ClientBehaviourCreator());
 
             base.Initialize();
         }
@@ -112,6 +113,13 @@ namespace ZombieTaxi
             MBHEngine.Behaviour.Behaviour t = new TwinStick(player, null);
             player.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(player);
+            // Store the player for easy access.
+            GameObjectManager.pInstance.pPlayer = player;
+
+            GameObject enemy = new GameObject("Kamikaze\\Kamikaze");
+            t = new Kamikaze(enemy, null);
+            enemy.AttachBehaviour( t );
+            GameObjectManager.pInstance.Add(enemy);
 
             mVingetting = new GameObject("Vingette\\Vingette");
             //GameObjectManager.pInstance.Add(ving);

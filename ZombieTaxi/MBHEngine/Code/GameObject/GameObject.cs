@@ -90,6 +90,12 @@ namespace MBHEngine.GameObject
         protected List<Behaviour.Behaviour> mBehaviours = new List<MBHEngine.Behaviour.Behaviour>();
 
         /// <summary>
+        /// A static list of behaviour creators which each instance will attempt to use to create behaviours
+        /// before moving on to the engine behaviours.
+        /// </summary>
+        static protected List<Behaviour.BehaviourCreator> mBehaviourCreators = new List<BehaviourCreator>();
+
+        /// <summary>
         /// Default Constructor.  Does nothing but needed to be overwritten so that
         /// we can create an OPTIONAL version which takes a parameter.
         /// </summary>
@@ -203,6 +209,18 @@ namespace MBHEngine.GameObject
         /// <returns>The newly created behaviour.</returns>
         protected virtual Behaviour.Behaviour CreateBehaviourByName(String behaviourType, String fileName)
         {
+            // Allow the client a chance to create non-engine behaviours.
+            for (Int16 i = 0; i < mBehaviourCreators.Count; i++)
+            {
+                Behaviour.Behaviour b = mBehaviourCreators[i].CreateBehaviourByName(this, behaviourType, fileName);
+
+                // Once the behaviour has been created there is no reason to continue.
+                if (b != null)
+                {
+                    return b;
+                }
+            }
+
             switch (behaviourType)
             {
                 case "MBHEngine.Code.Behaviour.Behaviour":
@@ -230,6 +248,15 @@ namespace MBHEngine.GameObject
                         throw new Exception("Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
                     }
             }
+        }
+
+        /// <summary>
+        /// Use this function to register client implementation of behaviour creators.
+        /// </summary>
+        /// <param name="b">An implementation of the BehaviourCreator Interface</param>
+        public static void AddBehaviourCreator(BehaviourCreator b)
+        {
+            mBehaviourCreators.Add(b);
         }
 
         /// <summary>
