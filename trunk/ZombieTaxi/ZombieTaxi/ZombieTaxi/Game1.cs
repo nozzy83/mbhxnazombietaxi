@@ -105,13 +105,18 @@ namespace ZombieTaxi
             // Keep the sprites looking Crisp.
             mSpriteSamplerState.Filter = TextureFilter.Point;
 
+            GameObject bg = new GameObject();
+            MBHEngine.Behaviour.Behaviour t = new InfiniteBG(bg, null);
+            bg.AttachBehaviour(t);
+            GameObjectManager.pInstance.Add(bg);
+
             GameObject debugStatsDisplay = new GameObject();
             MBHEngine.Behaviour.Behaviour fps = new MBHEngine.Behaviour.FrameRateDisplay(debugStatsDisplay, null);
             debugStatsDisplay.AttachBehaviour(fps);
             GameObjectManager.pInstance.Add(debugStatsDisplay);
 
             GameObject player = new GameObject("Player\\Player");
-            MBHEngine.Behaviour.Behaviour t = new TwinStick(player, null);
+            t = new TwinStick(player, null);
             player.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(player);
             // Store the player for easy access.
