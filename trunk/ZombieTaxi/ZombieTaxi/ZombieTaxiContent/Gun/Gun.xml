@@ -6,7 +6,7 @@
     <mDoRender>true</mDoRender>
     <mPosition>640 360</mPosition>
     <mRotation>0</mRotation>
-    <mScale>1 1</mScale>
+    <mScale>0.125 0.125</mScale>
     <mBehaviourFileNames>
       <Item>Gun\\Behaviours\\Sprite</Item>
     </mBehaviourFileNames>
