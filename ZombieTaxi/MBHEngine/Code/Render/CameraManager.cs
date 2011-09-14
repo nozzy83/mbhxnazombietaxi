@@ -87,6 +87,7 @@ namespace MBHEngine.Render
                 Matrix.CreateTranslation(-new Vector3(mTargetPosition, 0.0f)) * // change this to curPos to bring back blend
                 //Matrix.CreateRotationZ(Rotation) *
                 Matrix.CreateScale(new Vector3(8.0f, 8.0f, 8.0f)) *
+                //Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1.0f)) *
                 mScreenCenter;
         }
 
@@ -135,6 +136,14 @@ namespace MBHEngine.Render
                     mTargetPosition = value;
                     mCurBlendFrames = 0;
                 }
+            }
+        }
+
+        public Vector2 pScreenCenter
+        {
+            get
+            {
+                return new Vector2(mScreenCenter.Translation.X, mScreenCenter.Translation.Y);
             }
         }
     }
