@@ -6,7 +6,7 @@
     <mDoRender>false</mDoRender>
     <mPosition>0 0</mPosition>
     <mRotation>0</mRotation>
-    <mScale>10 0.25</mScale>
+    <mScale>1.25 0.03125</mScale>
     <mBehaviourFileNames>
       <Item>Bullet\\Behaviours\\Sprite</Item>
     </mBehaviourFileNames>

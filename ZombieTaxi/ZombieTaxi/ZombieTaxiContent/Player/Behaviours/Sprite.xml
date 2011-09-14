@@ -1,7 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
-    <mSpriteFileName>Player\\GreenBox</mSpriteFileName>
+    <mSpriteFileName>Player\\Wizard</mSpriteFileName>
+    <mIsAnimated>true</mIsAnimated>
+    <mNumFrames>2</mNumFrames>
+    <mFrameHeight>8</mFrameHeight>
+    <mTicksPerFrame>15</mTicksPerFrame>
   </Asset>
 </XnaContent>
 

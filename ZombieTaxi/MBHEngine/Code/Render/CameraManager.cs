@@ -86,7 +86,7 @@ namespace MBHEngine.Render
             mTransform =
                 Matrix.CreateTranslation(-new Vector3(mTargetPosition, 0.0f)) * // change this to curPos to bring back blend
                 //Matrix.CreateRotationZ(Rotation) *
-                Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1.0f)) *
+                Matrix.CreateScale(new Vector3(8.0f, 8.0f, 8.0f)) *
                 mScreenCenter;
         }
 

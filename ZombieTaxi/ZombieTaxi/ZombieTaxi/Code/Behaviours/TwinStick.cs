@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using MBHEngine.Debug;
 using MBHEngine.Math;
 using MBHEngine.Render;
+using MBHEngine.Behaviour;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -38,6 +39,8 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         private Int16 mCurrentBullet;
 
+        private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
+
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
@@ -55,7 +58,7 @@ namespace ZombieTaxi.Behaviours
         /// <param name="fileName">The file to load from.</param>
         public override void LoadContent(String fileName)
         {
-            mMoveSpeed = 5.0f;
+            mMoveSpeed = 0.625f;
             mCurrentBullet = 0;
 
             base.LoadContent(fileName);
@@ -68,9 +71,11 @@ namespace ZombieTaxi.Behaviours
             for (Int16 i = 0; i < 100; i++)
             {
                 mBullets[i] = new GameObject("Bullet\\Bullet");
-                mBullets[i].pDirection.mSpeed = 30.0f;
+                mBullets[i].pDirection.mSpeed = 3.75f;
                 GameObjectManager.pInstance.Add(mBullets[i]);
             }
+
+            mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
         }
 
         /// <summary>
@@ -86,6 +91,17 @@ namespace ZombieTaxi.Behaviours
             Vector2 dir1 = new Vector2(mMoveSpeed, -mMoveSpeed);
             dir1 *= g.ThumbSticks.Left;
             mParentGOH.pOrientation.mPosition += dir1;
+
+            // Flip the sprite to face the direction that we are moving.
+            if (g.ThumbSticks.Left.X > 0)
+            {
+                mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+            }
+            else if (g.ThumbSticks.Left.X < 0)
+            {
+                mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+            }
+            mParentGOH.OnMessage(mSpriteFxMsg);
 
             // Convert the direction of the right analog stick into an angle so that it can be used to set the rotation of
             // the sprite.
@@ -107,8 +123,8 @@ namespace ZombieTaxi.Behaviours
             // Start by placing it at the position of the player.
             mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
 
-            // Place the sprite 32 pixels off in the direction of the right analog stick.
-            Vector2 dir = new Vector2(32.0f, -32.0f);
+            // Place the sprite X pixels off in the direction of the right analog stick.
+            Vector2 dir = new Vector2(4.0f, -4.0f);
             dir *= Vector2.Normalize(g.ThumbSticks.Right);
             mGun.pOrientation.mPosition += dir;
             mGun.pOrientation.mRotation = (Single)angle;

@@ -53,6 +53,7 @@ namespace ZombieTaxi
             mGraphics = new GraphicsDeviceManager(this);
             mGraphics.PreferredBackBufferWidth = 1280;
             mGraphics.PreferredBackBufferHeight = 720;
+            //mGraphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
 
             // Avoid the "jitter".
@@ -119,7 +120,7 @@ namespace ZombieTaxi
             GameObject enemy = new GameObject("Kamikaze\\Kamikaze");
             t = new Kamikaze(enemy, null);
             enemy.AttachBehaviour( t );
-            GameObjectManager.pInstance.Add(enemy);
+            //GameObjectManager.pInstance.Add(enemy);
 
             mVingetting = new GameObject("Vingette\\Vingette");
             //GameObjectManager.pInstance.Add(ving);
