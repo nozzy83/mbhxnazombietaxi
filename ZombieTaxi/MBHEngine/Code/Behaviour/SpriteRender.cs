@@ -32,6 +32,49 @@ namespace MBHEngine.Behaviour
         };
 
         /// <summary>
+        /// Retrives the currently playing animation.
+        /// </summary>
+        public class GetActiveAnimationMessage : BehaviourMessage
+        {
+            public String mAnimationSetName;
+        }
+
+        /// <summary>
+        /// Sets the currently playing animation by name.  See XML for this sprite for corisponding names.
+        /// </summary>
+        public class SetActiveAnimationMessage : BehaviourMessage
+        {
+            public String mAnimationSetName;
+        }
+
+        /// <summary>
+        /// Defines a single set of animation.  A sprite sheet will usually contain a number of animation
+        /// sets.
+        /// </summary>
+        public class AnimationSet
+        {
+            /// <summary>
+            /// How many update passes to hold on a single frame of animation.
+            /// </summary>
+            public Int32 mTicksPerFrame;
+
+            /// <summary>
+            /// The name that this animation will be referenced as in code.
+            /// </summary>
+            public String mName;
+
+            /// <summary>
+            /// Which frame of the image does this particular animation start on.
+            /// </summary>
+            public Int32 mStartingFrame;
+
+            /// <summary>
+            /// The number of frames of animation.
+            /// </summary>
+            public Int32 mNumFrames;
+        };
+
+        /// <summary>
         /// The texture used to render the sprite.
         /// </summary>
         private Texture2D mTexture;
@@ -47,19 +90,9 @@ namespace MBHEngine.Behaviour
         public Boolean mIsAnimated;
 
         /// <summary>
-        /// The number of frames of animation.
-        /// </summary>
-        public Int32 mNumFrames;
-
-        /// <summary>
         /// The height, in pixels, of a single frame of animation.
         /// </summary>
         public Int32 mFrameHeight;
-
-        /// <summary>
-        /// How many update passes to hold on a single frame of animation.
-        /// </summary>
-        public Int32 mTicksPerFrame;
 
         /// <summary>
         /// Used for tracking how many frames have passed since the last animation change.
@@ -70,6 +103,21 @@ namespace MBHEngine.Behaviour
         /// The current frame of animation being displayed.
         /// </summary>
         private Int32 mCurrentFrame;
+
+        /// <summary>
+        /// A list of all the animations this sprite contains.
+        /// </summary>
+        private List<AnimationSet> mAnimations;
+
+        /// <summary>
+        /// Which index in mAnimations is currently playing.
+        /// </summary>
+        private Int32 mActiveAnimation;
+
+        /// <summary>
+        /// Draw second sprite as shadow.
+        /// </summary>
+        private Boolean mHasShadow;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -94,18 +142,34 @@ namespace MBHEngine.Behaviour
 
             mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
 
-            if( def.mIsAnimated )
+            if (def.mAnimationSets != null)
             {
-                mIsAnimated     = def.mIsAnimated;
-                mNumFrames      = def.mNumFrames;
+                mIsAnimated     = true;
                 mFrameHeight    = def.mFrameHeight;
-                mTicksPerFrame  = def.mTicksPerFrame;
+                mHasShadow      = def.mHasShadow;
+
+                mAnimations = new List<AnimationSet>();
+
+                for (int i = 0; i < def.mAnimationSets.Count; i++)
+                {
+                    AnimationSet temp = new AnimationSet();
+                    temp.mNumFrames = def.mAnimationSets[i].mNumFrames;
+                    temp.mTicksPerFrame = def.mAnimationSets[i].mTicksPerFrame;
+                    temp.mName = def.mAnimationSets[i].mName;
+                    temp.mStartingFrame = def.mAnimationSets[i].mStartingFrame;
+                    mAnimations.Add(temp);
+                }
+            }
+            else
+            {
+                mIsAnimated     = false;
             }
 
             mSpriteEffects = SpriteEffects.None;
 
             mFrameCounter = 0;
             mCurrentFrame = 0;
+            mActiveAnimation = 1;
         }
 
         /// <summary>
@@ -118,10 +182,10 @@ namespace MBHEngine.Behaviour
             {
                 mFrameCounter += 1;
 
-                if (mFrameCounter > mTicksPerFrame)
+                if (mFrameCounter > mAnimations[mActiveAnimation].mTicksPerFrame)
                 {
                     mCurrentFrame += 1;
-                    if (mCurrentFrame >= mNumFrames) mCurrentFrame = 0;
+                    if (mCurrentFrame >= mAnimations[mActiveAnimation].mNumFrames) mCurrentFrame = 0;
                     mFrameCounter = 0;
                 }
             }
@@ -135,7 +199,7 @@ namespace MBHEngine.Behaviour
         {
             if (mIsAnimated)
             {
-                Int32 baseIndex = mCurrentFrame * mFrameHeight;
+                Int32 baseIndex = (mAnimations[mActiveAnimation].mStartingFrame + mCurrentFrame) * mFrameHeight;
                 Rectangle rect = new Rectangle(0, baseIndex, mFrameHeight, mTexture.Width);
                 batch.Draw(mTexture,
                            mParentGOH.pOrientation.mPosition,
@@ -146,6 +210,19 @@ namespace MBHEngine.Behaviour
                            mParentGOH.pOrientation.mScale,
                            mSpriteEffects,
                            0);
+
+                if (mHasShadow)
+                {
+                    batch.Draw(mTexture,
+                               mParentGOH.pOrientation.mPosition + new Vector2(0, mFrameHeight),
+                               rect,
+                               new Color(0, 0, 0, 128),
+                               mParentGOH.pOrientation.mRotation,
+                               new Vector2(mTexture.Width * 0.5f, mFrameHeight * 0.5f),
+                               mParentGOH.pOrientation.mScale,
+                               mSpriteEffects | SpriteEffects.FlipVertically,
+                               0);
+                }
             }
             else
             {
@@ -158,6 +235,19 @@ namespace MBHEngine.Behaviour
                            mParentGOH.pOrientation.mScale,
                            mSpriteEffects,
                            0);
+
+                if (mHasShadow)
+                {
+                    batch.Draw(mTexture,
+                               mParentGOH.pOrientation.mPosition + new Vector2(0, mTexture.Height),
+                               null,
+                               Color.White,
+                               mParentGOH.pOrientation.mRotation,
+                               new Vector2(mTexture.Width * 0.5f, mTexture.Height * 0.5f),
+                               mParentGOH.pOrientation.mScale,
+                               mSpriteEffects,
+                               0);
+                }
             }
         }
 
@@ -183,13 +273,59 @@ namespace MBHEngine.Behaviour
                 SpriteRender.SetSpriteEffectsMessage temp = (SpriteRender.SetSpriteEffectsMessage)msg;
                 mSpriteEffects = temp.mSpriteEffects;
             }
+            else if (msg is GetActiveAnimationMessage)
+            {
+                SpriteRender.GetActiveAnimationMessage temp = (SpriteRender.GetActiveAnimationMessage)msg;
+                temp.mAnimationSetName = mAnimations[mActiveAnimation].mName;
+                msg = temp;
+            }
+            else if (msg is SetActiveAnimationMessage)
+            {
+                SpriteRender.SetActiveAnimationMessage temp = (SpriteRender.SetActiveAnimationMessage)msg;
+
+                if (mAnimations[mActiveAnimation].mName != temp.mAnimationSetName)
+                {
+                    for (int i = 0; i < mAnimations.Count; i++)
+                    {
+                        if (mAnimations[i].mName == temp.mAnimationSetName)
+                        {
+                            mActiveAnimation = i;
+                            mCurrentFrame = 0;
+                        }
+                    }
+                }
+            }
             else
             {
                 // This is not a message we know how to handle.
+                // TODO:
+                // This seems wrong.  Won't this overwrite any set messages that might need to be passed on to other
+                // behaviours?
                 msg = null;
             }
 
             return msg;
+        }
+
+        /// <summary>
+        /// The currently playing animation.  See XML for this sprite for corisponding names.
+        /// </summary>
+        public String pCurrentAnimation
+        {
+            get
+            {
+                return mAnimations[mActiveAnimation].mName;
+            }
+            set
+            {
+                for (int i = 0; i < mAnimations.Count; i++)
+                {
+                    if (mAnimations[i].mName == value)
+                    {
+                        mActiveAnimation = i;
+                    }
+                }
+            }
         }
     }
 }

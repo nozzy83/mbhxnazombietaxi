@@ -126,6 +126,10 @@
       <Project>{5DD5B096-5020-4604-9D07-0061D17E63E4}</Project>
       <Name>MBHEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ZombieTaxiContentDefs\ZombieTaxiContentDefs.csproj">
+      <Project>{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}</Project>
+      <Name>ZombieTaxiContentDefs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ZombieTaxiContent\ZombieTaxiContent.contentproj">
       <Name>ZombieTaxiContent</Name>
       <XnaReferenceType>Content</XnaReferenceType>

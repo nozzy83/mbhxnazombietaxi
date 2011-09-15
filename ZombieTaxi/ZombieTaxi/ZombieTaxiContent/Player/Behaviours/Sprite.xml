@@ -1,11 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
-    <mSpriteFileName>Player\\Wizard</mSpriteFileName>
-    <mIsAnimated>true</mIsAnimated>
-    <mNumFrames>2</mNumFrames>
-    <mFrameHeight>8</mFrameHeight>
-    <mTicksPerFrame>15</mTicksPerFrame>
+    <mSpriteFileName>Player\\Commando</mSpriteFileName>
+    <mFrameHeight>16</mFrameHeight>
+    <mHasShadow>true</mHasShadow>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>10</mTicksPerFrame>
+        <mName>Idle</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>10</mNumFrames>
+      </Item>      
+      <Item>
+        <mTicksPerFrame>10</mTicksPerFrame>
+        <mName>Walk</mName>
+        <mStartingFrame>10</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+      </Item>
+    </mAnimationSets>
   </Asset>
 </XnaContent>
 
