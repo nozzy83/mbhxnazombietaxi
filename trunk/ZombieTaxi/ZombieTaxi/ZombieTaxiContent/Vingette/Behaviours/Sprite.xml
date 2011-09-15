@@ -2,10 +2,6 @@
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
     <mSpriteFileName>Vingette\\BlackVingette</mSpriteFileName>
-    <mIsAnimated>false</mIsAnimated>
-    <mNumFrames>-1</mNumFrames>
-    <mFrameHeight>-1</mFrameHeight>
-    <mTicksPerFrame>-1</mTicksPerFrame>
   </Asset>
 </XnaContent>
 

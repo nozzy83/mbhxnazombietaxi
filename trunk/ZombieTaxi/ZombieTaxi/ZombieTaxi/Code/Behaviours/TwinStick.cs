@@ -40,6 +40,7 @@ namespace ZombieTaxi.Behaviours
         private Int16 mCurrentBullet;
 
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
+        private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -76,6 +77,7 @@ namespace ZombieTaxi.Behaviours
             }
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
+            mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
         }
 
         /// <summary>
@@ -96,10 +98,19 @@ namespace ZombieTaxi.Behaviours
             if (g.ThumbSticks.Left.X > 0)
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mSpriteActiveAnimMsg.mAnimationSetName = "Walk";
+                mParentGOH.OnMessage(mSpriteActiveAnimMsg);
             }
             else if (g.ThumbSticks.Left.X < 0)
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                mSpriteActiveAnimMsg.mAnimationSetName = "Walk";
+                mParentGOH.OnMessage(mSpriteActiveAnimMsg);
+            }
+            else
+            {
+                mSpriteActiveAnimMsg.mAnimationSetName = "Idle";
+                mParentGOH.OnMessage(mSpriteActiveAnimMsg);
             }
             mParentGOH.OnMessage(mSpriteFxMsg);
 

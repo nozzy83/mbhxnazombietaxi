@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010 Express for Windows Phone
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZombieTaxi", "ZombieTaxi\ZombieTaxi\ZombieTaxi.csproj", "{688B25A6-F39B-43CC-A1AB-A7244F0FF1E5}"
 	ProjectSection(ProjectDependencies) = postProject
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2} = {C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}
 		{5DD5B096-5020-4604-9D07-0061D17E63E4} = {5DD5B096-5020-4604-9D07-0061D17E63E4}
 	EndProjectSection
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "ZombieTaxiContent", "ZombieTaxi\ZombieTaxiContent\ZombieTaxiContent.contentproj", "{0553F421-289D-4AB5-A3F5-5B5FB940CB3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZombieTaxiContent", "ZombieTaxi\ZombieTaxiContent\ZombieTaxiContent.contentproj", "{0553F421-289D-4AB5-A3F5-5B5FB940CB3E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBHEngine", "MBHEngine\MBHEngine.csproj", "{5DD5B096-5020-4604-9D07-0061D17E63E4}"
 EndProject
@@ -15,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Box2D.XNA", "Box2D.XNA\Box2D.XNA.csproj", "{22791486-E721-4511-AA4B-DA26CF5D0F2E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBHEngineContent", "MBHEngine\Content\MBHEngineContent.contentproj", "{6DEDFF34-2E03-4847-863A-F03EA03352CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZombieTaxiContentDefs", "ZombieTaxiContentDefs\ZombieTaxiContentDefs.csproj", "{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +81,16 @@ Global
 		{6DEDFF34-2E03-4847-863A-F03EA03352CD}.Release|Any CPU.ActiveCfg = Release|x86
 		{6DEDFF34-2E03-4847-863A-F03EA03352CD}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{6DEDFF34-2E03-4847-863A-F03EA03352CD}.Release|x86.ActiveCfg = Release|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Debug|x86.ActiveCfg = Debug|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Debug|x86.Build.0 = Debug|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Release|Any CPU.ActiveCfg = Release|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Release|Mixed Platforms.Build.0 = Release|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Release|x86.ActiveCfg = Release|x86
+		{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
