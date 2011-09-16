@@ -4,9 +4,9 @@
     <mRenderPriority>50</mRenderPriority>
     <mDoUpdate>true</mDoUpdate>
     <mDoRender>true</mDoRender>
-    <mPosition>640 360</mPosition>
+    <mPosition>0 0</mPosition>
     <mRotation>0</mRotation>
-    <mScale>0.125 0.125</mScale>
+    <mScale>1 1</mScale>
     <mBehaviourFileNames>
       <Item>Gun\\Behaviours\\Sprite</Item>
     </mBehaviourFileNames>
