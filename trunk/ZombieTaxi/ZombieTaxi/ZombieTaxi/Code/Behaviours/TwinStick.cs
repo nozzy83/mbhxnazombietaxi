@@ -40,6 +40,7 @@ namespace ZombieTaxi.Behaviours
         private Int16 mCurrentBullet;
 
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
+        private SpriteRender.GetSpriteEffectsMessage mGetSpriteFxMsg;
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
 
         /// <summary>
@@ -66,6 +67,9 @@ namespace ZombieTaxi.Behaviours
 
             mGun = new GameObject("Gun\\Gun");
             GameObjectManager.pInstance.Add(mGun);
+            mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+            mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
+            mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
 
             mBullets = new GameObject[100];
 
@@ -77,6 +81,7 @@ namespace ZombieTaxi.Behaviours
             }
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
+            mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
         }
 
@@ -94,25 +99,46 @@ namespace ZombieTaxi.Behaviours
             dir1 *= g.ThumbSticks.Left;
             mParentGOH.pOrientation.mPosition += dir1;
 
+            // If the player has moved at all this frame, start with the gun right behind him.  We don't do this if he didn't
+            // move so that we don't need to figure out where to position it; we just use what was already there.
+            if (dir1.X != 0.0f)
+            {
+                mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+                mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
+            }
+
             // Flip the sprite to face the direction that we are moving.
             if (g.ThumbSticks.Left.X > 0)
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mParentGOH.OnMessage(mSpriteFxMsg);
                 mSpriteActiveAnimMsg.mAnimationSetName = "Walk";
                 mParentGOH.OnMessage(mSpriteActiveAnimMsg);
+
+                // Initially the gun is positioned assuming the R-Stick is not pressed.  Just point straight
+                // in the direction the player is walking.
+                mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mGun.OnMessage(mSpriteFxMsg);
+                mGun.pOrientation.mRotation = 0.0f;
+                mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
             }
             else if (g.ThumbSticks.Left.X < 0)
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                mParentGOH.OnMessage(mSpriteFxMsg);
                 mSpriteActiveAnimMsg.mAnimationSetName = "Walk";
                 mParentGOH.OnMessage(mSpriteActiveAnimMsg);
+
+                mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
+                mGun.OnMessage(mSpriteFxMsg);
+                mGun.pOrientation.mRotation = MathHelper.ToRadians(180.0f);
+                mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X - 1.0f;
             }
             else
             {
                 mSpriteActiveAnimMsg.mAnimationSetName = "Idle";
                 mParentGOH.OnMessage(mSpriteActiveAnimMsg);
             }
-            mParentGOH.OnMessage(mSpriteFxMsg);
 
             // Convert the direction of the right analog stick into an angle so that it can be used to set the rotation of
             // the sprite.
@@ -129,20 +155,15 @@ namespace ZombieTaxi.Behaviours
             DebugMessageDisplay.pInstance.AddDynamicMessage("Y: " + g.ThumbSticks.Right.Y);
 #endif // ALLOW_GARBAGE
 
-            // The gun should be just outside the player sprite in the direction the player is pressing the
-            // right analog stick.
-            // Start by placing it at the position of the player.
-            mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
-
-            // Place the sprite X pixels off in the direction of the right analog stick.
-            Vector2 dir = new Vector2(4.0f, -4.0f);
-            dir *= Vector2.Normalize(g.ThumbSticks.Right);
-            mGun.pOrientation.mPosition += dir;
-            mGun.pOrientation.mRotation = (Single)angle;
+            // Determine the direction that right analog stick is pointing (if any).
+            Vector2 dir = Vector2.Normalize(g.ThumbSticks.Right);
 
             // If the user is pressing the right analog stick, then they need to fire a bullet.
             if (!Single.IsNaN(dir.X) && !Single.IsNaN(dir.Y))
             {
+                //mGun.pOrientation.mPosition += dir;
+                mGun.pOrientation.mRotation = (Single)angle;
+
                 // We want some slight randomness to the bullets fired.  This is the randomness in radians.
                 Single spread = 0.1f;
 
@@ -165,6 +186,28 @@ namespace ZombieTaxi.Behaviours
                 mBullets[mCurrentBullet].pOrientation.mRotation = (Single)angle;
                 mBullets[mCurrentBullet].pDirection.mForward = finalDir;
 
+                // Use dir, not finalDir, so that the direction does not include the spread randomization.
+                if (dir.X > 0)
+                {
+                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                    mParentGOH.OnMessage(mSpriteFxMsg);
+
+                    // To start the gun would be set to point in the direction we are walking.  We have turned to face the direction
+                    // the player is shooting, so the gun needs to be updated as well.
+                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                    mGun.OnMessage(mSpriteFxMsg);
+                    mGun.pOrientation.mPosition.X = mParentGOH.pOrientation.mPosition.X + 1.0f;
+                }
+                else if (dir.X < 0)
+                {
+                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                    mParentGOH.OnMessage(mSpriteFxMsg);
+
+                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
+                    mGun.OnMessage(mSpriteFxMsg);
+                    mGun.pOrientation.mPosition.X = mParentGOH.pOrientation.mPosition.X - 1.0f;
+                }
+
                 // The screen's y direction is opposite the controller.
                 mBullets[mCurrentBullet].pDirection.mForward.Y *= -1;
 
@@ -180,7 +223,7 @@ namespace ZombieTaxi.Behaviours
                     mCurrentBullet = 0;
                 }
             }
-
+            
             CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
         }
 

@@ -28,7 +28,8 @@ namespace MBHEngine.Input
             RA_LEFT, RA_RIGHT, RA_UP, RA_DOWN, 
             A, B, X, Y, 
             L1, L2, L3, R1, R2, 
-            START, BACK };
+            START, BACK 
+        };
         
         /// <summary>
         /// Maximum number of controllers.
