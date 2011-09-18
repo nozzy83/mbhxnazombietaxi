@@ -65,20 +65,20 @@ namespace ZombieTaxi.Behaviours
 
             base.LoadContent(fileName);
 
-            mGun = new GameObject("Gun\\Gun");
-            GameObjectManager.pInstance.Add(mGun);
-            mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
-            mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
-            mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
-
             mBullets = new GameObject[100];
 
             for (Int16 i = 0; i < 100; i++)
             {
                 mBullets[i] = new GameObject("Bullet\\Bullet");
-                mBullets[i].pDirection.mSpeed = 3.75f;
+                mBullets[i].pDirection.mSpeed = 1.75f;
                 GameObjectManager.pInstance.Add(mBullets[i]);
             }
+
+            mGun = new GameObject("Gun\\Gun");
+            GameObjectManager.pInstance.Add(mGun);
+            mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+            mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
+            mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
@@ -164,28 +164,6 @@ namespace ZombieTaxi.Behaviours
                 //mGun.pOrientation.mPosition += dir;
                 mGun.pOrientation.mRotation = (Single)angle;
 
-                // We want some slight randomness to the bullets fired.  This is the randomness in radians.
-                Single spread = 0.1f;
-
-                // If they are holding R2, then the spread is even larger.
-                if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2, false))
-                {
-                    spread = 0.5f;
-                }
-
-                // Offset by a random amount within the spread range.
-                Single offset = ((Single)RandomManager.pInstance.RandomPercent() * spread) - (spread * 0.5f);
-                angle += offset;
-
-                // Convert the angle back into a vector so that it can be used to move the bullet.
-                Vector2 finalDir = new Vector2((Single)Math.Cos(angle), (Single)Math.Sin(angle));
-                finalDir.Y *= -1;
-
-                // Update the game object with all the new data.
-                mBullets[mCurrentBullet].pOrientation.mPosition = mGun.pOrientation.mPosition;
-                mBullets[mCurrentBullet].pOrientation.mRotation = (Single)angle;
-                mBullets[mCurrentBullet].pDirection.mForward = finalDir;
-
                 // Use dir, not finalDir, so that the direction does not include the spread randomization.
                 if (dir.X > 0)
                 {
@@ -207,6 +185,35 @@ namespace ZombieTaxi.Behaviours
                     mGun.OnMessage(mSpriteFxMsg);
                     mGun.pOrientation.mPosition.X = mParentGOH.pOrientation.mPosition.X - 1.0f;
                 }
+
+                // We want some slight randomness to the bullets fired.  This is the randomness in radians.
+                Single spread = 0.1f;
+
+                // If they are holding R2, then the spread is even larger.
+                if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2, false))
+                {
+                    spread = 0.5f;
+                }
+
+                // Offset by a random amount within the spread range.
+                Single offset = ((Single)RandomManager.pInstance.RandomPercent() * spread) - (spread * 0.5f);
+                angle += offset;
+
+                // Convert the angle back into a vector so that it can be used to move the bullet.
+                Vector2 finalDir = new Vector2((Single)Math.Cos(angle), (Single)Math.Sin(angle));
+                finalDir.Y *= -1;
+
+                Vector2 finalUp = new Vector2(-finalDir.Y, -finalDir.X);
+                if (finalDir.X < 0) finalUp *= -1;
+
+                // Update the game object with all the new data.
+                mBullets[mCurrentBullet].pOrientation.mPosition = mGun.pOrientation.mPosition;
+                mBullets[mCurrentBullet].pOrientation.mRotation = (Single)angle;
+                mBullets[mCurrentBullet].pDirection.mForward = finalDir;
+
+                finalDir.Y *= -1;
+                mBullets[mCurrentBullet].pOrientation.mPosition += finalUp * 1.0f;
+                mBullets[mCurrentBullet].pOrientation.mPosition += finalDir * 3.5f;
 
                 // The screen's y direction is opposite the controller.
                 mBullets[mCurrentBullet].pDirection.mForward.Y *= -1;

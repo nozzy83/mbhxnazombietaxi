@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
-    <mSpriteFileName>Gun\\Arrow</mSpriteFileName>
+    <mSpriteFileName>Bullet\\Pellet</mSpriteFileName>
   </Asset>
 </XnaContent>
 
