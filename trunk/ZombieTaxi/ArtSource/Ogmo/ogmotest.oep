@@ -1,0 +1,25 @@
+<project>
+	<name>Example Project</name>
+	<settings>
+		<defaultWidth>640</defaultWidth>
+		<defaultHeight>480</defaultHeight>
+		<maxWidth>999999</maxWidth>
+		<maxHeight>999999</maxHeight>
+		<workingDirectory>./gfx</workingDirectory>
+	</settings>
+	<tilesets>
+		<tileset name="bricks" image="tiles_bricks.png" tileWidth="16" tileHeight="16"/>
+		<tileset name="grass" image="tiles_grass.png" tileWidth="16" tileHeight="16"/>
+	</tilesets>
+	<objects>
+		<object name="ogmo" image="ogmo.png" width="16" height="16" limit="1"/>
+		<folder name="dangers">
+			<object name="spikes" image="spikes.png" width="16" height="16" resizableX="true" tile="true"/>
+		</folder>
+	</objects>	
+	<layers>
+		<grid name="floors" gridSize="16" exportAsObjects="true"/>
+		<objects name="actors" gridSize="16"/>
+		<tiles name="tilesAbove" gridSize="16" />
+	</layers>
+</project>

@@ -59,6 +59,10 @@
       <Project>{0E895839-448B-4495-8AAB-16DAC35B04FB}</Project>
       <Name>MBHEngineContentDefs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OgmoXNAPipeline4\OgmoXNAPipelineExtensions.csproj">
+      <Project>{EA08F2CC-6DE5-415D-B860-B0DA88E541D8}</Project>
+      <Name>OgmoXNAPipelineExtensions</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fonts\DebugDisplay.spritefont">

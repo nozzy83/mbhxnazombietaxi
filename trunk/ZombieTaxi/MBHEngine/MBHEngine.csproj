@@ -117,6 +117,7 @@
     <Compile Include="Code\Behaviour\BehaviourCreator.cs" />
     <Compile Include="Code\Behaviour\BehaviourMessage.cs" />
     <Compile Include="Code\Behaviour\FrameRateDisplay.cs" />
+    <Compile Include="Code\Behaviour\Level.cs" />
     <Compile Include="Code\Behaviour\SimulatedPhysics.cs" />
     <Compile Include="Code\Behaviour\SpriteRender.cs" />
     <Compile Include="Code\Behaviour\TileMapRender.cs" />
@@ -190,6 +191,10 @@
     <ProjectReference Include="..\MBHEngineContentDefs\MBHEngineContentDefs.csproj">
       <Project>{0E895839-448B-4495-8AAB-16DAC35B04FB}</Project>
       <Name>MBHEngineContentDefs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OgmoXNA4\OgmoXNA4.csproj">
+      <Project>{9A5B507A-5940-4737-95B3-621F618D4008}</Project>
+      <Name>OgmoXNA4</Name>
     </ProjectReference>
     <ProjectReference Include="Content\MBHEngineContent.contentproj">
       <Project>{6DEDFF34-2E03-4847-863A-F03EA03352CD}</Project>

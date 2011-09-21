@@ -243,6 +243,10 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.FrameRateDisplay(this, fileName);
                     }
+                case "MBHEngine.Code.Behaviour.Level":
+                    {
+                        return new MBHEngine.Behaviour.Level(this, fileName);
+                    }
                 default:
                     {
                         throw new Exception("Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
