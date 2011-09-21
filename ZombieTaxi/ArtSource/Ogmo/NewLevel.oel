@@ -1,0 +1,63 @@
+<level>
+  <width>640</width>
+  <height>480</height>
+  <actors>
+    <ogmo x="192" y="64"/>
+    <spikes x="208" y="64" width="16"/>
+    <spikes x="224" y="64" width="16"/>
+    <spikes x="240" y="64" width="48"/>
+  </actors>
+  <tilesAbove set="grass">
+    <tile tx="0" ty="0" x="192" y="80"/>
+    <tile tx="16" ty="0" x="208" y="80"/>
+    <tile tx="16" ty="0" x="224" y="80"/>
+    <tile tx="16" ty="0" x="240" y="80"/>
+    <tile tx="16" ty="0" x="256" y="80"/>
+    <tile tx="16" ty="0" x="272" y="80"/>
+    <tile tx="16" ty="0" x="288" y="80"/>
+    <tile tx="16" ty="0" x="304" y="80"/>
+    <tile tx="32" ty="0" x="320" y="80"/>
+    <tile tx="32" ty="16" x="320" y="96"/>
+    <tile tx="32" ty="16" x="320" y="112"/>
+    <tile tx="32" ty="16" x="320" y="128"/>
+    <tile tx="0" ty="16" x="192" y="96"/>
+    <tile tx="0" ty="16" x="192" y="112"/>
+    <tile tx="0" ty="16" x="192" y="128"/>
+    <tile tx="0" ty="32" x="192" y="144"/>
+    <tile tx="16" ty="32" x="208" y="144"/>
+    <tile tx="0" ty="16" x="224" y="160"/>
+    <tile tx="0" ty="16" x="224" y="176"/>
+    <tile tx="0" ty="32" x="224" y="192"/>
+    <tile tx="32" ty="32" x="240" y="192"/>
+    <tile tx="32" ty="16" x="240" y="176"/>
+    <tile tx="32" ty="16" x="240" y="160"/>
+    <tile tx="16" ty="16" x="224" y="144"/>
+    <tile tx="16" ty="16" x="240" y="144"/>
+    <tile tx="16" ty="32" x="256" y="144"/>
+    <tile tx="16" ty="32" x="272" y="144"/>
+    <tile tx="16" ty="32" x="288" y="144"/>
+    <tile tx="16" ty="32" x="304" y="144"/>
+    <tile tx="32" ty="32" x="320" y="144"/>
+    <tile tx="16" ty="16" x="208" y="96"/>
+    <tile tx="16" ty="16" x="224" y="96"/>
+    <tile tx="16" ty="16" x="240" y="96"/>
+    <tile tx="16" ty="16" x="256" y="96"/>
+    <tile tx="16" ty="16" x="272" y="96"/>
+    <tile tx="16" ty="16" x="288" y="96"/>
+    <tile tx="16" ty="16" x="304" y="96"/>
+    <tile tx="16" ty="16" x="304" y="112"/>
+    <tile tx="16" ty="16" x="304" y="128"/>
+    <tile tx="16" ty="16" x="288" y="128"/>
+    <tile tx="16" ty="16" x="272" y="128"/>
+    <tile tx="16" ty="16" x="256" y="128"/>
+    <tile tx="16" ty="16" x="240" y="128"/>
+    <tile tx="16" ty="16" x="224" y="128"/>
+    <tile tx="16" ty="16" x="208" y="128"/>
+    <tile tx="16" ty="16" x="208" y="112"/>
+    <tile tx="16" ty="16" x="224" y="112"/>
+    <tile tx="16" ty="16" x="240" y="112"/>
+    <tile tx="16" ty="16" x="256" y="112"/>
+    <tile tx="16" ty="16" x="272" y="112"/>
+    <tile tx="16" ty="16" x="288" y="112"/>
+  </tilesAbove>
+</level>

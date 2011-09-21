@@ -126,13 +126,18 @@
       <Project>{5DD5B096-5020-4604-9D07-0061D17E63E4}</Project>
       <Name>MBHEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OgmoXNA4\OgmoXNA4.csproj">
+      <Project>{9A5B507A-5940-4737-95B3-621F618D4008}</Project>
+      <Name>OgmoXNA4</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ZombieTaxiContentDefs\ZombieTaxiContentDefs.csproj">
       <Project>{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}</Project>
       <Name>ZombieTaxiContentDefs</Name>
     </ProjectReference>
     <ProjectReference Include="..\ZombieTaxiContent\ZombieTaxiContent.contentproj">
-      <Name>ZombieTaxiContent</Name>
+      <Name>ZombieTaxiContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
+      <Project>{0553F421-289D-4AB5-A3F5-5B5FB940CB3E}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

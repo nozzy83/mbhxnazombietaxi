@@ -67,6 +67,10 @@
       <Project>{0E895839-448B-4495-8AAB-16DAC35B04FB}</Project>
       <Name>MBHEngineContentDefs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OgmoXNAPipeline4\OgmoXNAPipelineExtensions.csproj">
+      <Project>{EA08F2CC-6DE5-415D-B860-B0DA88E541D8}</Project>
+      <Name>OgmoXNAPipelineExtensions</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gun\Arrow.png">
@@ -177,6 +181,41 @@
       <Name>Pellet</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Levels\Sample\SampleLevel.oel">
+      <Name>SampleLevel</Name>
+      <Importer>OelImporter</Importer>
+      <Processor>OelProcessor</Processor>
+      <ProcessorParameters_OgmoProjectFile>SampleProject.oep</ProcessorParameters_OgmoProjectFile>
+    </Compile>
+    <Compile Include="Levels\Sample\SampleProject.oep">
+      <Name>SampleProject</Name>
+      <Importer>OepImporter</Importer>
+      <Processor>OepProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Levels\Demo\Level1.oel">
+      <Name>Level1</Name>
+      <Importer>OelImporter</Importer>
+      <Processor>OelProcessor</Processor>
+      <ProcessorParameters_OgmoProjectFile>DemoProject.oep</ProcessorParameters_OgmoProjectFile>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Levels\Demo\DemoLevel.xml">
+      <Name>DemoLevel</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Levels\Demo\Behaviours\Level.xml">
+      <Name>Level</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

@@ -15,6 +15,8 @@ using MBHEngine.Input;
 using MBHEngine.Debug;
 using MBHEngine.Render;
 using ZombieTaxi.Behaviours;
+using OgmoXNA4;
+using MBHEngine.Behaviour;
 
 namespace ZombieTaxi
 {
@@ -115,6 +117,11 @@ namespace ZombieTaxi
             debugStatsDisplay.AttachBehaviour(fps);
             GameObjectManager.pInstance.Add(debugStatsDisplay);
 
+            GameObject level = new GameObject("Levels\\Demo\\DemoLevel");
+            //t = new Level(level, null);
+            //level.AttachBehaviour(t);
+            GameObjectManager.pInstance.Add(level);        
+
             GameObject player = new GameObject("Player\\Player");
             t = new TwinStick(player, null);
             player.AttachBehaviour(t);
@@ -129,6 +136,8 @@ namespace ZombieTaxi
 
             mVingetting = new GameObject("Vingette\\Vingette");
             //GameObjectManager.pInstance.Add(ving);
+
+            OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");    
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
