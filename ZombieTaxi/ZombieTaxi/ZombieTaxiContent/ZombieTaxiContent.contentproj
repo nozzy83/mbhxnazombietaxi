@@ -73,7 +73,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Sprites\Enviroments\" />
+    <Folder Include="Sprites\Environments\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Sprites\Items\HandGun.png">
