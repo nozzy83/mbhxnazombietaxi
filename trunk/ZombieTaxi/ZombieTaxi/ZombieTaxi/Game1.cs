@@ -117,27 +117,27 @@ namespace ZombieTaxi
             debugStatsDisplay.AttachBehaviour(fps);
             GameObjectManager.pInstance.Add(debugStatsDisplay);
 
-            GameObject level = new GameObject("Levels\\Demo\\DemoLevel");
+            GameObject level = new GameObject("GameObjects\\Levels\\Demo\\Demo");
             //t = new Level(level, null);
             //level.AttachBehaviour(t);
-            GameObjectManager.pInstance.Add(level);        
+            GameObjectManager.pInstance.Add(level);
 
-            GameObject player = new GameObject("Player\\Player");
+            GameObject player = new GameObject("GameObjects\\Characters\\Player\\Player");
             t = new TwinStick(player, null);
             player.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(player);
             // Store the player for easy access.
             GameObjectManager.pInstance.pPlayer = player;
 
-            GameObject enemy = new GameObject("Kamikaze\\Kamikaze");
+            GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
             t = new Kamikaze(enemy, null);
             enemy.AttachBehaviour( t );
             //GameObjectManager.pInstance.Add(enemy);
 
-            mVingetting = new GameObject("Vingette\\Vingette");
+            mVingetting = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
             //GameObjectManager.pInstance.Add(ving);
 
-            OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");    
+            //OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");    
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");

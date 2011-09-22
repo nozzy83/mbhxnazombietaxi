@@ -69,12 +69,12 @@ namespace ZombieTaxi.Behaviours
 
             for (Int16 i = 0; i < 100; i++)
             {
-                mBullets[i] = new GameObject("Bullet\\Bullet");
+                mBullets[i] = new GameObject("GameObjects\\Items\\Bullet\\Bullet");
                 mBullets[i].pDirection.mSpeed = 1.75f;
                 GameObjectManager.pInstance.Add(mBullets[i]);
             }
 
-            mGun = new GameObject("Gun\\Gun");
+            mGun = new GameObject("GameObjects\\Items\\Gun\\Gun");
             GameObjectManager.pInstance.Add(mGun);
             mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
             mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;

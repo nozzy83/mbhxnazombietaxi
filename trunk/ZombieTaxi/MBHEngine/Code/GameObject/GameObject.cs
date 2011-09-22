@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Storage;
 using MBHEngineContentDefs;
 using MBHEngine;
 using MBHEngine.Behaviour;
+using System.IO;
 
 namespace MBHEngine.GameObject
 {
@@ -132,7 +133,8 @@ namespace MBHEngine.GameObject
 
                 for (Int32 i = 0; i < def.mBehaviourFileNames.Count; i++)
                 {
-                    Behaviour.Behaviour temp = CreateBehaviourByName(def.mBehaviourClassNames[i], def.mBehaviourFileNames[i]);
+                    String goRootPath = System.IO.Path.GetDirectoryName(fileName);
+                    Behaviour.Behaviour temp = CreateBehaviourByName(def.mBehaviourClassNames[i], goRootPath + "\\Behaviours\\" + def.mBehaviourFileNames[i]);
                     mBehaviours.Add(temp);
                 }
             }
