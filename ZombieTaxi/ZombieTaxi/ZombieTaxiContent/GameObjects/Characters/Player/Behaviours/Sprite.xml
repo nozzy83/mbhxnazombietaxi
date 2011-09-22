@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\\Characters\\Commando</mSpriteFileName>
+    <mFrameHeight>16</mFrameHeight>
+    <mHasShadow>true</mHasShadow>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>10</mTicksPerFrame>
+        <mName>Idle</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>10</mNumFrames>
+      </Item>      
+      <Item>
+        <mTicksPerFrame>10</mTicksPerFrame>
+        <mName>Walk</mName>
+        <mStartingFrame>10</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+
