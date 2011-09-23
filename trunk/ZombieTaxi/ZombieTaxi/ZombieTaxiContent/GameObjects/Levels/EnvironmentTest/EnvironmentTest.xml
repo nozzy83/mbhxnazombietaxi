@@ -4,14 +4,14 @@
     <mRenderPriority>50</mRenderPriority>
     <mDoUpdate>true</mDoUpdate>
     <mDoRender>true</mDoRender>
-    <mPosition>320 240</mPosition>
+    <mPosition>0 0</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
     <mBehaviourFileNames>
-      <Item>Sprite</Item>
+      <Item>Level</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Code.Behaviour.Level</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

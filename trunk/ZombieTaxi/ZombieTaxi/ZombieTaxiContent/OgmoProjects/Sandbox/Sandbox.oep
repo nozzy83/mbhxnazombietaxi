@@ -1,0 +1,23 @@
+<project>
+	<name>Ogmo Editor Example Project</name>
+	<settings>
+		<defaultWidth>640</defaultWidth>
+		<defaultHeight>480</defaultHeight>
+		<minWidth>320</minWidth>
+		<minHeight>240</minHeight>
+		<maxWidth>8000</maxWidth>
+		<maxHeight>8000</maxHeight>
+    <workingDirectory>Sprites</workingDirectory>
+	</settings>
+	<values>
+		<string name="title" default="new level" maxChars="12" />
+	    <integer name="difficulty" default="1" min="1" max="5" />
+	</values>
+	<tilesets>
+		<tileset name="GreyStone" image="EnvironmentGrey.png" tileWidth="8" tileHeight="8" />
+	</tilesets>
+	<layers>
+		<grid name="collision" gridSize="8" exportAsObjects="false" />
+		<tiles name="environment" gridSize="8" drawGridSize="8" exportTileIDs="true"/>
+	</layers>
+</project>
