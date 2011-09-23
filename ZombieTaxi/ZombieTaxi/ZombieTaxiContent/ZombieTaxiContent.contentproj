@@ -151,6 +151,7 @@
       <Name>Sprite</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -182,11 +183,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OgmoProjects\Demo\Levels\Demo.oel">
-      <Name>Demo</Name>
+    <Compile Include="OgmoProjects\Demo\DemoLevel1.oel">
+      <Name>DemoLevel1</Name>
       <Importer>OelImporter</Importer>
       <Processor>OelProcessor</Processor>
-      <ProcessorParameters_OgmoProjectFile>../demo</ProcessorParameters_OgmoProjectFile>
+      <ProcessorParameters_OgmoProjectFile>Demo</ProcessorParameters_OgmoProjectFile>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
