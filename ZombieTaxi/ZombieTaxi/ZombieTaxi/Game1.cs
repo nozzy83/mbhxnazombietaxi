@@ -117,7 +117,7 @@ namespace ZombieTaxi
             debugStatsDisplay.AttachBehaviour(fps);
             GameObjectManager.pInstance.Add(debugStatsDisplay);
 
-            GameObject level = new GameObject("GameObjects\\Levels\\Demo\\Demo");
+            GameObject level = new GameObject("GameObjects\\Levels\\EnvironmentTest\\EnvironmentTest");
             //t = new Level(level, null);
             //level.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(level);

@@ -190,6 +190,28 @@
       <ProcessorParameters_OgmoProjectFile>Demo</ProcessorParameters_OgmoProjectFile>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OgmoProjects\Sandbox\EnvironmentTest.oel">
+      <Name>EnvironmentTest</Name>
+      <Importer>OelImporter</Importer>
+      <Processor>OelProcessor</Processor>
+      <ProcessorParameters_OgmoProjectFile>Sandbox</ProcessorParameters_OgmoProjectFile>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Levels\EnvironmentTest\Behaviours\Level.xml">
+      <Name>Level</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Levels\EnvironmentTest\EnvironmentTest.xml">
+      <Name>EnvironmentTest</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
