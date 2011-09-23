@@ -20,6 +20,7 @@ namespace OgmoXNA4
             this.Name = reader.ReadString();
             this.Texture = reader.ReadExternalReference<Texture2D>();
             this.TextureFile = reader.ReadString();
+            //this.Texture = reader.ContentManager.Load<Texture2D>(this.TextureFile);
             this.TileHeight = reader.ReadInt32();
             this.TileWidth = reader.ReadInt32();
             if (this.Texture != null)

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.LevelDefinition">
-    <mOgmoLevel>OgmoProjects\\Demo\\Levels\\Demo</mOgmoLevel>
+    <mOgmoLevel>OgmoProjects\\Demo\\DemoLevel1</mOgmoLevel>
     <mGridLayer>floors</mGridLayer>
     <mTileLayers>
       <Item>
