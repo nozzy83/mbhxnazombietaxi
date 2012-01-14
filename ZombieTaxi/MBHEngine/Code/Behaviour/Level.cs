@@ -18,70 +18,11 @@ namespace MBHEngine.Behaviour
     public class Level : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
-        /// A single square of the world.  This seems to duplicate a lot of the logic of the 
-        /// sprite behaviour so it should probably be converted over at some point.
-        /// </summary>
-        class Tile
-        {
-            /// <summary>
-            /// This implementation of Levels is heavily based on the Ogmo editor, so
-            /// we rely directly on some of its data structures.  This structure contains
-            /// information and content for all the tilesets in this level.
-            /// </summary>
-            private OgmoTileset mTileSet;
-
-            /// <summary>
-            /// The position of this tile in world coordinates.
-            /// </summary>
-            public Vector2 mPosition;
-
-            /// <summary>
-            /// Rectangle defining where on the source texture this tile should render from.
-            /// </summary>
-            public Rectangle mSource;
-
-            /// <summary>
-            /// The texture used for this tile.
-            /// </summary>
-            public Texture2D mTexture;
-
-            /// <summary>
-            /// The colour applied to the texture.
-            /// </summary>
-            public Color mTint;
-
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            /// <param name="tile">The tile as read in from the Ogmo library.</param>
-            /// <param name="useSourceIndex">Not sure.</param>
-            public Tile(OgmoTile tile, bool useSourceIndex)
-            {
-                mTint = Color.White;
-                mPosition = tile.Position;
-                mTileSet = tile.Tileset;
-                mTexture = mTileSet.Texture;
-
-                if (useSourceIndex)
-                    mSource = mTileSet.Sources[tile.SourceIndex];
-                else
-                    mSource = new Rectangle(tile.TextureOffset.X,
-                        tile.TextureOffset.Y,
-                        mTileSet.TileWidth,
-                        mTileSet.TileHeight);
-            }
-        };
-
-        /// <summary>
-        /// All the tiles that make up this level.  This includes multiple layers all concatinated into
-        /// a single list.
-        /// </summary>
-        List<Tile> mTiles = new List<Tile>();
-
-        /// <summary>
         /// Collision information for this level.
         /// </summary>
         Int32[,] mCollisionGrid;
+
+        Texture2D debugTexture;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -102,26 +43,16 @@ namespace MBHEngine.Behaviour
         {
             LevelDefinition def = GameObjectManager.pInstance.pContentManager.Load<LevelDefinition>(fileName);
 
-            // Load the actual level file.
-            OgmoLevel level = GameObjectManager.pInstance.pContentManager.Load<OgmoLevel>(def.mOgmoLevel);
+            mCollisionGrid = new Int32[80, 60];
 
-            // Get the loaded grid data and use it for a collision layer.
-            mCollisionGrid = level.GetLayer<OgmoGridLayer>(def.mGridLayer).RawData;
+            mCollisionGrid[40, 28] = 1;
+            mCollisionGrid[40, 29] = 1;
+            mCollisionGrid[40, 30] = 1;
+            mCollisionGrid[41, 30] = 1;
+            mCollisionGrid[42, 30] = 1;
 
-            // Loop through all the layers and add them to the tiles array.  Multiple layers get added to the same
-            // List because they have no impact on each other; it's just a list of things to draw.
-            for (Int32 i = 0; i < def.mTileLayers.Count; i++)
-            {
-                // Cache this stuff ahead of time to simplify code.
-                Int32 count = level.GetLayer<OgmoTileLayer>(def.mTileLayers[i].mName).Tiles.Count<OgmoTile>();
-                OgmoTile[] tiles = level.GetLayer<OgmoTileLayer>(def.mTileLayers[i].mName).Tiles;
-                Boolean useIndex = def.mTileLayers[i].mUsesTextureIndex;
-
-                for (Int32 j = 0; j < count; j++)
-                {
-                    mTiles.Add(new Tile(tiles[j], useIndex));
-                }
-            }
+            debugTexture = new Texture2D(GameObjectManager.pInstance.pGraphicsDevice, 1, 1);
+            debugTexture.SetData(new Color[] { Color.White });
 
             base.LoadContent(fileName);
         }
@@ -132,10 +63,15 @@ namespace MBHEngine.Behaviour
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
-            for (int i = 0; i < mTiles.Count; i++)
+            for (Int32 y = 0; y < 60; y++)
             {
-                Tile tile = mTiles[i];
-                batch.Draw(tile.mTexture, tile.mPosition, tile.mSource, tile.mTint);
+                for (Int32 x = 0; x < 80; x++)
+                {
+                    if (mCollisionGrid[x, y] != 0)
+                    {
+                        batch.Draw(debugTexture, new Rectangle(x * 8, y * 8, 8, 8), Color.Black);
+                    }
+                }
             }
         }
     }
