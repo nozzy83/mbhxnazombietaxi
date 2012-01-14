@@ -118,6 +118,7 @@
     <Compile Include="Code\Behaviour\BehaviourMessage.cs" />
     <Compile Include="Code\Behaviour\FrameRateDisplay.cs" />
     <Compile Include="Code\Behaviour\Level.cs" />
+    <Compile Include="Code\Behaviour\OgmoRender.cs" />
     <Compile Include="Code\Behaviour\SimulatedPhysics.cs" />
     <Compile Include="Code\Behaviour\SpriteRender.cs" />
     <Compile Include="Code\Behaviour\TileMapRender.cs" />
