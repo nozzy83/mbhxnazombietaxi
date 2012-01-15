@@ -51,6 +51,11 @@ namespace MBHEngine.Render
         private Single mCurBlendFrames;
 
         /// <summary>
+        /// The amount of zoom to scale the camera shot by.  1 means default zoom, higher numbers mean more zoomed in.
+        /// </summary>
+        private Single mZoomAmount;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         private CameraManager()
@@ -62,6 +67,8 @@ namespace MBHEngine.Render
 
             mBlendFrames = 10;
             mScreenCenter = Matrix.CreateTranslation(640, 360, 0);
+
+            mZoomAmount = 8.0f;
 
             mTransform =
                 Matrix.CreateTranslation(-new Vector3(0f, 0f, 0.0f)) *
@@ -86,7 +93,7 @@ namespace MBHEngine.Render
             mTransform =
                 Matrix.CreateTranslation(-new Vector3(mTargetPosition, 0.0f)) * // change this to curPos to bring back blend
                 //Matrix.CreateRotationZ(Rotation) *
-                Matrix.CreateScale(new Vector3(8.0f, 8.0f, 8.0f)) *
+                Matrix.CreateScale(new Vector3(mZoomAmount)) *
                 //Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1.0f)) *
                 mScreenCenter;
         }
@@ -144,6 +151,18 @@ namespace MBHEngine.Render
             get
             {
                 return new Vector2(mScreenCenter.Translation.X, mScreenCenter.Translation.Y);
+            }
+        }
+
+        public Single pZoomScale
+        {
+            get
+            {
+                return mZoomAmount;
+            }
+            set
+            {
+                mZoomAmount = value;
             }
         }
     }

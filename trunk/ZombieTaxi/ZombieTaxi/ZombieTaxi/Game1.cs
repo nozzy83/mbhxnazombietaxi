@@ -43,7 +43,7 @@ namespace ZombieTaxi
         /// Graphic for the vingette.
         /// </summary>
         GameObject mVingetting;
-
+        
         /// <summary>
         /// Constuctor
         /// </summary>
@@ -137,7 +137,7 @@ namespace ZombieTaxi
             mVingetting = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
             //GameObjectManager.pInstance.Add(ving);
 
-            //OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");    
+            //OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
@@ -173,6 +173,10 @@ namespace ZombieTaxi
             PhysicsManager.pInstance.Update(gameTime);
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
+            DebugShapeDisplay.pInstance.Update();
+
+            DebugShapeDisplay.pInstance.AddSegment(new Vector2(0, 0), new Vector2(32, 32), Color.Black);
+            DebugShapeDisplay.pInstance.AddSolidCircle(new Vector2(0.0f, 0.0f), 8, new Vector2(1, 0), Color.Magenta);
 
             base.Update(gameTime);
         }
@@ -205,6 +209,8 @@ namespace ZombieTaxi
             mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
             DebugMessageDisplay.pInstance.Render(mSpriteBatch);
             mSpriteBatch.End();
+
+            DebugShapeDisplay.pInstance.Render();
 
             base.Draw(gameTime);
         }

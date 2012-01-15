@@ -122,6 +122,10 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Box2D.XNA\Box2D.XNA.csproj">
+      <Project>{22791486-E721-4511-AA4B-DA26CF5D0F2E}</Project>
+      <Name>Box2D.XNA</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\MBHEngine\MBHEngine.csproj">
       <Project>{5DD5B096-5020-4604-9D07-0061D17E63E4}</Project>
       <Name>MBHEngine</Name>
