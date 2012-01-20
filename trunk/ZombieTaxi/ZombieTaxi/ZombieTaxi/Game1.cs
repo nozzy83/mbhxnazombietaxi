@@ -17,6 +17,7 @@ using MBHEngine.Render;
 using ZombieTaxi.Behaviours;
 using OgmoXNA4;
 using MBHEngine.Behaviour;
+using MBHEngine.World;
 
 namespace ZombieTaxi
 {
@@ -112,15 +113,12 @@ namespace ZombieTaxi
             bg.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(bg);
 
+            WorldManager.pInstance.Initialize();
+
             GameObject debugStatsDisplay = new GameObject();
             MBHEngine.Behaviour.Behaviour fps = new MBHEngine.Behaviour.FrameRateDisplay(debugStatsDisplay, null);
             debugStatsDisplay.AttachBehaviour(fps);
             GameObjectManager.pInstance.Add(debugStatsDisplay);
-
-            GameObject level = new GameObject("GameObjects\\Levels\\EnvironmentTest\\EnvironmentTest");
-            //t = new Level(level, null);
-            //level.AttachBehaviour(t);
-            GameObjectManager.pInstance.Add(level);
 
             GameObject player = new GameObject("GameObjects\\Characters\\Player\\Player");
             t = new TwinStick(player, null);
@@ -175,8 +173,10 @@ namespace ZombieTaxi
             CameraManager.pInstance.Update(gameTime);
             DebugShapeDisplay.pInstance.Update();
 
-            DebugShapeDisplay.pInstance.AddSegment(new Vector2(0, 0), new Vector2(32, 32), Color.Black);
-            DebugShapeDisplay.pInstance.AddSolidCircle(new Vector2(0.0f, 0.0f), 8, new Vector2(1, 0), Color.Magenta);
+            //DebugShapeDisplay.pInstance.AddSegment(new Vector2(0, 0), new Vector2(32, 32), Color.Black);
+            //DebugShapeDisplay.pInstance.AddSolidCircle(new Vector2(0.0f, 0.0f), 8, new Vector2(1, 0), Color.Magenta);
+            //DebugShapeDisplay.pInstance.AddTransform(new Vector2(0.0f, 0.0f));
+            //DebugShapeDisplay.pInstance.AddAABB(new Vector2(32.0f, 32.0f), 8.0f, 16.0f, Color.Green);
 
             base.Update(gameTime);
         }

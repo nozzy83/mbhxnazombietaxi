@@ -11,6 +11,7 @@ using MBHEngine.Debug;
 using MBHEngine.Math;
 using MBHEngine.Render;
 using MBHEngine.Behaviour;
+using MBHEngine.World;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -42,6 +43,7 @@ namespace ZombieTaxi.Behaviours
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
         private SpriteRender.GetSpriteEffectsMessage mGetSpriteFxMsg;
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
+        private Level.CheckForCollisionMessage mLevelCollisionMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -78,11 +80,12 @@ namespace ZombieTaxi.Behaviours
             GameObjectManager.pInstance.Add(mGun);
             mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
             mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
-            mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
+            //mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
+            mLevelCollisionMsg = new Level.CheckForCollisionMessage();
         }
 
         /// <summary>
@@ -94,6 +97,9 @@ namespace ZombieTaxi.Behaviours
             // Grab the current state of the gamepad.
             GamePadState g = InputManager.pInstance.pActiveGamePadState;
 
+            // Store the original position prior to polling any input for use with collision reactions.
+            Vector2 origPos = mParentGOH.pOrientation.mPosition;
+
             // The character will move at this rate in the direction of the Left Analog Stick.
             Vector2 dir1 = new Vector2(mMoveSpeed, -mMoveSpeed);
             dir1 *= g.ThumbSticks.Left;
@@ -104,7 +110,7 @@ namespace ZombieTaxi.Behaviours
             if (dir1.X != 0.0f)
             {
                 mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
-                mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
+                //mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
             }
 
             // Flip the sprite to face the direction that we are moving.
@@ -230,7 +236,40 @@ namespace ZombieTaxi.Behaviours
                     mCurrentBullet = 0;
                 }
             }
-            
+
+            mLevelCollisionMsg.mDesiredRect = new Microsoft.Xna.Framework.Rectangle((Int32)Math.Round(mParentGOH.pOrientation.mPosition.X) - 4,
+                                                           (Int32)Math.Round(mParentGOH.pOrientation.mPosition.Y) - 4,
+                                                           8, 8);
+            mLevelCollisionMsg.mOriginalRect = new Microsoft.Xna.Framework.Rectangle((Int32)Math.Round(origPos.X) - 4,
+                                                           (Int32)Math.Round(origPos.Y) - 4,
+                                                           8, 8);
+            mLevelCollisionMsg.mDesiredPos = mParentGOH.pOrientation.mPosition;
+            mLevelCollisionMsg.mOriginalPos = origPos;
+            DebugShapeDisplay.pInstance.AddAABB(mParentGOH.pOrientation.mPosition, 8, 8, Color.Green);
+            WorldManager.pInstance.pCurrentLevel.OnMessage(mLevelCollisionMsg);
+
+            if (mLevelCollisionMsg.mCollisionDetected)
+            {
+                DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected");
+
+                if (mLevelCollisionMsg.mCollisionDetectedX)
+                {
+                    DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected X");
+                    if (mParentGOH.pOrientation.mPosition.X > origPos.X || mParentGOH.pOrientation.mPosition.X < origPos.X)
+                    {
+                        mParentGOH.pOrientation.mPosition.X = origPos.X;
+                    }
+                }
+                if (mLevelCollisionMsg.mCollisionDetectedY)
+                {
+                    DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected Y");
+                    if (mParentGOH.pOrientation.mPosition.Y > origPos.Y || mParentGOH.pOrientation.mPosition.Y < origPos.Y)
+                    {
+                        mParentGOH.pOrientation.mPosition.Y = origPos.Y;
+                    }
+                }
+            }
+
             CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
         }
 

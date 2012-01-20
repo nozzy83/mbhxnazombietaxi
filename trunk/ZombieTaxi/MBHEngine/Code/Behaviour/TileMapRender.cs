@@ -142,7 +142,7 @@ namespace MBHEngine.Behaviour
 
                 batch.Draw(mTexture,
                            pos,
-                           new Rectangle(x * mSourceWidth, y * mSourceHeight, mSourceWidth, mSourceHeight),
+                           new Microsoft.Xna.Framework.Rectangle(x * mSourceWidth, y * mSourceHeight, mSourceWidth, mSourceHeight),
                            Color.White,
                            mParentGOH.pOrientation.mRotation,
                            new Vector2(mSourceWidth * 0.5f, mSourceHeight * 0.5f),

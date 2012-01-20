@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework;
 
 namespace MBHEngineContentDefs
 {
@@ -51,6 +52,12 @@ namespace MBHEngineContentDefs
         /// </summary>
         [ContentSerializer(Optional = true)]
         public Boolean mHasShadow;
+
+        /// <summary>
+        /// The offset that the objects origin can be found.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Vector2 mMotionRoot;
 
         /// <summary>
         /// A list of all the animations contained in this sprite set.
