@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
+using MBHEngine.Debug;
 //using dreambuildplay2010.Code.Utilities;
 //using dreambuildplay2010.Code.Game.GameStates;
 
@@ -250,6 +251,8 @@ namespace MBHEngine.GameObject
                 if (mGameObjects[i].pDoRender == true)
                 {
                     mGameObjects[i].Render(batch);
+
+                    DebugShapeDisplay.pInstance.AddTransform(mGameObjects[i].pOrientation.mPosition);
                 }
             }
         }

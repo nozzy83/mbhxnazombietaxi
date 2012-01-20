@@ -2,6 +2,7 @@
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
     <mSpriteFileName>Sprites\\Items\\HandGun</mSpriteFileName>
+    <mMotionRoot>3 1.5</mMotionRoot>
   </Asset>
 </XnaContent>
 

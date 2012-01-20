@@ -24,7 +24,7 @@ namespace MBHEngine.Math
         /// <summary>
         /// This world is where all the simulation is done.
         /// </summary>
-        private World mPhysicsWorld;
+        private Box2D.XNA.World mPhysicsWorld;
 
         /// <summary>
         /// Used for the debug rendering of the Box2D simulation.
@@ -42,7 +42,7 @@ namespace MBHEngine.Math
         /// </summary>
         public PhysicsManager()
         {
-            mPhysicsWorld = new World(new Vector2(0, 10.0f), true);
+            mPhysicsWorld = new Box2D.XNA.World(new Vector2(0, 10.0f), true);
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace MBHEngine.Math
         /// <summary>
         /// Allow others access to the box 2d world object to reduce the number of wrappers needed.
         /// </summary>
-        public World pWorld
+        public Box2D.XNA.World pWorld
         {
             get
             {

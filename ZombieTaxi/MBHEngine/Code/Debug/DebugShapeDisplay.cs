@@ -204,19 +204,18 @@ namespace MBHEngine.Debug
             mLineCount++;
         }
 
-        /*
-        public void DrawTransform(ref Transform xf)
+        /// <summary>
+        /// Draws a simple cross to represent a transform in the world.
+        /// </summary>
+        /// <param name="rootPosition">Position of the Object.</param>
+        public void AddTransform(Vector2 rootPosition)
         {
-            float axisScale = 0.4f;
-            Vector2 p1 = xf.Position;
-            
-            Vector2 p2 = p1 + axisScale * xf.R.col1;
-            DrawSegment(p1, p2, Color.Red);
-
-            p2 = p1 + axisScale * xf.R.col2;
-            DrawSegment(p1, p2, Color.Green);
+            Single length = 2.0f;
+            Single offsetX = rootPosition.X + length;
+            Single offsetY = rootPosition.Y - length;
+            AddSegment(rootPosition, new Vector2(offsetX, rootPosition.Y), Color.Red);
+            AddSegment(rootPosition, new Vector2(rootPosition.X, offsetY), Color.Blue);
         }
-        */
 
         /// <summary>
         /// Draws a dot.
@@ -234,6 +233,31 @@ namespace MBHEngine.Debug
             verts[3] = p + new Vector2(-hs,  hs);
 
             AddSolidPolygon(verts, 4, color, true);
+        }
+
+        /// <summary>
+        /// Draws an axis-align bounding box.
+        /// </summary>
+        /// <param name="position">Center point of the box.</param>
+        /// <param name="width">The full width of the box from far left to far right.</param>
+        /// <param name="height">The full height of the box from the bottom to the top.</param>
+        /// <param name="color">The color to use when rendering the box.</param>
+        public void AddAABB(Vector2 position, Single width, Single height, Color color)
+        {
+            Single widthHalf = width * 0.5f;
+            Single heightHalf = height * 0.5f;
+            Single left = position.X - widthHalf;
+            Single right = position.X + widthHalf;
+            Single top = position.Y - heightHalf;
+            Single bottom = position.Y + heightHalf;
+
+            Vector2[] verts = new Vector2[8];
+            verts[0] = new Vector2(left, bottom);
+            verts[1] = new Vector2(left, top);
+            verts[2] = new Vector2(right, top);
+            verts[3] = new Vector2(right, bottom);
+
+            AddSolidPolygon(verts, 4, color);
         }
 
         /// <summary>
@@ -280,19 +304,6 @@ namespace MBHEngine.Debug
             // Reset the used verticies for the next frame.
             mLineCount = mFillCount = 0;
         }
-        
-        /*
-        public void DrawAABB(ref AABB aabb, Color color)
-        {
-            Vector2[] verts = new Vector2[8];
-            verts[0] = new Vector2(aabb.lowerBound.X, aabb.lowerBound.Y);
-            verts[1] = new Vector2(aabb.upperBound.X, aabb.lowerBound.Y);
-            verts[2] = new Vector2(aabb.upperBound.X, aabb.upperBound.Y);
-            verts[3] = new Vector2(aabb.lowerBound.X, aabb.upperBound.Y);
-
-            DrawPolygon(ref verts, 4, color);
-        }
-        */
 
         /// <summary>
         /// Access to the single instance of the class.

@@ -131,10 +131,12 @@
     <Compile Include="Code\IO\DatabaseManager.cs" />
     <Compile Include="Code\Math\PhysicsManager.cs" />
     <Compile Include="Code\Math\RandomManager.cs" />
+    <Compile Include="Code\Math\Rectangle.cs" />
     <Compile Include="Code\Render\CameraManager.cs" />
     <Compile Include="Code\Render\DebugDrawBox2D.cs" />
     <Compile Include="Code\Render\DebugDrawBox2DSpritePoly.cs" />
     <Compile Include="Code\Render\DebugSpritePoly.cs" />
+    <Compile Include="Code\World\WorldManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
