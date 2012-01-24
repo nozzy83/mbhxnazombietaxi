@@ -152,6 +152,16 @@ namespace MBHEngine.GameObject
             // Keep track of how many objects were updated this frame.
             int count = 0;
 
+            // Some behaviours require some logic to be done prior to the standard update.  This is their chance.
+            //
+            for (int i = 0; i < mGameObjects.Count; i++)
+            {
+                if (mGameObjects[i].pDoUpdate)
+                {
+                    mGameObjects[i].PreUpdate(gameTime);
+                }
+            }
+
             // First update every object we are managing.
             //
             for (int i = 0; i < mGameObjects.Count; i++)
@@ -162,6 +172,16 @@ namespace MBHEngine.GameObject
                 }
 
                 count++;
+            }
+
+            // A final chance to update behaviours after all the updates have been completed.
+            //
+            for (int i = 0; i < mGameObjects.Count; i++)
+            {
+                if (mGameObjects[i].pDoUpdate)
+                {
+                    mGameObjects[i].PostUpdate(gameTime);
+                }
             }
 
             //DebugMessageDisplay.pInstance.AddDynamicMessage("Updated " + count + " GameObjects");

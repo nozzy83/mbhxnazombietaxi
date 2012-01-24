@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.GameObject;
 using MBHEngine.Render;
+using MBHEngine.Math;
 
 namespace MBHEngine.Debug
 {
@@ -205,6 +206,16 @@ namespace MBHEngine.Debug
         }
 
         /// <summary>
+        /// Draws a line between 2 points.
+        /// </summary>
+        /// <param name="line">The line to draw.</param>
+        /// <param name="color">The color of the line.</param>
+        public void AddSegment(LineSegment line, Color color)
+        {
+            AddSegment(line.pPointA, line.pPointB, color);
+        }
+
+        /// <summary>
         /// Draws a simple cross to represent a transform in the world.
         /// </summary>
         /// <param name="rootPosition">Position of the Object.</param>
@@ -261,9 +272,35 @@ namespace MBHEngine.Debug
         }
 
         /// <summary>
+        /// Draws an axis-aligned rectangle.
+        /// </summary>
+        /// <param name="box">Rectangle to render.</param>
+        /// <param name="color">The color to render it as.</param>
+        public void AddAABB(Math.Rectangle box, Color color)
+        {
+            Vector2[] verts = new Vector2[8];
+            verts[0] = new Vector2(box.pLeft, box.pBottom);
+            verts[1] = new Vector2(box.pLeft, box.pTop);
+            verts[2] = new Vector2(box.pRight, box.pTop);
+            verts[3] = new Vector2(box.pRight, box.pBottom);
+
+            AddSolidPolygon(verts, 4, color);
+        }
+
+        /// <summary>
         /// Call this once per frame.
         /// </summary>
+        /// <remarks>This needs to be called before anything is added this frame.</remarks>
         public void Update()
+        {
+            // Reset the used verticies for the next frame.
+            mLineCount = mFillCount = 0;
+        }
+
+        /// <summary>
+        /// Call to render all the currently pending debug shapes.
+        /// </summary>
+        public void Render()
         {
             GraphicsDevice device = GameObjectManager.pInstance.pGraphicsDevice;
 
@@ -282,16 +319,9 @@ namespace MBHEngine.Debug
             projectionMatrix *= Matrix.CreateScale(new Vector3(CameraManager.pInstance.pZoomScale));
 
             mSimpleColorEffect.Projection = projectionMatrix;
-        }
 
-        /// <summary>
-        /// Call to render all the currently pending debug shapes.
-        /// </summary>
-        public void Render()
-        {
             mSimpleColorEffect.Techniques[0].Passes[0].Apply();
 
-            GraphicsDevice device = GameObjectManager.pInstance.pGraphicsDevice;
             device.RasterizerState = RasterizerState.CullNone;
             device.BlendState = BlendState.AlphaBlend;
             
@@ -300,9 +330,6 @@ namespace MBHEngine.Debug
             
             if (mLineCount > 0)
                 device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.LineList, mVertsLines, 0, mLineCount);
-
-            // Reset the used verticies for the next frame.
-            mLineCount = mFillCount = 0;
         }
 
         /// <summary>

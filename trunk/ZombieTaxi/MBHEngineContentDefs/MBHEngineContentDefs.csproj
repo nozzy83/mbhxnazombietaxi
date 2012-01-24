@@ -118,6 +118,7 @@
     <Compile Include="Behaviour\OgmoRenderDefinition.cs" />
     <Compile Include="Behaviour\SimulatedPhysicsDefinition.cs" />
     <Compile Include="Behaviour\SpriteRenderDefinition.cs" />
+    <Compile Include="Behaviour\TileCollisionDefinition.cs" />
     <Compile Include="Behaviour\TileMapRenderDefinition.cs" />
     <Compile Include="GameObject\GameObjectDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

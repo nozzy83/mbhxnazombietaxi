@@ -121,6 +121,7 @@
     <Compile Include="Code\Behaviour\OgmoRender.cs" />
     <Compile Include="Code\Behaviour\SimulatedPhysics.cs" />
     <Compile Include="Code\Behaviour\SpriteRender.cs" />
+    <Compile Include="Code\Behaviour\TileCollision.cs" />
     <Compile Include="Code\Behaviour\TileMapRender.cs" />
     <Compile Include="Code\Debug\DebugMessageDisplay.cs" />
     <Compile Include="Code\Debug\DebugShapeDisplay.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Code\Input\InputManager.cs" />
     <Compile Include="Code\IO\CommandLineManager.cs" />
     <Compile Include="Code\IO\DatabaseManager.cs" />
+    <Compile Include="Code\Math\LineSegment.cs" />
     <Compile Include="Code\Math\PhysicsManager.cs" />
     <Compile Include="Code\Math\RandomManager.cs" />
     <Compile Include="Code\Math\Rectangle.cs" />
