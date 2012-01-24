@@ -23,13 +23,40 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class CheckForCollisionMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Was a collision detected at all.
+            /// </summary>
             public Boolean mCollisionDetected;
+
+            /// <summary>
+            /// Was a collision detected n the X direction specifically.
+            /// </summary>
             public Boolean mCollisionDetectedX;
+
+            /// <summary>
+            /// Was a collision detect in the Y direction specifically.
+            /// </summary>
             public Boolean mCollisionDetectedY;
-            public Rectangle mOriginalRect;
-            public Vector2 mOriginalPos;
-            public Rectangle mDesiredRect;
-            public Vector2 mDesiredPos;
+
+            /// <summary>
+            /// At what point did the collision occur in the X (if one did occur).
+            /// </summary>
+            public Single mCollisionPointX;
+
+            /// <summary>
+            /// At what point did the collision occur in the Y (if one did occur).
+            /// </summary>
+            public Single mCollisionPointY;
+
+            /// <summary>
+            /// The collision volume representing when the object started at the begining of this movement.
+            /// </summary>
+            public MBHEngine.Math.Rectangle mOriginalRect;
+
+            /// <summary>
+            /// The collision volume representing where the object is trying to reach.
+            /// </summary>
+            public MBHEngine.Math.Rectangle mDesiredRect;
         };
 
         /// <summary>
@@ -37,6 +64,9 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class Tile
         {
+            /// <summary>
+            /// The different types of walls that a tile can have.  Basically the different sides.
+            /// </summary>
             public enum WallTypes
             {
                 None = 0,
@@ -45,7 +75,17 @@ namespace MBHEngine.Behaviour
                 Bottom = 4,
                 Left = 8,
             };
+
+            /// <summary>
+            /// The type of tile this is.
+            /// </summary>
+            /// <remarks>Right now this is just 0 (not solid), 1 (solid), 2 (temp - solid with collision)</remarks>
             public Int32 mType = 0;
+
+            /// <summary>
+            /// Bits representing while walls this tile can have.  & it with a WallType to determine
+            /// if it has a particular wall.
+            /// </summary>
             public WallTypes mActiveWalls = WallTypes.None;
         }
 
@@ -98,10 +138,12 @@ namespace MBHEngine.Behaviour
         {
             LevelDefinition def = GameObjectManager.pInstance.pContentManager.Load<LevelDefinition>(fileName);
 
+            // TODO: This should be loaded in from the def.
             mMapWidth = 20;
             mMapHeight = 20;
             mTileWidth = mTileHeight = 8;
 
+            // Start by creating all the tiles for this level.
             mCollisionGrid = new Tile[mMapWidth, mMapHeight];
             for (Int32 y = 0; y < mMapHeight; y++)
             {
@@ -111,7 +153,7 @@ namespace MBHEngine.Behaviour
                 }
             }
 
-            //mCollisionGrid[0, 0] = 1;
+            // TODO: The map data should be read in from the level def.
             mCollisionGrid[0, 1].mType = 1;
             mCollisionGrid[1, 1].mType = 1;
             mCollisionGrid[1, 0].mType = 1;
@@ -120,13 +162,17 @@ namespace MBHEngine.Behaviour
             mCollisionGrid[4, 5].mType = 1;
             mCollisionGrid[4, 7].mType = 1;
             mCollisionGrid[5, 5].mType = 1;
-            mCollisionGrid[5, 7].mType = 1;
+            mCollisionGrid[6, 7].mType = 1;
 
             mCollisionGrid[4, 10].mType = 1;
             mCollisionGrid[6, 10].mType = 1;
             mCollisionGrid[4, 11].mType = 1;
             mCollisionGrid[6, 11].mType = 1;
             mCollisionGrid[5, 12].mType = 1;
+            
+            // Loop through all the tiles and calculate which sides need to have collision checks done on it.
+            // For example if a tile has another tile directly above it, it does not need to check collision 
+            // on the top side, because it is not reachable.
             for (Int32 y = 0; y < mMapHeight; y++)
             {
                 for (Int32 x = 0; x < mMapWidth; x++)
@@ -145,6 +191,7 @@ namespace MBHEngine.Behaviour
                 }
             }
 
+            // A debug texture used for rendering to blocks.
             debugTexture = new Texture2D(GameObjectManager.pInstance.pGraphicsDevice, 1, 1);
             debugTexture.SetData(new Color[] { Color.White });
 
@@ -225,10 +272,10 @@ namespace MBHEngine.Behaviour
                 Level.CheckForCollisionMessage temp = (Level.CheckForCollisionMessage)msg;
                 temp.mCollisionDetected = CheckForCollision(temp.mOriginalRect,
                                                             temp.mDesiredRect,
-                                                            temp.mOriginalPos,
-                                                            temp.mDesiredPos,
                                                             out temp.mCollisionDetectedX,
-                                                            out temp.mCollisionDetectedY);
+                                                            out temp.mCollisionDetectedY,
+                                                            out temp.mCollisionPointX,
+                                                            out temp.mCollisionPointY);
                 msg = temp;
             }
             else
@@ -243,48 +290,96 @@ namespace MBHEngine.Behaviour
             return msg;
         }
 
-        private Boolean CheckForCollision(Rectangle startRect, Rectangle endRect, Vector2 start, Vector2 end, out Boolean collideX, out Boolean collideY)
+        /// <summary>
+        /// Does a collision check between every tile in the level and a specified rectangle.  Requires
+        /// both the starting position and the desired position, so that it can figure out details about
+        /// how it collided with different tiles.
+        /// </summary>
+        /// <param name="startRect">The location of this collision rect at the start of this movement.</param>
+        /// <param name="endRect">The rectangle representing the final position that it is trying to get to.</param>
+        /// <param name="collideX">Did this check yield a collision in the X direction?</param>
+        /// <param name="collideY">Did this check yield a collision in the Y direction?</param>
+        /// <param name="collidePointX">Where did the X collision happen (if it did)?</param>
+        /// <param name="collidePointY">Where did the Y collision happen (if it did)?</param>
+        /// <returns></returns>
+        private Boolean CheckForCollision(MBHEngine.Math.Rectangle startRect, 
+            MBHEngine.Math.Rectangle endRect, 
+            out Boolean collideX, 
+            out Boolean collideY,
+            out Single collidePointX,
+            out Single collidePointY)
         {
-            Vector2 dir = end - start;
+            // Which direction is this thing heading?
+            // Needed to determine which walls to check against (eg. no need to check left wall if we are moving left).
+            Vector2 dir = endRect.pCenterPoint - startRect.pCenterPoint;
 
+            // Start by assuming no collisions occured.
             Boolean hit = false;
             collideX = false;
             collideY = false;
+            collidePointX = collidePointY = 0;
 
+            // Loop through every time checking for collisions.
             for (Int32 y = 0; y < mMapHeight; y++)
             {
                 for (Int32 x = 0; x < mMapWidth; x++)
                 {
+                    // Is this tile solid and does it have any active walls?
+                    // It may be solid with no walls in the case of one completly surrounded.
                     if (mCollisionGrid[x, y].mType == 1 && mCollisionGrid[x,y].mActiveWalls != Tile.WallTypes.None)
                     {
-                        Rectangle tileRect = new Rectangle(x * mTileWidth, y * mTileHeight, mTileWidth, mTileHeight);
+                        // Calculate the center point of the tile.
+                        Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));
+
+                        // Create a rectangle to represent the tile.
+                        MBHEngine.Math.Rectangle tileRect = new MBHEngine.Math.Rectangle(mTileWidth, mTileHeight, cent);
+
+                        // Does the place we are trying to move to intersect with the tile? 
                         if (tileRect.Intersects(endRect))
                         {
+                            // If we are moving right, and we hit a tile with a left wall...
+                            // And we started with the right most part of the collision rect outside of the tile...
                             if (dir.X > 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Left) != Tile.WallTypes.None &&
-                                startRect.Right <= x * mTileWidth)
+                                startRect.pRight <= x * mTileWidth)
                             {
+                                // We have collide along the x axis.
                                 collideX = true;
+                                collidePointX = x * mTileWidth;
                             }
+                            // If we are moving left, and we hit a tile with a right wall...
+                            // And we started with the left most part of the collision rect outside of the tile...
                             else if (dir.X < 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Right) != Tile.WallTypes.None &&
-                                startRect.Left >= x * mTileWidth + mTileWidth)
+                                startRect.pLeft >= x * mTileWidth + mTileWidth)
                             {
+                                // We have collided along the x axis.
                                 collideX = true;
+                                collidePointX = x * mTileWidth + mTileWidth;
                             }
                             if (dir.Y > 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Top) != Tile.WallTypes.None &&
-                                startRect.Bottom <= y * mTileHeight)
+                                startRect.pBottom <= y * mTileHeight)
                             {
                                 collideY = true;
+                                collidePointY = y * mTileHeight;
                             }
                             else if (dir.Y < 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Bottom) != Tile.WallTypes.None &&
-                                startRect.Top >= y * mTileHeight + mTileWidth)
+                                startRect.pTop >= y * mTileHeight + mTileWidth)
                             {
                                 collideY = true;
+                                collidePointY = y * mTileHeight + mTileWidth;
                             }
+
+#if ALLOW_GARBAGE
+                            DebugMessageDisplay.pInstance.AddDynamicMessage("Collide Dir: " + dir);
+#endif
+
+                            // Set the collision type temporarily to 2, to signal that it collided.
                             mCollisionGrid[x, y].mType = 2;
+
+                            // If we make it to this point there was a collision of some type.
                             hit = true;
                         }
                     }

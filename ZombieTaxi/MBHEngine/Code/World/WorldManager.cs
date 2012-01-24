@@ -6,6 +6,9 @@ using MBHEngine.GameObject;
 
 namespace MBHEngine.World
 {
+    /// <summary>
+    /// Manages the world; in particular levels.
+    /// </summary>
     public class WorldManager
     {
         /// <summary>

@@ -147,6 +147,19 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// Called once per frame before the update function. Is called for ALL gameobjects, prior 
+        /// to calling Update.
+        /// </summary>
+        /// <param name="gameTime">The amount of time that has passed this frame.</param>
+        public virtual void PreUpdate(GameTime gameTime)
+        {
+            for (int i = 0; i < mBehaviours.Count; i++)
+            {
+                mBehaviours[i].PreUpdate(gameTime);
+            }
+        }
+
+        /// <summary>
         /// Called once per frame by the game object manager.
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
@@ -157,6 +170,19 @@ namespace MBHEngine.GameObject
                 mBehaviours[i].Update(gameTime);
 
                 mOrientation.mPosition += mDirection.mForward * mDirection.mSpeed;
+            }
+        }
+
+        /// <summary>
+        /// Called once per frame after the Update function. Is called after all objects have
+        /// caled Update.
+        /// </summary>
+        /// <param name="gameTime">The amount of time that has passed this frame.</param>
+        public virtual void PostUpdate(GameTime gameTime)
+        {
+            for (int i = 0; i < mBehaviours.Count; i++)
+            {
+                mBehaviours[i].PostUpdate(gameTime);
             }
         }
 
@@ -248,6 +274,10 @@ namespace MBHEngine.GameObject
                 case "MBHEngine.Code.Behaviour.Level":
                     {
                         return new MBHEngine.Behaviour.Level(this, fileName);
+                    }
+                case "MBHEngine.Code.Behaviour.TileCollision":
+                    {
+                        return new MBHEngine.Behaviour.TileCollision(this, fileName);
                     }
                 default:
                     {

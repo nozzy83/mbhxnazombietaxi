@@ -49,14 +49,6 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
-        /// Get the collision boundaries for the current animation.
-        /// </summary>
-        public class GetCollisionRectangleMessage : BehaviourMessage
-        {
-            public MBHEngine.Math.Rectangle mBounds;
-        }
-
-        /// <summary>
         /// Defines a single set of animation.  A sprite sheet will usually contain a number of animation
         /// sets.
         /// </summary>
@@ -81,11 +73,6 @@ namespace MBHEngine.Behaviour
             /// The number of frames of animation.
             /// </summary>
             public Int32 mNumFrames;
-
-            /// <summary>
-            /// The collision boundary of this animation set.
-            /// </summary>
-            public MBHEngine.Math.Rectangle mCollisionRectangle;
         };
 
         /// <summary>
@@ -161,6 +148,11 @@ namespace MBHEngine.Behaviour
 
             mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
             mMotionRoot = def.mMotionRoot;
+            Single colHeight = mTexture.Height;
+            if (def.mFrameHeight > 0)
+            {
+                colHeight = def.mFrameHeight;
+            }
 
             if (def.mAnimationSets != null)
             {
@@ -314,12 +306,6 @@ namespace MBHEngine.Behaviour
                         }
                     }
                 }
-            }
-            else if (msg is GetCollisionRectangleMessage)
-            {
-                GetCollisionRectangleMessage temp = (GetCollisionRectangleMessage)msg;
-                temp.mBounds = mAnimations[mActiveAnimation].mCollisionRectangle;
-                msg = temp;
             }
             else
             {

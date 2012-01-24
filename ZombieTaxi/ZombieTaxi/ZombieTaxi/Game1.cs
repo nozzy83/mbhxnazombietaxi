@@ -44,6 +44,13 @@ namespace ZombieTaxi
         /// Graphic for the vingette.
         /// </summary>
         GameObject mVingetting;
+
+        LineSegment mL1, mL2;
+
+        /// <summary>
+        /// Whether or not to draw debug information.
+        /// </summary>
+        Boolean mDebugDrawEnabled;
         
         /// <summary>
         /// Constuctor
@@ -82,6 +89,9 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Initialize(Content, mGraphics);
             PhysicsManager.pInstance.Initialize(mGraphics, mSpriteBatch);
             GameObject.AddBehaviourCreator(new ClientBehaviourCreator());
+
+            // By default draw all deug information.
+            mDebugDrawEnabled = true;
 
             base.Initialize();
         }
@@ -137,6 +147,9 @@ namespace ZombieTaxi
 
             //OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");
 
+            mL1 = new LineSegment(new Vector2(-40, -40), new Vector2(-30, -30));
+            mL2 = new LineSegment(new Vector2(-40, -40), new Vector2(-30, -40));
+
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
 #endif
@@ -162,7 +175,13 @@ namespace ZombieTaxi
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.L3, true))
+            {
+                mDebugDrawEnabled ^= true;
+            }
+
             DebugMessageDisplay.pInstance.ClearDynamicMessages();
+            DebugShapeDisplay.pInstance.Update();
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Game-Time Delta: " + gameTime.ElapsedGameTime.TotalSeconds);
@@ -171,12 +190,26 @@ namespace ZombieTaxi
             PhysicsManager.pInstance.Update(gameTime);
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
-            DebugShapeDisplay.pInstance.Update();
 
             //DebugShapeDisplay.pInstance.AddSegment(new Vector2(0, 0), new Vector2(32, 32), Color.Black);
             //DebugShapeDisplay.pInstance.AddSolidCircle(new Vector2(0.0f, 0.0f), 8, new Vector2(1, 0), Color.Magenta);
             //DebugShapeDisplay.pInstance.AddTransform(new Vector2(0.0f, 0.0f));
             //DebugShapeDisplay.pInstance.AddAABB(new Vector2(32.0f, 32.0f), 8.0f, 16.0f, Color.Green);
+
+
+            mL1.pPointA = GameObjectManager.pInstance.pPlayer.pOrientation.mPosition;
+
+            DebugShapeDisplay.pInstance.AddSegment(mL1, Color.Black);
+            DebugShapeDisplay.pInstance.AddSegment(mL2, Color.Black);
+
+            Vector2 intersectionPoint = new Vector2();
+            if (mL1.Intersects(mL2, ref intersectionPoint))
+            {
+#if ALLOW_GARBAGE
+                DebugMessageDisplay.pInstance.AddDynamicMessage("Line Collision");
+#endif
+                DebugShapeDisplay.pInstance.AddPoint(intersectionPoint, 1, Color.Red);
+            }
 
             base.Update(gameTime);
         }
@@ -203,14 +236,18 @@ namespace ZombieTaxi
             mVingetting.Render(mSpriteBatch);
             mSpriteBatch.End();
 
-            // We need to go back to standard alpha blend before drawing the debug layer.
-            mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            mSpriteBatch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-            mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
-            DebugMessageDisplay.pInstance.Render(mSpriteBatch);
-            mSpriteBatch.End();
 
-            DebugShapeDisplay.pInstance.Render();
+            if (mDebugDrawEnabled)
+            {
+                DebugShapeDisplay.pInstance.Render();
+
+                // We need to go back to standard alpha blend before drawing the debug layer.
+                mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                mSpriteBatch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+                mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                DebugMessageDisplay.pInstance.Render(mSpriteBatch);
+                mSpriteBatch.End();
+            }
 
             base.Draw(gameTime);
         }

@@ -12,19 +12,194 @@ namespace MBHEngine.Math
     /// </summary>
     public class Rectangle
     {
-        private Vector2 mTopLeft;
-        private Vector2 mBottomRight;
+        /// <summary>
+        /// The width from left to right.
+        /// </summary>
+        private Single mWidth;
 
+        /// <summary>
+        /// The height from top to bottom.
+        /// </summary>
+        private Single mHeight;
+
+        /// <summary>
+        /// The width from center point to the edge.
+        /// </summary>
+        private Single mHalfWidth;
+
+        /// <summary>
+        /// The height from the center point to the edge.
+        /// </summary>
+        private Single mHalfHeight;
+
+        /// <summary>
+        /// The center point of this rectangle.
+        /// </summary>
+        private Vector2 mCenterPoint;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Rectangle()
         {
-            mTopLeft = new Vector2();
-            mBottomRight = new Vector2();
+            mWidth = 0;
+            mHeight = 0;
+            mHalfWidth = 0;
+            mHalfHeight = 0;
+            mCenterPoint = new Vector2();
         }
 
-        public Rectangle(Vector2 topLeft, Vector2 bottomRight)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="width">The width from left edge to right edge.</param>
+        /// <param name="height">The height from top edge to bottom edge.</param>
+        /// <param name="center">The position of this rectangle.</param>
+        public Rectangle(Single width, Single height, Vector2 center = new Vector2())
         {
-            mTopLeft = topLeft;
-            mBottomRight = bottomRight;
+            pDimensions = new Vector2(width, height);
+            mCenterPoint = center;
+        }
+
+        /// <summary>
+        /// Checks if this Rectangle intersects with another Rectangle.
+        /// </summary>
+        /// <param name="other">The other rectangle to check against.</param>
+        /// <returns>True if the rectangle intersect.</returns>
+        public Boolean Intersects(Rectangle other)
+        {
+            // We will determine intersection by seeing if the distance between the two rectangles
+            // is less than the two rectangles half-widths.
+            //
+
+            // Start by getting the distance between the two rectangles.
+            Vector2 seperation = mCenterPoint - other.pCenterPoint;
+
+            // Now get the minimum amont of seperation required to avoid a collision.
+            Single safeSeperationX = mHalfWidth + other.pDimensionsHalved.X;
+            Single safeSeperationY = mHalfHeight + other.pDimensionsHalved.Y;
+
+            // Is the distance between the two greater than the minumum safe distance?
+            if (System.Math.Abs(seperation.X) >= safeSeperationX)
+            {
+                return false;
+            }
+
+            if (System.Math.Abs(seperation.Y) >= safeSeperationY)
+            {
+                return false;
+            }
+
+            // If we make it to this point we have at least one collision.
+            return true;
+        }
+
+        /// <summary>
+        /// Deep copy of Rectangles.
+        /// </summary>
+        /// <param name="other">The rectangle to copy.</param>
+        public void Copy(Rectangle other)
+        {
+            pCenterPoint = other.pCenterPoint;
+            pDimensions = other.pDimensions;
+        }
+
+        /// <summary>
+        /// Convert the rectangle to whole numbers.  Rounds all numbers instead of straight truncation.
+        /// </summary>
+        public void ToWholeNumber()
+        {
+            pDimensions = new Vector2((Single)System.Math.Round(pDimensions.X), (Single)System.Math.Round(pDimensions.Y));
+            pCenterPoint = new Vector2((Single)System.Math.Round(pCenterPoint.X), (Single)System.Math.Round(pCenterPoint.Y));
+        }
+
+        /// <summary>
+        /// The top of the rectangle in world space.
+        /// </summary>
+        public Single pTop
+        {
+            get
+            {
+                return mCenterPoint.Y - mHalfHeight;
+            }
+        }
+
+        /// <summary>
+        /// The bottom of the rectangle in world space.
+        /// </summary>
+        public Single pBottom
+        {
+            get
+            {
+                return mCenterPoint.Y + mHalfHeight;
+            }
+        }
+
+        /// <summary>
+        /// The left of the rectangle in world space.
+        /// </summary>
+        public Single pLeft
+        {
+            get
+            {
+                return mCenterPoint.X - mHalfWidth;
+            }
+        }
+
+        /// <summary>
+        /// The right of the rectangle in world space.
+        /// </summary>
+        public Single pRight
+        {
+            get
+            {
+                return mCenterPoint.X + mHalfWidth;
+            }
+        }
+
+        /// <summary>
+        /// The center of the rectangle.
+        /// </summary>
+        public Vector2 pCenterPoint
+        {
+            get
+            {
+                return mCenterPoint;
+            }
+            set
+            {
+                mCenterPoint = value;
+            }
+        }
+
+        /// <summary>
+        /// The width and height of the rectangle.
+        /// </summary>
+        public Vector2 pDimensions
+        {
+            get
+            {
+                return new Vector2(mWidth, mHeight);
+            }
+            set
+            {
+                mWidth = value.X;
+                mHalfWidth = value.X * 0.5f;
+                mHeight = value.Y;
+                mHalfHeight = value.Y * 0.5f;
+            }
+        }
+
+        /// <summary>
+        /// The width and height of the rectnagle cut in half.
+        /// The distance from the center to the edge.
+        /// </summary>
+        public Vector2 pDimensionsHalved
+        {
+            get
+            {
+                return new Vector2(mHalfWidth, mHalfHeight);
+            }
         }
     }
 }

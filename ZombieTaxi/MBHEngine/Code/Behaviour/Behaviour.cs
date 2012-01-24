@@ -46,10 +46,28 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Called once per frame before the update function. Is called for ALL gameobjects, prior 
+        /// to calling Update.
+        /// </summary>
+        /// <param name="gameTime">The amount of time that has passed this frame.</param>
+        public virtual void PreUpdate(GameTime gameTime)
+        {
+        }
+
+        /// <summary>
         /// Called once per frame by the game object.
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public virtual void Update(GameTime gameTime)
+        {
+        }
+
+        /// <summary>
+        /// Called once per frame after the Update function. Is called after all objects have
+        /// caled Update.
+        /// </summary>
+        /// <param name="gameTime">The amount of time that has passed this frame.</param>
+        public virtual void PostUpdate(GameTime gameTime)
         {
         }
 

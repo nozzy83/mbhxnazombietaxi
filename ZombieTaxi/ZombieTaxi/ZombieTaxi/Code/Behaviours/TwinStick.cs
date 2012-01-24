@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MBHEngine.GameObject;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.Input;
 using Microsoft.Xna.Framework.Input;
@@ -12,6 +11,7 @@ using MBHEngine.Math;
 using MBHEngine.Render;
 using MBHEngine.Behaviour;
 using MBHEngine.World;
+using Microsoft.Xna.Framework;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -43,7 +43,6 @@ namespace ZombieTaxi.Behaviours
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
         private SpriteRender.GetSpriteEffectsMessage mGetSpriteFxMsg;
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
-        private Level.CheckForCollisionMessage mLevelCollisionMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -85,7 +84,6 @@ namespace ZombieTaxi.Behaviours
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
-            mLevelCollisionMsg = new Level.CheckForCollisionMessage();
         }
 
         /// <summary>
@@ -237,38 +235,9 @@ namespace ZombieTaxi.Behaviours
                 }
             }
 
-            mLevelCollisionMsg.mDesiredRect = new Microsoft.Xna.Framework.Rectangle((Int32)Math.Round(mParentGOH.pOrientation.mPosition.X) - 4,
-                                                           (Int32)Math.Round(mParentGOH.pOrientation.mPosition.Y) - 4,
-                                                           8, 8);
-            mLevelCollisionMsg.mOriginalRect = new Microsoft.Xna.Framework.Rectangle((Int32)Math.Round(origPos.X) - 4,
-                                                           (Int32)Math.Round(origPos.Y) - 4,
-                                                           8, 8);
-            mLevelCollisionMsg.mDesiredPos = mParentGOH.pOrientation.mPosition;
-            mLevelCollisionMsg.mOriginalPos = origPos;
-            DebugShapeDisplay.pInstance.AddAABB(mParentGOH.pOrientation.mPosition, 8, 8, Color.Green);
-            WorldManager.pInstance.pCurrentLevel.OnMessage(mLevelCollisionMsg);
-
-            if (mLevelCollisionMsg.mCollisionDetected)
-            {
-                DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected");
-
-                if (mLevelCollisionMsg.mCollisionDetectedX)
-                {
-                    DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected X");
-                    if (mParentGOH.pOrientation.mPosition.X > origPos.X || mParentGOH.pOrientation.mPosition.X < origPos.X)
-                    {
-                        mParentGOH.pOrientation.mPosition.X = origPos.X;
-                    }
-                }
-                if (mLevelCollisionMsg.mCollisionDetectedY)
-                {
-                    DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected Y");
-                    if (mParentGOH.pOrientation.mPosition.Y > origPos.Y || mParentGOH.pOrientation.mPosition.Y < origPos.Y)
-                    {
-                        mParentGOH.pOrientation.mPosition.Y = origPos.Y;
-                    }
-                }
-            }
+#if ALLOW_GARBAGE
+            DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pOrientation.mPosition);
+#endif
 
             CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
         }
