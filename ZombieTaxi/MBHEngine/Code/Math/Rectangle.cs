@@ -36,7 +36,7 @@ namespace MBHEngine.Math
         /// The center point of this rectangle.
         /// </summary>
         private Vector2 mCenterPoint;
-
+        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -58,7 +58,7 @@ namespace MBHEngine.Math
         public Rectangle(Single width, Single height, Vector2 center = new Vector2())
         {
             pDimensions = new Vector2(width, height);
-            mCenterPoint = center;
+            pCenterPoint = center;
         }
 
         /// <summary>
@@ -114,6 +114,46 @@ namespace MBHEngine.Math
         }
 
         /// <summary>
+        /// Get a line defining a particular edge of the rectangle.
+        /// </summary>
+        /// <param name="edge">A preallocated edge (to avoid garbage).</param>
+        public void GetTopEdge(ref LineSegment edge)
+        {
+            edge.pPointA = pTopLeft;
+            edge.pPointB = pTopRight;
+        }
+
+        /// <summary>
+        /// Get a line defining a particular edge of the rectangle.
+        /// </summary>
+        /// <param name="edge">A preallocated edge (to avoid garbage).</param>
+        public void GetRightEdge(ref LineSegment edge)
+        {
+            edge.pPointA = pTopRight;
+            edge.pPointB = pBottomRight;
+        }
+
+        /// <summary>
+        /// Get a line defining a particular edge of the rectangle.
+        /// </summary>
+        /// <param name="edge">A preallocated edge (to avoid garbage).</param>
+        public void GetBottomEdge(ref LineSegment edge)
+        {
+            edge.pPointA = pBottomLeft;
+            edge.pPointB = pBottomRight;
+        }
+
+        /// <summary>
+        /// Get a line defining a particular edge of the rectangle.
+        /// </summary>
+        /// <param name="edge">A preallocated edge (to avoid garbage).</param>
+        public void GetLeftEdge(ref LineSegment edge)
+        {
+            edge.pPointA = pTopLeft;
+            edge.pPointB = pBottomLeft;
+        }
+
+        /// <summary>
         /// The top of the rectangle in world space.
         /// </summary>
         public Single pTop
@@ -157,6 +197,50 @@ namespace MBHEngine.Math
             }
         }
 
+        /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pTopLeft
+        {
+            get
+            {
+                return new Vector2(pLeft, pTop);
+            }
+        }
+
+        /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pTopRight
+        {
+            get
+            {
+                return new Vector2(pRight, pTop);
+            }
+        }
+
+        /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pBottomRight
+        {
+            get
+            {
+                return new Vector2(pRight, pBottom);
+            }
+        }
+
+        /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pBottomLeft
+        {
+            get
+            {
+                return new Vector2(pLeft, pBottom);
+            }
+        }
+        
         /// <summary>
         /// The center of the rectangle.
         /// </summary>

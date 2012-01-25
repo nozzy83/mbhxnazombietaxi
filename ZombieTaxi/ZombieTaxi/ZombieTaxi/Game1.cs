@@ -45,8 +45,6 @@ namespace ZombieTaxi
         /// </summary>
         GameObject mVingetting;
 
-        LineSegment mL1, mL2;
-
         /// <summary>
         /// Whether or not to draw debug information.
         /// </summary>
@@ -147,9 +145,6 @@ namespace ZombieTaxi
 
             //OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");
 
-            mL1 = new LineSegment(new Vector2(-40, -40), new Vector2(-30, -30));
-            mL2 = new LineSegment(new Vector2(-40, -40), new Vector2(-30, -40));
-
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
 #endif
@@ -195,21 +190,6 @@ namespace ZombieTaxi
             //DebugShapeDisplay.pInstance.AddSolidCircle(new Vector2(0.0f, 0.0f), 8, new Vector2(1, 0), Color.Magenta);
             //DebugShapeDisplay.pInstance.AddTransform(new Vector2(0.0f, 0.0f));
             //DebugShapeDisplay.pInstance.AddAABB(new Vector2(32.0f, 32.0f), 8.0f, 16.0f, Color.Green);
-
-
-            mL1.pPointA = GameObjectManager.pInstance.pPlayer.pOrientation.mPosition;
-
-            DebugShapeDisplay.pInstance.AddSegment(mL1, Color.Black);
-            DebugShapeDisplay.pInstance.AddSegment(mL2, Color.Black);
-
-            Vector2 intersectionPoint = new Vector2();
-            if (mL1.Intersects(mL2, ref intersectionPoint))
-            {
-#if ALLOW_GARBAGE
-                DebugMessageDisplay.pInstance.AddDynamicMessage("Line Collision");
-#endif
-                DebugShapeDisplay.pInstance.AddPoint(intersectionPoint, 1, Color.Red);
-            }
 
             base.Update(gameTime);
         }
