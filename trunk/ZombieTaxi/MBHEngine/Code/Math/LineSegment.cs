@@ -24,6 +24,15 @@ namespace MBHEngine.Math
         /// <summary>
         /// Constructor.
         /// </summary>
+        public LineSegment()
+        {
+            mPointA = new Vector2();
+            mPointB = new Vector2();
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         /// <param name="pA">Point A</param>
         /// <param name="pB">Point B</param>
         public LineSegment(Vector2 pA, Vector2 pB)

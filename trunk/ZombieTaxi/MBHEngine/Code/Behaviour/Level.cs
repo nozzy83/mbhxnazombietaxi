@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
 using MBHEngineContentDefs;
 using MBHEngine.Debug;
+using MBHEngine.Math;
 
 namespace MBHEngine.Behaviour
 {
@@ -117,7 +118,14 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// Texture used for rendering the collision boxes.
         /// </summary>
-        private Texture2D debugTexture;
+        private Texture2D mDebugTexture;
+
+        /// <summary>
+        /// These are needed to do our wall collision and we want to avoid allocating them over and
+        /// over again, so instead we just reuse the same ones.
+        /// </summary>
+        private LineSegment mCollisionWall;
+        private LineSegment mCollisionRectMovement;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -169,6 +177,20 @@ namespace MBHEngine.Behaviour
             mCollisionGrid[4, 11].mType = 1;
             mCollisionGrid[6, 11].mType = 1;
             mCollisionGrid[5, 12].mType = 1;
+
+            mCollisionGrid[0, 2].mType = 1;
+            mCollisionGrid[0, 3].mType = 1;
+            mCollisionGrid[0, 4].mType = 1;
+            mCollisionGrid[0, 5].mType = 1;
+            mCollisionGrid[0, 6].mType = 1;
+            mCollisionGrid[0, 7].mType = 1;
+            mCollisionGrid[0, 8].mType = 1;
+            mCollisionGrid[0, 9].mType = 1;
+            mCollisionGrid[0, 10].mType = 1;
+            mCollisionGrid[0, 11].mType = 1;
+            mCollisionGrid[0, 12].mType = 1;
+            mCollisionGrid[0, 13].mType = 1;
+            mCollisionGrid[0, 14].mType = 1;
             
             // Loop through all the tiles and calculate which sides need to have collision checks done on it.
             // For example if a tile has another tile directly above it, it does not need to check collision 
@@ -191,9 +213,13 @@ namespace MBHEngine.Behaviour
                 }
             }
 
+            // Allocate these once and use them over and over again.
+            mCollisionWall = new LineSegment();
+            mCollisionRectMovement = new LineSegment();
+
             // A debug texture used for rendering to blocks.
-            debugTexture = new Texture2D(GameObjectManager.pInstance.pGraphicsDevice, 1, 1);
-            debugTexture.SetData(new Color[] { Color.White });
+            mDebugTexture = new Texture2D(GameObjectManager.pInstance.pGraphicsDevice, 1, 1);
+            mDebugTexture.SetData(new Color[] { Color.White });
 
             base.LoadContent(fileName);
         }
@@ -223,7 +249,7 @@ namespace MBHEngine.Behaviour
                         mCollisionGrid[x, y].mType = 1;
 
                         // Draw the collison volume.
-                        batch.Draw(debugTexture, new Rectangle(x * mTileWidth, y * mTileHeight, mTileWidth, mTileHeight), c);
+                        batch.Draw(mDebugTexture, new Microsoft.Xna.Framework.Rectangle(x * mTileWidth, y * mTileHeight, mTileWidth, mTileHeight), c);
 
                         // Draw the walls that have been determined to require collision checks.
                         //
@@ -302,7 +328,8 @@ namespace MBHEngine.Behaviour
         /// <param name="collidePointX">Where did the X collision happen (if it did)?</param>
         /// <param name="collidePointY">Where did the Y collision happen (if it did)?</param>
         /// <returns></returns>
-        private Boolean CheckForCollision(MBHEngine.Math.Rectangle startRect, 
+        private Boolean CheckForCollision(
+            MBHEngine.Math.Rectangle startRect, 
             MBHEngine.Math.Rectangle endRect, 
             out Boolean collideX, 
             out Boolean collideY,
@@ -338,38 +365,87 @@ namespace MBHEngine.Behaviour
                         if (tileRect.Intersects(endRect))
                         {
                             // If we are moving right, and we hit a tile with a left wall...
-                            // And we started with the right most part of the collision rect outside of the tile...
                             if (dir.X > 0 &&
-                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Left) != Tile.WallTypes.None &&
-                                startRect.pRight <= x * mTileWidth)
+                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Left) != Tile.WallTypes.None)
                             {
-                                // We have collide along the x axis.
-                                collideX = true;
-                                collidePointX = x * mTileWidth;
+                                // Create a line from the center of our destination...
+                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointB = endRect.pCenterPoint;
+
+                                // ...and a line representing the wall we are testing against.
+                                tileRect.GetLeftEdge(ref mCollisionWall);
+
+                                // If those two lines intersect, then we count this collision.
+                                // We do this line check to avoid colliding with both top/bottom and
+                                // left/right in the same movement.  That causes issues like getting stuck in
+                                // tight corridors.
+                                Vector2 intersect = new Vector2();
+                                if (mCollisionWall.Intersects(mCollisionRectMovement, ref intersect))
+                                {
+                                    DebugShapeDisplay.pInstance.AddSegment(mCollisionRectMovement, Color.DarkRed);
+                                    DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
+                                    // We have collide along the x axis.
+                                    collideX = true;
+                                    collidePointX = x * mTileWidth;
+                                }
                             }
                             // If we are moving left, and we hit a tile with a right wall...
-                            // And we started with the left most part of the collision rect outside of the tile...
                             else if (dir.X < 0 &&
-                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Right) != Tile.WallTypes.None &&
-                                startRect.pLeft >= x * mTileWidth + mTileWidth)
+                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Right) != Tile.WallTypes.None)
                             {
-                                // We have collided along the x axis.
-                                collideX = true;
-                                collidePointX = x * mTileWidth + mTileWidth;
+                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointB = endRect.pCenterPoint;
+
+                                tileRect.GetRightEdge(ref mCollisionWall);
+
+                                Vector2 intersect = new Vector2();
+
+                                if (mCollisionWall.Intersects(mCollisionRectMovement, ref intersect))
+                                {
+                                    DebugShapeDisplay.pInstance.AddSegment(mCollisionRectMovement, Color.DarkRed);
+                                    DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
+                                    // We have collide along the x axis.
+                                    collideX = true;
+                                    collidePointX = x * mTileWidth + mTileWidth;
+                                }
                             }
                             if (dir.Y > 0 &&
-                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Top) != Tile.WallTypes.None &&
-                                startRect.pBottom <= y * mTileHeight)
+                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Top) != Tile.WallTypes.None)
                             {
-                                collideY = true;
-                                collidePointY = y * mTileHeight;
+                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointB = endRect.pCenterPoint;
+
+                                tileRect.GetTopEdge(ref mCollisionWall);
+
+                                Vector2 intersect = new Vector2();
+
+                                if (mCollisionWall.Intersects(mCollisionRectMovement, ref intersect))
+                                {
+                                    DebugShapeDisplay.pInstance.AddSegment(mCollisionRectMovement, Color.DarkRed);
+                                    DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
+                                    // We have collide along the y axis.
+                                    collideY = true;
+                                    collidePointY = y * mTileHeight;
+                                }
                             }
                             else if (dir.Y < 0 &&
-                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Bottom) != Tile.WallTypes.None &&
-                                startRect.pTop >= y * mTileHeight + mTileWidth)
+                                (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Bottom) != Tile.WallTypes.None)
                             {
-                                collideY = true;
-                                collidePointY = y * mTileHeight + mTileWidth;
+                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointB = endRect.pCenterPoint;
+
+                                tileRect.GetBottomEdge(ref mCollisionWall);
+
+                                Vector2 intersect = new Vector2();
+
+                                if (mCollisionWall.Intersects(mCollisionRectMovement, ref intersect))
+                                {
+                                    DebugShapeDisplay.pInstance.AddSegment(mCollisionRectMovement, Color.DarkRed);
+                                    DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
+                                    // We have collide along the y axis.
+                                    collideY = true;
+                                    collidePointY = y * mTileHeight + mTileHeight;
+                                }
                             }
 
 #if ALLOW_GARBAGE
