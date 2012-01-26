@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.Debug;
 using MBHEngine.World;
+using MBHEngineContentDefs;
+using MBHEngine.GameObject;
 
 namespace MBHEngine.Behaviour
 {
@@ -53,13 +55,11 @@ namespace MBHEngine.Behaviour
         {
             base.LoadContent(fileName);
 
-            //SpriteRenderDefinition def = GameObjectManager.pInstance.pContentManager.Load<SpriteRenderDefinition>(fileName);
+            TileCollisionDefinition def = GameObjectManager.pInstance.pContentManager.Load<TileCollisionDefinition>(fileName);
 
             //mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
 
-            // TODO: Load this data in.
-            //
-            mCollisionRectangle = new Math.Rectangle(8.0f, 8.0f);
+            mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
 
             // Start the previous position at the current position.  It will get overwritten in th update anyway.
             mPreviousPos = mParentGOH.pOrientation.mPosition;

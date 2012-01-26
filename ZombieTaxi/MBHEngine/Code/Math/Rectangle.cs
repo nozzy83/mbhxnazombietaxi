@@ -62,6 +62,17 @@ namespace MBHEngine.Math
         }
 
         /// <summary>
+        /// Constrcutor.
+        /// </summary>
+        /// <param name="dimension">The width and height.</param>
+        /// <param name="center">The position of the rectangle.</param>
+        public Rectangle(Vector2 dimension, Vector2 center = new Vector2())
+        {
+            pDimensions = dimension;
+            pCenterPoint = center;
+        }
+
+        /// <summary>
         /// Checks if this Rectangle intersects with another Rectangle.
         /// </summary>
         /// <param name="other">The other rectangle to check against.</param>
