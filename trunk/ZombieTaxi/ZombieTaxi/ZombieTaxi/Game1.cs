@@ -59,8 +59,8 @@ namespace ZombieTaxi
             CommandLineManager.pInstance.pArgs = args;
 
             mGraphics = new GraphicsDeviceManager(this);
-            mGraphics.PreferredBackBufferWidth = 1280;
-            mGraphics.PreferredBackBufferHeight = 720;
+            mGraphics.PreferredBackBufferWidth = 1280; //640;
+            mGraphics.PreferredBackBufferHeight = 720; // 480;
             //mGraphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
 
@@ -87,6 +87,7 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Initialize(Content, mGraphics);
             PhysicsManager.pInstance.Initialize(mGraphics, mSpriteBatch);
             GameObject.AddBehaviourCreator(new ClientBehaviourCreator());
+            CameraManager.pInstance.Initialize(mGraphics.GraphicsDevice);
 
             // By default draw all deug information.
             mDebugDrawEnabled = true;
