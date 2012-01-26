@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MBHEngine.Render
 {
@@ -56,17 +57,18 @@ namespace MBHEngine.Render
         private Single mZoomAmount;
 
         /// <summary>
-        /// Constructor.
+        /// Initialize the singleton.  Call before first use.
         /// </summary>
-        private CameraManager()
+        /// <param name="device">The initialized graphics device.  Used to calculate screen position.</param>
+        public void Initialize(GraphicsDevice device)
         {
             mTransform = Matrix.Identity;
-            mTargetPosition = new Vector2(640, 360);
+            mTargetPosition = new Vector2(device.Viewport.Width * 0.5f, device.Viewport.Height * 0.5f);
             mLastPosition = new Vector2();
             mCurBlendFrames = 0;
 
             mBlendFrames = 10;
-            mScreenCenter = Matrix.CreateTranslation(640, 360, 0);
+            mScreenCenter = Matrix.CreateTranslation(device.Viewport.Width * 0.5f, device.Viewport.Height * 0.5f, 0);
 
             mZoomAmount = 8.0f;
 
