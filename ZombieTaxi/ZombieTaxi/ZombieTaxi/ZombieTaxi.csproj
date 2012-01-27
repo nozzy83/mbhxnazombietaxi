@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code\Behaviours\ClientBehaviourCreator.cs" />
+    <Compile Include="Code\Behaviours\Health.cs" />
     <Compile Include="Code\Behaviours\InfiniteBG.cs" />
     <Compile Include="Code\Behaviours\Kamikaze.cs" />
     <Compile Include="Code\Behaviours\TwinStick.cs" />
@@ -125,6 +126,10 @@
     <ProjectReference Include="..\..\Box2D.XNA\Box2D.XNA.csproj">
       <Project>{22791486-E721-4511-AA4B-DA26CF5D0F2E}</Project>
       <Name>Box2D.XNA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MBHEngineContentDefs\MBHEngineContentDefs.csproj">
+      <Project>{0E895839-448B-4495-8AAB-16DAC35B04FB}</Project>
+      <Name>MBHEngineContentDefs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\MBHEngine\MBHEngine.csproj">
       <Project>{5DD5B096-5020-4604-9D07-0061D17E63E4}</Project>

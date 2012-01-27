@@ -238,6 +238,12 @@ namespace ZombieTaxi.Behaviours
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pOrientation.mPosition);
 #endif
+            // DEBUG TESTING
+            //
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
+            {
+                mParentGOH.OnMessage(new Health.OnApplyDamage(113));
+            }
 
             CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
         }
@@ -248,6 +254,24 @@ namespace ZombieTaxi.Behaviours
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
+        }
+
+        /// <summary>
+        /// The main interface for communicating between behaviours.  Using polymorphism, we
+        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
+        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// from it (set message) or store some data in it (get message).
+        /// </summary>
+        /// <param name="msg">The message being communicated to the behaviour.</param>
+        public override void OnMessage(ref BehaviourMessage msg)
+        {
+            // Which type of message was sent to us?
+            if (msg is Health.OnZeroHealth)
+            {
+#if ALLOW_GARBAGE
+                DebugMessageDisplay.pInstance.AddConstantMessage("Player Died");
+#endif
+            }
         }
     }
 }

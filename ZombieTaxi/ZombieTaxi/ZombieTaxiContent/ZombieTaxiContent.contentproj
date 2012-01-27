@@ -50,6 +50,10 @@
       <Project>{EA08F2CC-6DE5-415D-B860-B0DA88E541D8}</Project>
       <Name>OgmoXNAPipelineExtensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ZombieTaxiContentDefs\ZombieTaxiContentDefs.csproj">
+      <Project>{C4A6CC91-CCC3-4DEF-A36C-94F170DDE6B2}</Project>
+      <Name>ZombieTaxiContentDefs</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Sprites\Items\Pellet.png">
@@ -222,6 +226,13 @@
   <ItemGroup>
     <Compile Include="GameObjects\Items\Bullet\Behaviours\TileCollision.xml">
       <Name>TileCollision</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Characters\Player\Behaviours\Health.xml">
+      <Name>Health</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>

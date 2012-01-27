@@ -157,8 +157,7 @@ namespace MBHEngine.Behaviour
         /// from it (set message) or store some data in it (get message).
         /// </summary>
         /// <param name="msg">The message being communicated to the behaviour.</param>
-        /// <returns>The resulting message.  If not null, the message was handled.</returns>
-        public override BehaviourMessage OnMessage(BehaviourMessage msg)
+        public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
             if (msg is GetCollisionRectangleMessage)
@@ -167,16 +166,6 @@ namespace MBHEngine.Behaviour
                 temp.mBounds = mCollisionRectangle;
                 msg = temp;
             }
-            else
-            {
-                // This is not a message we know how to handle.
-                // TODO:
-                // This seems wrong.  Won't this overwrite any set messages that might need to be passed on to other
-                // behaviours?
-                msg = null;
-            }
-
-            return msg;
         }
     }
 }
