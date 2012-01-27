@@ -59,8 +59,8 @@ namespace ZombieTaxi
             CommandLineManager.pInstance.pArgs = args;
 
             mGraphics = new GraphicsDeviceManager(this);
-            mGraphics.PreferredBackBufferWidth = 1280; //640;
-            mGraphics.PreferredBackBufferHeight = 720; // 480;
+            mGraphics.PreferredBackBufferWidth = 1280; // 640;
+            mGraphics.PreferredBackBufferHeight = 720; // 360;
             //mGraphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
 

@@ -353,7 +353,7 @@ namespace MBHEngine.Behaviour
                 {
                     // Is this tile solid and does it have any active walls?
                     // It may be solid with no walls in the case of one completly surrounded.
-                    if (mCollisionGrid[x, y].mType == 1 && mCollisionGrid[x,y].mActiveWalls != Tile.WallTypes.None)
+                    if (mCollisionGrid[x, y].mType != 0 && mCollisionGrid[x,y].mActiveWalls != Tile.WallTypes.None)
                     {
                         // Calculate the center point of the tile.
                         Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));

@@ -168,9 +168,9 @@ namespace MBHEngine.GameObject
             for (int i = 0; i < mBehaviours.Count; i++)
             {
                 mBehaviours[i].Update(gameTime);
-
-                mOrientation.mPosition += mDirection.mForward * mDirection.mSpeed;
             }
+
+            mOrientation.mPosition += mDirection.mForward * mDirection.mSpeed;
         }
 
         /// <summary>

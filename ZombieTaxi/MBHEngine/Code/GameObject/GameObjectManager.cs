@@ -184,7 +184,9 @@ namespace MBHEngine.GameObject
                 }
             }
 
-            //DebugMessageDisplay.pInstance.AddDynamicMessage("Updated " + count + " GameObjects");
+#if ALLOW_GARBAGE
+            DebugMessageDisplay.pInstance.AddDynamicMessage("Updated " + count + " GameObjects");
+#endif
 
             // Now loop through our list of objects which need to be removed and
             // remove them.
