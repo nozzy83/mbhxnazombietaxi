@@ -203,19 +203,15 @@ namespace MBHEngine.GameObject
         /// handles the message, it will return.
         /// </summary>
         /// <param name="msg">The message to send.</param>
-        /// <returns>The resulting message, or null if it was not handled at all.</returns>
+        /// <returns>The message passed in, likely modified by handling behaviours.</returns>
         public virtual BehaviourMessage OnMessage(BehaviourMessage msg)
         {
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                BehaviourMessage temp = mBehaviours[i].OnMessage(msg);
-                if (temp != null)
-                {
-                    return temp;
-                }
+                mBehaviours[i].OnMessage(ref msg);
             }
 
-            return null;
+            return msg;
         }
 
         /// <summary>

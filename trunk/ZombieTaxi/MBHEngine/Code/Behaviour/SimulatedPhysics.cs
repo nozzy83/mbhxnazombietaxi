@@ -159,8 +159,7 @@ namespace MBHEngine.Behaviour
         /// from it (set message) or store some data in it (get message).
         /// </summary>
         /// <param name="msg">The message being communicated to the behaviour.</param>
-        /// <returns>The resulting message.  If not null, the message was handled.</returns>
-        public override BehaviourMessage OnMessage(BehaviourMessage msg)
+        public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
             if (msg is SimulatedPhysics.GetBodyMessage)
@@ -169,13 +168,6 @@ namespace MBHEngine.Behaviour
                 temp.mBody = mBody;
                 msg = temp;
             }
-            else
-            {
-                // This is not a message we know how to handle.
-                msg = null;
-            }
-
-            return msg;
         }
     }
 }

@@ -92,11 +92,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviour\HealthDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Behaviour\" />
     <Folder Include="GameObject\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MBHEngineContentDefs\MBHEngineContentDefs.csproj">
+      <Project>{0E895839-448B-4495-8AAB-16DAC35B04FB}</Project>
+      <Name>MBHEngineContentDefs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />

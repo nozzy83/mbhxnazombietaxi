@@ -23,13 +23,17 @@ namespace ZombieTaxi.Behaviours
         {
             switch (behaviourType)
             {
-                case "ZombieTaxi.Code.Behaviour.TwinStick":
+                case "ZombieTaxi.Behaviour.TwinStick":
                     {
                         return new TwinStick(go, fileName);
                     }
-                case "ZombieTaxi.Code.Behaviour.Kamikaze":
+                case "ZombieTaxi.Behaviour.Kamikaze":
                     {
                         return new Kamikaze(go, fileName);
+                    }
+                case "ZombieTaxi.Behaviours.Health":
+                    {
+                        return new Health(go, fileName);
                     }
                 default:
                     {
