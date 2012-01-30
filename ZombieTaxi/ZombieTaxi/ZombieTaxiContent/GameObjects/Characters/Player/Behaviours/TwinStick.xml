@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.TwinStickDefinition">
+    <mMoveSpeed>0.625</mMoveSpeed>
+  </Asset>
+</XnaContent>
+

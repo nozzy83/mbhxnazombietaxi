@@ -12,6 +12,7 @@ using MBHEngine.Render;
 using MBHEngine.Behaviour;
 using MBHEngine.World;
 using Microsoft.Xna.Framework;
+using ZombieTaxiContentDefs;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -61,10 +62,12 @@ namespace ZombieTaxi.Behaviours
         /// <param name="fileName">The file to load from.</param>
         public override void LoadContent(String fileName)
         {
-            mMoveSpeed = 0.625f;
-            mCurrentBullet = 0;
-
             base.LoadContent(fileName);
+
+            TwinStickDefinition def = GameObjectManager.pInstance.pContentManager.Load<TwinStickDefinition>(fileName);
+
+            mMoveSpeed = def.mMoveSpeed;
+            mCurrentBullet = 0;
 
             mBullets = new GameObject[100];
 

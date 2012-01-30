@@ -35,6 +35,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new Health(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.TwinStick":
+                    {
+                        return new TwinStick(go, fileName);
+                    }
                 default:
                     {
                         return null;
