@@ -130,8 +130,8 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Add(debugStatsDisplay);
 
             GameObject player = new GameObject("GameObjects\\Characters\\Player\\Player");
-            t = new TwinStick(player, null);
-            player.AttachBehaviour(t);
+            //t = new TwinStick(player, null);
+            //player.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(player);
             // Store the player for easy access.
             GameObjectManager.pInstance.pPlayer = player;
