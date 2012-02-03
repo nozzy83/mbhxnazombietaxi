@@ -123,6 +123,7 @@
     <Compile Include="Code\Behaviour\SpriteRender.cs" />
     <Compile Include="Code\Behaviour\TileCollision.cs" />
     <Compile Include="Code\Behaviour\TileMapRender.cs" />
+    <Compile Include="Code\Behaviour\Timer.cs" />
     <Compile Include="Code\Debug\DebugMessageDisplay.cs" />
     <Compile Include="Code\Debug\DebugShapeDisplay.cs" />
     <Compile Include="Code\GameObject\GameObject.cs" />

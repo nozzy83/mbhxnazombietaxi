@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\\Items\\Pellet</mSpriteFileName>
+    <mMotionRoot>0.5 0.5</mMotionRoot>
+  </Asset>
+</XnaContent>
+
