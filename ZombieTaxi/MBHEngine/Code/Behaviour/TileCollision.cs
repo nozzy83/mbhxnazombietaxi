@@ -21,6 +21,10 @@ namespace MBHEngine.Behaviour
             public MBHEngine.Math.Rectangle mBounds;
         }
 
+        public class OnTileCollisionMessage : BehaviourMessage
+        {
+        }
+
         /// <summary>
         /// The collision boundary of this animation set.
         /// </summary>
@@ -35,6 +39,7 @@ namespace MBHEngine.Behaviour
         /// Messages.  Preallocated to avoid triggering the garbage collector.
         /// </summary>
         private Level.CheckForCollisionMessage mLevelCollisionMsg;
+        private OnTileCollisionMessage mOnTileCollisionMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -66,6 +71,8 @@ namespace MBHEngine.Behaviour
 
             // Preallocate messages to avoid garbage collection.
             mLevelCollisionMsg = new Level.CheckForCollisionMessage();
+            mOnTileCollisionMsg = new OnTileCollisionMessage();
+
             mLevelCollisionMsg.mDesiredRect = new Math.Rectangle();
             mLevelCollisionMsg.mOriginalRect = new Math.Rectangle();
         }
@@ -99,14 +106,14 @@ namespace MBHEngine.Behaviour
             if (mLevelCollisionMsg.mCollisionDetected)
             {
 #if ALLOW_GARBAGE
-                DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected");
+                //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected");
 #endif
 
                 // Seperate X and Y collision so that they can react seperatly.
                 if (mLevelCollisionMsg.mCollisionDetectedX)
                 {
 #if ALLOW_GARBAGE
-                    DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected X");
+                    //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected X");
 #endif
 
                     // If we collided along the x-axis, but the object directly against that collision point.
@@ -122,7 +129,7 @@ namespace MBHEngine.Behaviour
                 if (mLevelCollisionMsg.mCollisionDetectedY)
                 {
 #if ALLOW_GARBAGE
-                    DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected Y");
+                    //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected Y");
 #endif
 
                     if (mParentGOH.pOrientation.mPosition.Y > mPreviousPos.Y)
@@ -134,6 +141,8 @@ namespace MBHEngine.Behaviour
                         mParentGOH.pOrientation.mPosition.Y = mLevelCollisionMsg.mCollisionPointY + mCollisionRectangle.pDimensionsHalved.Y;// mPreviousPos.X;
                     }
                 }
+
+                mParentGOH.OnMessage(mOnTileCollisionMsg);
             }
 
             // Update the collision rectangle's position based on the final position of the parent game object.

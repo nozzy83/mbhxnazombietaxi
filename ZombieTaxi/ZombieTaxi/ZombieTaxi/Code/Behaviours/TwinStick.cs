@@ -37,13 +37,21 @@ namespace ZombieTaxi.Behaviours
         private GameObject[] mBullets;
 
         /// <summary>
+        /// Grenades fired with alt fire.
+        /// </summary>
+        private GameObject[] mGrenades;
+
+        /// <summary>
         /// mBullets is used as a circular array, and this is the current index.
         /// </summary>
         private Int16 mCurrentBullet;
 
+        private Int16 mCurrentGrenade;
+
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
         private SpriteRender.GetSpriteEffectsMessage mGetSpriteFxMsg;
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
+        private Timer.ToggleTimerMessage mToggleTimerMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -68,6 +76,7 @@ namespace ZombieTaxi.Behaviours
 
             mMoveSpeed = def.mMoveSpeed;
             mCurrentBullet = 0;
+            mCurrentGrenade = 0;
 
             mBullets = new GameObject[100];
 
@@ -78,6 +87,14 @@ namespace ZombieTaxi.Behaviours
                 GameObjectManager.pInstance.Add(mBullets[i]);
             }
 
+            mGrenades = new GameObject[6];
+            for (Int16 i = 0; i < mGrenades.Length; i++)
+            {
+                mGrenades[i] = new GameObject("GameObjects\\Items\\Grenade\\Grenade");
+                mGrenades[i].pDirection.mSpeed = 0.25f;
+                GameObjectManager.pInstance.Add(mGrenades[i]);
+            } 
+
             mGun = new GameObject("GameObjects\\Items\\Gun\\Gun");
             GameObjectManager.pInstance.Add(mGun);
             mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
@@ -87,6 +104,7 @@ namespace ZombieTaxi.Behaviours
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
+            mToggleTimerMsg = new Timer.ToggleTimerMessage();
         }
 
         /// <summary>
@@ -227,6 +245,25 @@ namespace ZombieTaxi.Behaviours
 
                 // By default the bullets have their renderer turned off.
                 mBullets[mCurrentBullet].pDoRender = true;
+
+                if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
+                {
+                    GameObject go = mGrenades[mCurrentGrenade];
+                    go.pOrientation.mPosition = mBullets[mCurrentBullet].pOrientation.mPosition;
+                    go.pOrientation.mRotation = mBullets[mCurrentBullet].pOrientation.mRotation;
+                    go.pDirection.mForward = mBullets[mCurrentBullet].pDirection.mForward;
+                    go.pDoRender = true;
+                    mToggleTimerMsg.mActivate = true;
+                    mToggleTimerMsg.mReset = true;
+                    go.OnMessage(mToggleTimerMsg);
+
+                    mCurrentGrenade++;
+
+                    if (mCurrentGrenade >= mGrenades.Length)
+                    {
+                        mCurrentGrenade = 0;
+                    }
+                }
 
                 // Next time fire a new bullet.
                 mCurrentBullet++;

@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code\Behaviours\ClientBehaviourCreator.cs" />
+    <Compile Include="Code\Behaviours\Explosive.cs" />
     <Compile Include="Code\Behaviours\Health.cs" />
     <Compile Include="Code\Behaviours\InfiniteBG.cs" />
     <Compile Include="Code\Behaviours\Kamikaze.cs" />

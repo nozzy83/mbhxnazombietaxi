@@ -39,6 +39,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new TwinStick(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.Explosive":
+                    {
+                        return new Explosive(go, fileName);
+                    }
                 default:
                     {
                         return null;

@@ -275,6 +275,10 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.TileCollision(this, fileName);
                     }
+                case "MBHEngine.Code.Behaviour.Timer":
+                    {
+                        return new MBHEngine.Behaviour.Timer(this, fileName);
+                    }
                 default:
                     {
                         throw new Exception("Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
@@ -322,13 +326,23 @@ namespace MBHEngine.GameObject
         public Orientation pOrientation
         {
             get { return mOrientation; }
-            set { mOrientation = value; }
+            set 
+            {
+                // Do a deep copy to avoid holding a reference to another game objects orientation.
+                mOrientation.mPosition = value.mPosition;
+                mOrientation.mRotation = value.mRotation;
+                mOrientation.mScale = value.mScale;
+            }
         }
 
         public Direction pDirection
         {
             get { return mDirection; }
-            set { mDirection = value; }
+            set 
+            { 
+                mDirection.mForward = value.mForward;
+                mDirection.mSpeed = value.mSpeed; 
+            }
         }
     }
 }

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
+    <mRenderPriority>50</mRenderPriority>
+    <mDoUpdate>true</mDoUpdate>
+    <mDoRender>false</mDoRender>
+    <mPosition>0 0</mPosition>
+    <mRotation>0</mRotation>
+    <mScale>1 1</mScale>
+    <mBehaviourFileNames>
+      <Item>Sprite</Item>
+      <Item>TileCollision</Item>
+      <Item>Timer</Item>
+      <Item>Explosive</Item>
+    </mBehaviourFileNames>
+    <mBehaviourClassNames>
+      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Code.Behaviour.TileCollision</Item>
+      <Item>MBHEngine.Code.Behaviour.Timer</Item>
+      <Item>ZombieTaxi.Behaviours.Explosive</Item>
+    </mBehaviourClassNames>
+  </Asset>
+</XnaContent>
+
