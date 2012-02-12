@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\\Effects\\BulletSpark</mSpriteFileName>
+    <mFrameHeight>4</mFrameHeight>
+    <mHasShadow>false</mHasShadow>
+    <mMotionRoot>2 2</mMotionRoot>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>Spark1</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>3</mNumFrames>
+        <mLooping>false</mLooping>
+      </Item>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>Spark2</mName>
+        <mStartingFrame>3</mStartingFrame>
+        <mNumFrames>4</mNumFrames>
+        <mLooping>false</mLooping>
+      </Item>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>Spark3</mName>
+        <mStartingFrame>7</mStartingFrame>
+        <mNumFrames>3</mNumFrames>
+        <mLooping>false</mLooping>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+

@@ -231,6 +231,9 @@ namespace ZombieTaxi.Behaviours
                 Vector2 finalUp = new Vector2(-finalDir.Y, -finalDir.X);
                 if (finalDir.X < 0) finalUp *= -1;
 
+                // If the bullet is not reset the explosive behaviour will only work once.
+                mBullets[mCurrentBullet].ResetBehaviours();
+
                 // Update the game object with all the new data.
                 mBullets[mCurrentBullet].pOrientation.mPosition = mGun.pOrientation.mPosition;
                 mBullets[mCurrentBullet].pOrientation.mRotation = (Single)angle;

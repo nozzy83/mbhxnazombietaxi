@@ -5,6 +5,8 @@ using System.Text;
 using MBHEngine.Behaviour;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
+using ZombieTaxiContentDefs;
+using MBHEngine.Math;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -16,12 +18,18 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// When an explosive explodes there is an explosion effect that needs to be shown.  This is it.
         /// </summary>
-        GameObject mExplosionEffect;
+        private GameObject mExplosionEffect;
 
         /// <summary>
         /// Keep track of whether or not this explosive has actually exploded yet.
         /// </summary>
-        Boolean mExploded;
+        private Boolean mExploded;
+
+        /// <summary>
+        /// To make explosions look a little better they can possibly play somewhat random animations
+        /// adding variety when they happen very close to each other.
+        /// </summary>
+        private List<String> mExplosionAnimationNames;
 
         /// <summary>
         /// Preallocate our messages so that we don't trigger the garbage collector later.
@@ -47,10 +55,12 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
-            //HealthDefinition def = GameObjectManager.pInstance.pContentManager.Load<HealthDefinition>(fileName);
+            ExplosiveDefinition def = GameObjectManager.pInstance.pContentManager.Load<ExplosiveDefinition>(fileName);
 
-            mExplosionEffect = new GameObject("GameObjects\\Effects\\Explosion\\Explosion");
+            mExplosionEffect = new GameObject(def.mEffectFileName);
             GameObjectManager.pInstance.Add(mExplosionEffect);
+
+            mExplosionAnimationNames = def.mAnimationsToPlay;
 
             mExploded = false;
 
@@ -88,8 +98,9 @@ namespace ZombieTaxi.Behaviours
                 (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage || 
                 msg is MBHEngine.Behaviour.Timer.OnTimerCompleteMessage))
             {
-                // TODO: Play explosion here.
-                mSetActiveAnimationMessage.mAnimationSetName = "Explode";
+                // Pick a random animation to play.
+                Int32 index = RandomManager.pInstance.RandomNumber() % mExplosionAnimationNames.Count;
+                mSetActiveAnimationMessage.mAnimationSetName = mExplosionAnimationNames[index];
                 mSetActiveAnimationMessage.mReset = true;
 
                 mExplosionEffect.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
