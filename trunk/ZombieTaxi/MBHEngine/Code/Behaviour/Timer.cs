@@ -99,7 +99,7 @@ namespace MBHEngine.Behaviour
                 mTimePassedSeconds -= gameTime.ElapsedGameTime.TotalSeconds;
 
 #if ALLOW_GARBAGE
-                DebugMessageDisplay.pInstance.AddDynamicMessage("Timer: " + mTimePassedSeconds);
+                //DebugMessageDisplay.pInstance.AddDynamicMessage("Timer: " + mTimePassedSeconds);
 #endif
                 // Once we reach 0 the timer is done.
                 if (mTimePassedSeconds <= 0)

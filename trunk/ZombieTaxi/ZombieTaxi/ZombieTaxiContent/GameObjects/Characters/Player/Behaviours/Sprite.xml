@@ -11,12 +11,14 @@
         <mName>Idle</mName>
         <mStartingFrame>0</mStartingFrame>
         <mNumFrames>10</mNumFrames>
+        <mLooping>true</mLooping>
       </Item>      
       <Item>
         <mTicksPerFrame>10</mTicksPerFrame>
         <mName>Walk</mName>
         <mStartingFrame>10</mStartingFrame>
         <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
       </Item>
     </mAnimationSets>
   </Asset>

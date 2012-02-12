@@ -90,5 +90,12 @@ namespace MBHEngine.Behaviour
         public virtual void OnMessage(ref BehaviourMessage msg) 
         {
         }
+
+        /// <summary>
+        /// Resets a behaviour to its initial state.
+        /// </summary>
+        public virtual void Reset()
+        {
+        }
     }
 }

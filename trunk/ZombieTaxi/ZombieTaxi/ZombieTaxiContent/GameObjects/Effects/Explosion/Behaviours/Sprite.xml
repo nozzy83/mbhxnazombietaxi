@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\\Effects\\Explosion</mSpriteFileName>
+    <mFrameHeight>32</mFrameHeight>
+    <mHasShadow>false</mHasShadow>
+    <mMotionRoot>16 30</mMotionRoot>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>Explode</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>8</mNumFrames>
+        <mLooping>false</mLooping>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+
