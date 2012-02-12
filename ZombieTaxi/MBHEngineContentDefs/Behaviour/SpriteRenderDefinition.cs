@@ -34,6 +34,11 @@ namespace MBHEngineContentDefs
             /// The number of frames of animation.
             /// </summary>
             public Int32 mNumFrames;
+
+            /// <summary>
+            /// Does this animation loop?
+            /// </summary>
+            public Boolean mLooping;
         };
 
         /// <summary>

@@ -14,6 +14,21 @@ namespace ZombieTaxi.Behaviours
     class Explosive : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
+        /// When an explosive explodes there is an explosion effect that needs to be shown.  This is it.
+        /// </summary>
+        GameObject mExplosionEffect;
+
+        /// <summary>
+        /// Keep track of whether or not this explosive has actually exploded yet.
+        /// </summary>
+        Boolean mExploded;
+
+        /// <summary>
+        /// Preallocate our messages so that we don't trigger the garbage collector later.
+        /// </summary>
+        SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
+
+        /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
         /// </summary>
@@ -33,6 +48,13 @@ namespace ZombieTaxi.Behaviours
             base.LoadContent(fileName);
 
             //HealthDefinition def = GameObjectManager.pInstance.pContentManager.Load<HealthDefinition>(fileName);
+
+            mExplosionEffect = new GameObject("GameObjects\\Effects\\Explosion\\Explosion");
+            GameObjectManager.pInstance.Add(mExplosionEffect);
+
+            mExploded = false;
+
+            mSetActiveAnimationMessage = new SpriteRender.SetActiveAnimationMessage();
         }
 
         /// <summary>
@@ -41,6 +63,15 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
+        }
+
+        /// <summary>
+        /// Resets a behaviour to its initial state.
+        /// </summary>
+        public override void Reset()
+        {
+            mExplosionEffect.ResetBehaviours();
+            mExploded = false;
         }
 
         /// <summary>
@@ -53,9 +84,22 @@ namespace ZombieTaxi.Behaviours
         public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
-            if (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage)
+            if ((!mExploded) &&
+                (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage || 
+                msg is MBHEngine.Behaviour.Timer.OnTimerCompleteMessage))
             {
                 // TODO: Play explosion here.
+                mSetActiveAnimationMessage.mAnimationSetName = "Explode";
+                mSetActiveAnimationMessage.mReset = true;
+
+                mExplosionEffect.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+                mExplosionEffect.OnMessage(mSetActiveAnimationMessage);
+                mExplosionEffect.pDoRender = mExplosionEffect.pDoUpdate = true;
+
+                mParentGOH.pDoRender = false;
+                mParentGOH.pDirection.mForward = Vector2.Zero;
+
+                mExploded = true;
             }
         }
     }

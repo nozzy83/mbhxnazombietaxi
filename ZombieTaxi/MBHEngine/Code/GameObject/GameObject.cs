@@ -215,6 +215,17 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// Resets all behaviours on this GO to thier initial state.
+        /// </summary>
+        public virtual void ResetBehaviours()
+        {
+            for (int i = 0; i < mBehaviours.Count; i++)
+            {
+                mBehaviours[i].Reset();
+            }
+        }
+
+        /// <summary>
         /// Attaches an already exisiting behaviour to this game object.  This is handy for manually
         /// creating GameObjects, instead of through the usually xml definitions.
         /// </summary>

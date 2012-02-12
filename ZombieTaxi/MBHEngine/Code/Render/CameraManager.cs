@@ -69,8 +69,11 @@ namespace MBHEngine.Render
 
             mBlendFrames = 10;
             mScreenCenter = Matrix.CreateTranslation(device.Viewport.Width * 0.5f, device.Viewport.Height * 0.5f, 0);
-
+#if SMALL_WINDOW
+            mZoomAmount = 4.0f;
+#else
             mZoomAmount = 8.0f;
+#endif
 
             mTransform =
                 Matrix.CreateTranslation(-new Vector3(0f, 0f, 0.0f)) *

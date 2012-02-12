@@ -46,6 +46,15 @@ namespace MBHEngine.Behaviour
         public class SetActiveAnimationMessage : BehaviourMessage
         {
             public String mAnimationSetName;
+            public Boolean mReset;
+        }
+
+        /// <summary>
+        /// An event that gets sent when not looping animations complete.
+        /// </summary>
+        public class OnAnimationCompleteMesage : BehaviourMessage
+        {
+            public String mAnimationSetName;
         }
 
         /// <summary>
@@ -73,6 +82,16 @@ namespace MBHEngine.Behaviour
             /// The number of frames of animation.
             /// </summary>
             public Int32 mNumFrames;
+
+            /// <summary>
+            /// Does this animation loop?
+            /// </summary>
+            public Boolean mLooping;
+
+            /// <summary>
+            /// Has a non-looping animation completed?
+            /// </summary>
+            public Boolean mAnimationComplete;
         };
 
         /// <summary>
@@ -126,6 +145,11 @@ namespace MBHEngine.Behaviour
         private Vector2 mMotionRoot;
 
         /// <summary>
+        /// Preallocated messages to avoid garbage collection during gameplay.
+        /// </summary>
+        private OnAnimationCompleteMesage mOnAnimationCompleteMsg;
+
+        /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
         /// </summary>
@@ -169,6 +193,8 @@ namespace MBHEngine.Behaviour
                     temp.mTicksPerFrame = def.mAnimationSets[i].mTicksPerFrame;
                     temp.mName = def.mAnimationSets[i].mName;
                     temp.mStartingFrame = def.mAnimationSets[i].mStartingFrame;
+                    temp.mLooping = def.mAnimationSets[i].mLooping;
+                    temp.mAnimationComplete = false;
                     mAnimations.Add(temp);
                 }
             }
@@ -181,7 +207,9 @@ namespace MBHEngine.Behaviour
 
             mFrameCounter = 0;
             mCurrentFrame = 0;
-            mActiveAnimation = 1;
+            mActiveAnimation = 0;
+
+            mOnAnimationCompleteMsg = new OnAnimationCompleteMesage();
         }
 
         /// <summary>
@@ -190,14 +218,37 @@ namespace MBHEngine.Behaviour
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
-            if (mIsAnimated)
+            if (mIsAnimated && !mAnimations[mActiveAnimation].mAnimationComplete)
             {
                 mFrameCounter += 1;
 
                 if (mFrameCounter > mAnimations[mActiveAnimation].mTicksPerFrame)
                 {
                     mCurrentFrame += 1;
-                    if (mCurrentFrame >= mAnimations[mActiveAnimation].mNumFrames) mCurrentFrame = 0;
+
+                    if (mCurrentFrame >= mAnimations[mActiveAnimation].mNumFrames)
+                    {
+                        // Handle the case where the animation does not loop.
+                        if (!mAnimations[mActiveAnimation].mLooping)
+                        {
+                            // The current frame was already incremented above, so we need to reverse that so that
+                            // we don't render the frame after this animation.
+                            mCurrentFrame -= 1;
+
+                            // Avoid the animation getting updates now since there is not point; it will just sit on the 
+                            // last frame until it is reset or a new animation is played.
+                            mAnimations[mActiveAnimation].mAnimationComplete = true;
+
+                            // Set up and send the animation complete message so that people can react to it.
+                            mOnAnimationCompleteMsg.mAnimationSetName = mAnimations[mActiveAnimation].mName;
+                            mParentGOH.OnMessage(mOnAnimationCompleteMsg);
+                        }
+                        else
+                        {
+                            // In the case of a looping animation we simple go back to the first frame.
+                            mCurrentFrame = 0;
+                        }
+                    }
                     mFrameCounter = 0;
                 }
             }
@@ -294,6 +345,7 @@ namespace MBHEngine.Behaviour
             {
                 SpriteRender.SetActiveAnimationMessage temp = (SpriteRender.SetActiveAnimationMessage)msg;
 
+                // If the animation is not currently playing we need to find it.
                 if (mAnimations[mActiveAnimation].mName != temp.mAnimationSetName)
                 {
                     for (int i = 0; i < mAnimations.Count; i++)
@@ -302,9 +354,21 @@ namespace MBHEngine.Behaviour
                         {
                             mActiveAnimation = i;
                             mCurrentFrame = 0;
+                            mAnimations[mActiveAnimation].mAnimationComplete = false;
                         }
                     }
                 }
+                // In the case where it is a non-looping animation which has completed, we need to reset the 
+                // animation to the beginning.
+                // If it is a looping animation we don't do anything and assume that they just wanted to continue
+                // the animation.
+                else if (mAnimations[mActiveAnimation].mAnimationComplete)
+                {
+                    mCurrentFrame = 0;
+                    mAnimations[mActiveAnimation].mAnimationComplete = false;
+
+                }
+                
             }
         }
 

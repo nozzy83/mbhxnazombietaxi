@@ -249,6 +249,7 @@ namespace ZombieTaxi.Behaviours
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
                 {
                     GameObject go = mGrenades[mCurrentGrenade];
+                    go.ResetBehaviours();
                     go.pOrientation.mPosition = mBullets[mCurrentBullet].pOrientation.mPosition;
                     go.pOrientation.mRotation = mBullets[mCurrentBullet].pOrientation.mRotation;
                     go.pDirection.mForward = mBullets[mCurrentBullet].pDirection.mForward;
