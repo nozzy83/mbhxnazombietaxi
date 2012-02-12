@@ -6,7 +6,17 @@ using MBHEngineContentDefs;
 
 namespace ZombieTaxiContentDefs
 {
-    class ExplosiveDefinition : BehaviourDefinition
+    public class ExplosiveDefinition : BehaviourDefinition
     {
+        /// <summary>
+        /// The name of the effect game object that will be spawned when this explosive explodes.
+        /// </summary>
+        public String mEffectFileName;
+
+        /// <summary>
+        /// A list of possible animations to play on mEffectFileName when an explosion occurs.  
+        /// It will pick one at random.
+        /// </summary>
+        public List<String> mAnimationsToPlay;
     }
 }
