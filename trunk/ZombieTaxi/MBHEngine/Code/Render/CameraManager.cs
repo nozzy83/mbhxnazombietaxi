@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MBHEngine.GameObject;
+using MBHEngine.Debug;
 
 namespace MBHEngine.Render
 {
@@ -57,6 +59,11 @@ namespace MBHEngine.Render
         private Single mZoomAmount;
 
         /// <summary>
+        /// Keeps track of the viewable world space.
+        /// </summary>
+        private MBHEngine.Math.Rectangle mViewRectangle;
+
+        /// <summary>
         /// Initialize the singleton.  Call before first use.
         /// </summary>
         /// <param name="device">The initialized graphics device.  Used to calculate screen position.</param>
@@ -80,6 +87,8 @@ namespace MBHEngine.Render
                 //Matrix.CreateRotationZ(Rotation) *
                 Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1.0f)) *
                 mScreenCenter;
+
+            mViewRectangle = new Math.Rectangle();
         }
 
         /// <summary>
@@ -101,6 +110,24 @@ namespace MBHEngine.Render
                 Matrix.CreateScale(new Vector3(mZoomAmount)) *
                 //Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1.0f)) *
                 mScreenCenter;
+
+            // Update the view area.
+            mViewRectangle.pCenterPoint = pTargetPosition;
+            mViewRectangle.pDimensions = new Vector2(
+                (GameObjectManager.pInstance.pGraphicsDevice.Viewport.Width) / mZoomAmount,
+                (GameObjectManager.pInstance.pGraphicsDevice.Viewport.Height) / mZoomAmount);
+
+            //DebugShapeDisplay.pInstance.AddAABB(mViewRectangle, Color.Orange);
+        }
+
+        /// <summary>
+        /// Checks if a Rectangle is on screen at all.
+        /// </summary>
+        /// <param name="rect">The rectangle to check.</param>
+        /// <returns></returns>
+        public Boolean IsOnCamera(MBHEngine.Math.Rectangle rect)
+        {
+            return mViewRectangle.Intersects(rect);
         }
 
         /// <summary>
