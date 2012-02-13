@@ -11,6 +11,7 @@ using MBHEngine.GameObject;
 using MBHEngineContentDefs;
 using MBHEngine.Debug;
 using MBHEngine.Math;
+using MBHEngine.Render;
 
 namespace MBHEngine.Behaviour
 {
@@ -88,6 +89,11 @@ namespace MBHEngine.Behaviour
             /// if it has a particular wall.
             /// </summary>
             public WallTypes mActiveWalls = WallTypes.None;
+
+            /// <summary>
+            /// Rather than calculating the rectangle defining the bounds of this tile.
+            /// </summary>
+            public MBHEngine.Math.Rectangle mCollisionRect;
         }
 
         /// <summary>
@@ -147,8 +153,8 @@ namespace MBHEngine.Behaviour
             LevelDefinition def = GameObjectManager.pInstance.pContentManager.Load<LevelDefinition>(fileName);
 
             // TODO: This should be loaded in from the def.
-            mMapWidth = 20;
-            mMapHeight = 20;
+            mMapWidth = 200;
+            mMapHeight = 200;
             mTileWidth = mTileHeight = 8;
 
             // Start by creating all the tiles for this level.
@@ -158,10 +164,22 @@ namespace MBHEngine.Behaviour
                 for (Int32 x = 0; x < mMapWidth; x++)
                 {
                     mCollisionGrid[x,y] = new Tile();
+
+                    // Calculate the center point of the tile.
+                    Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));
+
+                    // Create a rectangle to represent the tile.
+                    mCollisionGrid[x,y].mCollisionRect = new MBHEngine.Math.Rectangle(mTileWidth, mTileHeight, cent);
+
+                    if (RandomManager.pInstance.RandomPercent() <= 0.05f)
+                    {
+                        mCollisionGrid[x,y].mType = 1;
+                    }
                 }
             }
 
             // TODO: The map data should be read in from the level def.
+            /*
             mCollisionGrid[0, 1].mType = 1;
             mCollisionGrid[1, 1].mType = 1;
             mCollisionGrid[1, 0].mType = 1;
@@ -191,6 +209,7 @@ namespace MBHEngine.Behaviour
             mCollisionGrid[0, 12].mType = 1;
             mCollisionGrid[0, 13].mType = 1;
             mCollisionGrid[0, 14].mType = 1;
+            */
             
             // Loop through all the tiles and calculate which sides need to have collision checks done on it.
             // For example if a tile has another tile directly above it, it does not need to check collision 
@@ -243,10 +262,18 @@ namespace MBHEngine.Behaviour
                         // But if a collision was detected on it, render it red.
                         if (mCollisionGrid[x, y].mType == 2)
                             c = Color.Red;
+                        // If a collision was even checked for, render it Orange.
+                        else if (mCollisionGrid[x, y].mType == 3)
+                            c = Color.OrangeRed;
 
                         // Reset the collision type (assuming that if it entered this if statement it should,
                         // be type 1.
                         mCollisionGrid[x, y].mType = 1;
+
+                        if (!CameraManager.pInstance.IsOnCamera(mCollisionGrid[x, y].mCollisionRect))
+                        {
+                            continue;
+                        }
 
                         // Draw the collison volume.
                         batch.Draw(mDebugTexture, new Microsoft.Xna.Framework.Rectangle(x * mTileWidth, y * mTileHeight, mTileWidth, mTileHeight), c);
@@ -335,34 +362,49 @@ namespace MBHEngine.Behaviour
             collideY = false;
             collidePointX = collidePointY = 0;
 
+            // We don't want to check against every tile in the world.  Instead attempt to narrow it down
+            // based on the fact that the tiles can be mapped from their x,y position to their index
+            // into the array.
+            Int32 checkRange = 6;
+            Single x2 = (endRect.pCenterPoint.X / mTileWidth) - ((Single)checkRange * 0.5f);
+            Int32 startX = System.Math.Max((Int32)System.Math.Round(x2), 0);
+
+            Single y2 = (endRect.pCenterPoint.Y / mTileHeight) - ((Single)checkRange * 0.5f);
+            Int32 startY = System.Math.Max((Int32)System.Math.Round(y2), 0);
+
             // Loop through every time checking for collisions.
-            for (Int32 y = 0; y < mMapHeight; y++)
+            for (Int32 y = startY; y < mMapHeight && y < startY + checkRange; y++)
             {
-                for (Int32 x = 0; x < mMapWidth; x++)
+                for (Int32 x = startX; x < mMapWidth && x < startX + checkRange; x++)
                 {
+
                     // Is this tile solid and does it have any active walls?
                     // It may be solid with no walls in the case of one completly surrounded.
                     if (mCollisionGrid[x, y].mType != 0 && mCollisionGrid[x,y].mActiveWalls != Tile.WallTypes.None)
                     {
+                        // This tile has been considered for a collision.  It will be changed to type 2 if there is a
+                        // collision.
+                        mCollisionGrid[x, y].mType = 3;
+
                         // Calculate the center point of the tile.
                         Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));
 
                         // Create a rectangle to represent the tile.
-                        MBHEngine.Math.Rectangle tileRect = new MBHEngine.Math.Rectangle(mTileWidth, mTileHeight, cent);
+                        //MBHEngine.Math.Rectangle tileRect = new MBHEngine.Math.Rectangle(mTileWidth, mTileHeight, cent);
 
                         // Does the place we are trying to move to intersect with the tile? 
-                        if (tileRect.Intersects(endRect))
+                        if (mCollisionGrid[x, y].mCollisionRect.Intersects(endRect))
                         {
                             // If we are moving right, and we hit a tile with a left wall...
                             if (dir.X > 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Left) != Tile.WallTypes.None)
                             {
                                 // Create a line from the center of our destination...
-                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointA = mCollisionGrid[x, y].mCollisionRect.pCenterPoint;
                                 mCollisionRectMovement.pPointB = endRect.pCenterPoint;
 
                                 // ...and a line representing the wall we are testing against.
-                                tileRect.GetLeftEdge(ref mCollisionWall);
+                                mCollisionGrid[x, y].mCollisionRect.GetLeftEdge(ref mCollisionWall);
 
                                 // If those two lines intersect, then we count this collision.
                                 // We do this line check to avoid colliding with both top/bottom and
@@ -382,10 +424,10 @@ namespace MBHEngine.Behaviour
                             else if (dir.X < 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Right) != Tile.WallTypes.None)
                             {
-                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointA = mCollisionGrid[x, y].mCollisionRect.pCenterPoint;
                                 mCollisionRectMovement.pPointB = endRect.pCenterPoint;
 
-                                tileRect.GetRightEdge(ref mCollisionWall);
+                                mCollisionGrid[x, y].mCollisionRect.GetRightEdge(ref mCollisionWall);
 
                                 Vector2 intersect = new Vector2();
 
@@ -401,10 +443,10 @@ namespace MBHEngine.Behaviour
                             if (dir.Y > 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Top) != Tile.WallTypes.None)
                             {
-                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointA = mCollisionGrid[x, y].mCollisionRect.pCenterPoint;
                                 mCollisionRectMovement.pPointB = endRect.pCenterPoint;
 
-                                tileRect.GetTopEdge(ref mCollisionWall);
+                                mCollisionGrid[x, y].mCollisionRect.GetTopEdge(ref mCollisionWall);
 
                                 Vector2 intersect = new Vector2();
 
@@ -420,10 +462,10 @@ namespace MBHEngine.Behaviour
                             else if (dir.Y < 0 &&
                                 (mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Bottom) != Tile.WallTypes.None)
                             {
-                                mCollisionRectMovement.pPointA = tileRect.pCenterPoint;
+                                mCollisionRectMovement.pPointA = mCollisionGrid[x, y].mCollisionRect.pCenterPoint;
                                 mCollisionRectMovement.pPointB = endRect.pCenterPoint;
 
-                                tileRect.GetBottomEdge(ref mCollisionWall);
+                                mCollisionGrid[x, y].mCollisionRect.GetBottomEdge(ref mCollisionWall);
 
                                 Vector2 intersect = new Vector2();
 
