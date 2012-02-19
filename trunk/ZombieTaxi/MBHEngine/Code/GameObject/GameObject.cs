@@ -290,6 +290,10 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.Timer(this, fileName);
                     }
+                case "MBHEngine.Code.Behaviour.PathFind":
+                    {
+                        return new MBHEngine.Behaviour.PathFind(this, fileName);
+                    }
                 default:
                     {
                         throw new Exception("Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
