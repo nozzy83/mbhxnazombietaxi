@@ -116,6 +116,7 @@
     <Compile Include="Behaviour\BehaviourDefinition.cs" />
     <Compile Include="Behaviour\LevelDefinition.cs" />
     <Compile Include="Behaviour\OgmoRenderDefinition.cs" />
+    <Compile Include="Behaviour\PathFindDefinition.cs" />
     <Compile Include="Behaviour\SimulatedPhysicsDefinition.cs" />
     <Compile Include="Behaviour\SpriteRenderDefinition.cs" />
     <Compile Include="Behaviour\TileCollisionDefinition.cs" />

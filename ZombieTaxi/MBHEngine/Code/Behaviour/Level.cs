@@ -62,6 +62,22 @@ namespace MBHEngine.Behaviour
         };
 
         /// <summary>
+        /// Finds the tile at the specified position.
+        /// </summary>
+        public class GetTileAtPositionMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// A position in world space to check against.
+            /// </summary>
+            public Vector2 mPosition;
+
+            /// <summary>
+            /// The tile which the position intersects, or null if there is not one.
+            /// </summary>
+            public Tile mTile;
+        }
+
+        /// <summary>
         /// Data about a single tile.
         /// </summary>
         public class Tile
@@ -94,6 +110,28 @@ namespace MBHEngine.Behaviour
             /// Rather than calculating the rectangle defining the bounds of this tile.
             /// </summary>
             public MBHEngine.Math.Rectangle mCollisionRect;
+
+            /// <summary>
+            /// References to the tiles surrounding this one.
+            /// </summary>
+            public Tile[] mAdjecentTiles;
+
+            /// <summary>
+            /// Uses these enums to look up the adjecent tiles in mAdjecentTiles.
+            /// </summary>
+            public enum AdjectTileDir
+            {
+                LEFT = 0,
+                LEFT_UP,
+                UP,
+                RIGHT_UP,
+                RIGHT,
+                RIGHT_DOWN,
+                DOWN,
+                LEFT_DOWN,
+
+                NUM_DIRECTIONS,
+            }
         }
 
         /// <summary>
@@ -165,12 +203,54 @@ namespace MBHEngine.Behaviour
                 {
                     mCollisionGrid[x,y] = new Tile();
 
+                    // Precalculate the adjecent tiles to this one.
+                    //
+
+                    // Allocate space for the Array itself.
+                    mCollisionGrid[x, y].mAdjecentTiles = new Tile[(Int32)Tile.AdjectTileDir.NUM_DIRECTIONS];
+
+                    // Start with the tiles left of this one, but avoid looking outside the map.
+                    if (x > 0)
+                    {
+                        // Store a reference to the tile to the left.
+                        mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.LEFT] = mCollisionGrid[x - 1, y];
+
+                        // Since the tile to the left was created before this one, it needs to be updated to point to this
+                        // once as the tile on it right.
+                        mCollisionGrid[x - 1, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.RIGHT] = mCollisionGrid[x, y];
+
+                        // Check up and to the left if that is not outside the map.
+                        if (y > 0)
+                        {
+                            // Again, set ourselves and then the adjecent one which was created prior to us being
+                            // created.
+                            mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.LEFT_UP] = mCollisionGrid[x - 1, y - 1];
+                            mCollisionGrid[x - 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjectTileDir.RIGHT_DOWN] = mCollisionGrid[x, y];
+                        }
+                    }
+
+                    // For tiles above.
+                    if (y > 0)
+                    {
+                        // Set our up, their down.
+                        mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.UP] = mCollisionGrid[x, y - 1];
+                        mCollisionGrid[x, y - 1].mAdjecentTiles[(Int32)Tile.AdjectTileDir.DOWN] = mCollisionGrid[x, y];
+
+                        // All that is left is the RIGHT_UP/LEFT_DOWN relationship.
+                        if (x < mMapWidth - 1)
+                        {
+                            mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.RIGHT_UP] = mCollisionGrid[x + 1, y - 1];
+                            mCollisionGrid[x + 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjectTileDir.LEFT_DOWN] = mCollisionGrid[x, y];
+                        }
+                    }
+
                     // Calculate the center point of the tile.
                     Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));
 
                     // Create a rectangle to represent the tile.
                     mCollisionGrid[x,y].mCollisionRect = new MBHEngine.Math.Rectangle(mTileWidth, mTileHeight, cent);
 
+                    // Give it a random chance to be solid.
                     if (RandomManager.pInstance.RandomPercent() <= 0.05f)
                     {
                         mCollisionGrid[x,y].mType = 1;
@@ -249,6 +329,21 @@ namespace MBHEngine.Behaviour
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
+            //Vector2 playerPos = GameObjectManager.pInstance.pPlayer.pOrientation.mPosition;
+            //Tile playerTile = GetTileAtPosition(playerPos.X, playerPos.Y);
+            //if (playerTile != null)
+            //{
+            //    for (Int32 i = 0; i < playerTile.mAdjecentTiles.Length; i++)
+            //    {
+            //        if (playerTile.mAdjecentTiles[i] != null)
+            //        {
+            //            DebugShapeDisplay.pInstance.AddSegment(
+            //                playerTile.mCollisionRect.pCenterPoint,
+            //                playerTile.mAdjecentTiles[i].mCollisionRect.pCenterPoint,
+            //                Color.Purple);
+            //        }
+            //    }
+            //}
             for (Int32 y = 0; y < mMapHeight; y++)
             {
                 for (Int32 x = 0; x < mMapWidth; x++)
@@ -330,6 +425,37 @@ namespace MBHEngine.Behaviour
                                                             out temp.mCollisionPointY);
                 msg = temp;
             }
+            else if (msg is GetTileAtPositionMessage)
+            {
+                GetTileAtPositionMessage temp = (GetTileAtPositionMessage)msg;
+
+                temp.mTile = GetTileAtPosition(temp.mPosition.X, temp.mPosition.Y);
+
+                msg = temp;
+            }
+        }
+
+        /// <summary>
+        /// Calculate which tile is at a particular position in world space.
+        /// </summary>
+        /// <param name="x">The x position in world space.</param>
+        /// <param name="y">The y position in world space.</param>
+        /// <returns>The tile at that position or null if none exists.</returns>
+        private Tile GetTileAtPosition(Single x, Single y)
+        {
+            // We assume that the x and y are at the center point of the object so don't round these numbers
+            // just truncate them down.
+            Int32 xIndex = (Int32)(x / mTileWidth);
+            Int32 yIndex = (Int32)(y / mTileHeight);
+
+            if (xIndex < 0 || xIndex >= mMapWidth || yIndex < 0 || yIndex >= mMapHeight)
+            {
+                return null;
+            }
+            else
+            {
+                return mCollisionGrid[xIndex, yIndex];
+            }
         }
 
         /// <summary>
@@ -365,7 +491,7 @@ namespace MBHEngine.Behaviour
             // We don't want to check against every tile in the world.  Instead attempt to narrow it down
             // based on the fact that the tiles can be mapped from their x,y position to their index
             // into the array.
-            Int32 checkRange = 6;
+            Int32 checkRange = 5;
             Single x2 = (endRect.pCenterPoint.X / mTileWidth) - ((Single)checkRange * 0.5f);
             Int32 startX = System.Math.Max((Int32)System.Math.Round(x2), 0);
 
