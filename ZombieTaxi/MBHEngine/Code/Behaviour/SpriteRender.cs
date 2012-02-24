@@ -172,6 +172,7 @@ namespace MBHEngine.Behaviour
 
             mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
             mMotionRoot = def.mMotionRoot;
+            mHasShadow = def.mHasShadow;
             Single colHeight = mTexture.Height;
             if (def.mFrameHeight > 0)
             {
@@ -182,7 +183,6 @@ namespace MBHEngine.Behaviour
             {
                 mIsAnimated     = true;
                 mFrameHeight    = def.mFrameHeight;
-                mHasShadow      = def.mHasShadow;
 
                 mAnimations = new List<AnimationSet>();
 
@@ -304,11 +304,11 @@ namespace MBHEngine.Behaviour
                     batch.Draw(mTexture,
                                mParentGOH.pOrientation.mPosition + new Vector2(0, mTexture.Height),
                                null,
-                               Color.White,
+                               new Color(0, 0, 0, 128),
                                mParentGOH.pOrientation.mRotation,
                                mMotionRoot,
                                mParentGOH.pOrientation.mScale,
-                               mSpriteEffects,
+                               mSpriteEffects | SpriteEffects.FlipVertically,
                                0);
                 }
             }
