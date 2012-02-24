@@ -9,13 +9,43 @@ using MBHEngine.Input;
 
 namespace MBHEngine.Behaviour
 {
+    /// <summary>
+    /// Behaviour which finds a path from one point to another using A*.
+    /// </summary>
     public class PathFind : Behaviour
     {
+        /// <summary>
+        /// Updates the curent destination of the path finder.  This will reset any path finding
+        /// data solved up to this point.
+        /// </summary>
+        public class SetDestinationMessage : BehaviourMessage
+        {
+            public Vector2 mDestination;
+        }
+
+        /// <summary>
+        /// Update the source position of the path finder.  This will reset any path finding 
+        /// data solved up to this point.
+        /// </summary>
+        public class SetSourceMessage : BehaviourMessage
+        {
+            public Vector2 mSource;
+        }
+
+        /// <summary>
+        /// Retrives the current best node in the path.  By traversing from here back to the source
+        /// using mPrev, you can deterime the whole path.
+        /// </summary>
+        public class GetCurrentBestNode : BehaviourMessage
+        {
+            public PathNode mBest;
+        }
+
         /// <summary>
         /// Represents a node in the path.  Basically a wrapper for a tile, but with some additional
         /// information needed to track its place in the search algorithm.
         /// </summary>
-        private class PathNode
+        public class PathNode
         {
             /// <summary>
             /// The tile in the level this node represents.
@@ -34,14 +64,21 @@ namespace MBHEngine.Behaviour
             public Single mCostFromStart;
 
             /// <summary>
-            /// Often refered to as H in most A* algorithms.  This is the "cost" to get from this tile to the destination.
-            /// This is just an estimate since we won't know the actual cost until the path is calculated.
+            /// Often refered to as H in most A* algorithms.  This is the "cost" to get from this tile 
+            /// to the destination. This is just an estimate since we won't know the actual cost until 
+            /// the path is calculated.
             /// </summary>
             public Single mCostToEnd;
 
             /// <summary>
-            /// The tallied cost of this node taking into account G and H.  Used to determine which nodes are better/worse
-            /// than others.
+            /// Used by the client to keep track of whether or not the object using this path has 
+            /// reached this node yet.
+            /// </summary>
+            public Boolean mReached;
+
+            /// <summary>
+            /// The tallied cost of this node taking into account G and H.  Used to determine which 
+            /// nodes are better/worse than others.
             /// </summary>
             public Single pFinalCost
             {
@@ -61,6 +98,7 @@ namespace MBHEngine.Behaviour
                 mPrev = null;
                 mCostFromStart = 0;
                 mCostToEnd = 0;
+                mReached = false;
             }
         }
 
@@ -118,6 +156,18 @@ namespace MBHEngine.Behaviour
         private Level.Tile mDestinationTile;
 
         /// <summary>
+        /// There are a couple things that can cause our current pathing solution to be considered
+        /// invalid and force us to start over (eg. source moved).
+        /// </summary>
+        Boolean mPathInvalidated;
+
+        /// <summary>
+        /// Allows for the possibility to automatically update the source position based on the parent 
+        /// Game Object.
+        /// </summary>
+        Boolean mUpdateSourceAutomatically;
+
+        /// <summary>
         /// Preallocated to avoid garbage at runtime.
         /// </summary>
         private MBHEngine.Behaviour.Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
@@ -164,6 +214,10 @@ namespace MBHEngine.Behaviour
 
             // Assume the path is not solved.
             mSolved = false;
+            mPathInvalidated = false;
+
+            // TODO: This should be read in from the xml.
+            mUpdateSourceAutomatically = false;
             
             // Preallocate messages to avoid GC during gameplay.
             //
@@ -185,16 +239,12 @@ namespace MBHEngine.Behaviour
             // Store the current level for easy access throughout algorithm.
             GameObject.GameObject curLvl = World.WorldManager.pInstance.pCurrentLevel;
 
-            // There are a couple things that can cause our current pathing solution to be considered
-            // invalid and force us to start over (eg. source moved).
-            Boolean pathInvalidated = false;
-
             // DEBUG
             // If the user presses A set the player's current location as a new destination.
-            if (InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
+            if (false && InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
             {
                 mDestination = mParentGOH.pOrientation.mPosition;
-                pathInvalidated = true;
+                mPathInvalidated = true;
                 mSolved = false;
 
                 // We will need to do a couple checks to see if we have found the destination tile, so cache that
@@ -204,27 +254,32 @@ namespace MBHEngine.Behaviour
                 mDestinationTile = mGetTileAtPositionMsg.mTile;
             }
 
-            // Update the source incase the GO has moved since the last update.
-            mSource = mParentGOH.pOrientation.mPosition;
-
-            // Grab the tile at the source position.
-            mGetTileAtPositionMsg.mPosition = mSource;
-            curLvl.OnMessage(mGetTileAtPositionMsg);
-
-            // We only care if they moved enough to make it onto a new tile.
-            if (mSourceTile != mGetTileAtPositionMsg.mTile)
+            // Does this instance of the behaviour just want to automatically update the source
+            // based on our parents position?
+            if (mUpdateSourceAutomatically)
             {
-                // Update the source tile with the tile the GO has moved to.
-                mSourceTile = mGetTileAtPositionMsg.mTile;
+                // Update the source incase the GO has moved since the last update.
+                mSource = mParentGOH.pOrientation.mPosition;
 
-                // Let the algorithm know that it needs to recalculate.
-                // TODO: With only moving one tile at a time, could this be optimized to
-                //       check if this tile is already in the path, or append it to the start
-                //       of the path?
-                pathInvalidated = true;
+                // Grab the tile at the source position.
+                mGetTileAtPositionMsg.mPosition = mSource;
+                curLvl.OnMessage(mGetTileAtPositionMsg);
 
-                // Since the source has changed, this path can no longer be considered solved.
-                mSolved = false;
+                // We only care if they moved enough to make it onto a new tile.
+                if (mSourceTile != mGetTileAtPositionMsg.mTile)
+                {
+                    // Update the source tile with the tile the GO has moved to.
+                    mSourceTile = mGetTileAtPositionMsg.mTile;
+
+                    // Let the algorithm know that it needs to recalculate.
+                    // TODO: With only moving one tile at a time, could this be optimized to
+                    //       check if this tile is already in the path, or append it to the start
+                    //       of the path?
+                    mPathInvalidated = true;
+
+                    // Since the source has changed, this path can no longer be considered solved.
+                    mSolved = false;
+                }
             }
 
             // If there is no tile at the destination then there is no path finding to do.
@@ -242,7 +297,7 @@ namespace MBHEngine.Behaviour
             }
 
             // If the path has become invalid, we need to restart the pathing algorithm.
-            if (pathInvalidated)
+            if (mPathInvalidated)
             {
                 // Clear all the open nodes, and remember to return them to the unused pool!
                 for (Int32 i = 0; i < mOpenNodes.Count; i++)
@@ -270,10 +325,13 @@ namespace MBHEngine.Behaviour
                 p.mCostToEnd = Vector2.Distance(mSource, mDestination);
 
                 // Store the tile itself.  No need to store the previous tile, as there is none in this case.
-                p.mTile = mGetTileAtPositionMsg.mTile;
+                p.mTile = mSourceTile;
 
                 // Add it to the list, and start the search!
                 mOpenNodes.Add(p);
+
+                // The path is no longer invalid.  It has begun.
+                mPathInvalidated = false;
             }
 
             // This path finding is very expensive over long distances.  To avoid slowing down the game,
@@ -442,19 +500,57 @@ namespace MBHEngine.Behaviour
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
-            /*
             // Which type of message was sent to us?
-            if (msg is ToggleTimerMessage)
+            if (msg is SetDestinationMessage)
             {
-                ToggleTimerMessage tmp = (ToggleTimerMessage)msg;
-                mActive = tmp.mActivate;
-                if (tmp.mReset)
+                SetDestinationMessage tmp = (SetDestinationMessage)msg;
+
+                mGetTileAtPositionMsg.mPosition = tmp.mDestination;
+                World.WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                if (mDestinationTile != mGetTileAtPositionMsg.mTile)
                 {
-                    // Reset the timer back to the original.
-                    mTimePassedSeconds = mLifeTimeSeconds;
-                };
+                    mDestination = tmp.mDestination;
+                    mPathInvalidated = true;
+                    mSolved = false;
+
+                    // We will need to do a couple checks to see if we have found the destination tile, so cache that
+                    // now.
+                    mDestinationTile = mGetTileAtPositionMsg.mTile;
+                }
             }
-            */
+            else if (msg is SetSourceMessage)
+            {
+                SetSourceMessage tmp = (SetSourceMessage)msg;
+
+                // Grab the tile at the source position.
+                mGetTileAtPositionMsg.mPosition = tmp.mSource;
+                World.WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                // We only care if they moved enough to make it onto a new tile.
+                if (mSourceTile != mGetTileAtPositionMsg.mTile)
+                {
+                    // Update the source incase the GO has moved since the last update.
+                    mSource = tmp.mSource;
+
+                    // Update the source tile with the tile the GO has moved to.
+                    mSourceTile = mGetTileAtPositionMsg.mTile;
+
+                    // Let the algorithm know that it needs to recalculate.
+                    // TODO: With only moving one tile at a time, could this be optimized to
+                    //       check if this tile is already in the path, or append it to the start
+                    //       of the path?
+                    mPathInvalidated = true;
+
+                    // Since the source has changed, this path can no longer be considered solved.
+                    mSolved = false;
+                }
+            }
+            else if (msg is GetCurrentBestNode)
+            {
+                GetCurrentBestNode tmp = (GetCurrentBestNode)msg;
+                tmp.mBest = mCurBest;
+            }
         }
 
         /// <summary>

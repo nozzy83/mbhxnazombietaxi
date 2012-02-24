@@ -144,7 +144,7 @@ namespace ZombieTaxi
             GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
             t = new Kamikaze(enemy, null);
             enemy.AttachBehaviour( t );
-            //GameObjectManager.pInstance.Add(enemy);
+            GameObjectManager.pInstance.Add(enemy);
 
             mVingetting = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
             //GameObjectManager.pInstance.Add(ving);
