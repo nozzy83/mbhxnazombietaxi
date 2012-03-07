@@ -24,12 +24,12 @@ namespace MBHEngine.Debug
         /// <summary>
         /// Preallocated verticies for rendering solid lines.
         /// </summary>
-        private VertexPositionColor[] mVertsLines = new VertexPositionColor[100000];
+        private VertexPositionColor[] mVertsLines = new VertexPositionColor[1000000];
 
         /// <summary>
         /// Preallocated verticies used for rendering the semi-transparent fill on some shapes.
         /// </summary>
-        private VertexPositionColor[] mVertsFill = new VertexPositionColor[100000];
+        private VertexPositionColor[] mVertsFill = new VertexPositionColor[1000000];
 
         /// <summary>
         /// Keep track of the currently used verticies.

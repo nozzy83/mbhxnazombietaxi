@@ -205,7 +205,7 @@ namespace MBHEngine.Behaviour
             if (mUnusedNodes == null)
             {
                 mUnusedNodes = new Stack<PathNode>(10000);
-                for (Int32 i = 0; i < 10000; i++)
+                for (Int32 i = 0; i < 100000; i++)
                 {
                     PathNode temp = new PathNode();
                     mUnusedNodes.Push(temp);
@@ -231,9 +231,9 @@ namespace MBHEngine.Behaviour
         public override void Update(GameTime gameTime)
         {
 #if ALLOW_GARBAGE
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Open: " + mOpenNodes.Count);
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Closed: " + mClosedNodes.Count);
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + mUnusedNodes.Count);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Open: " + mOpenNodes.Count);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Closed: " + mClosedNodes.Count);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + mUnusedNodes.Count);
 #endif
 
             // Store the current level for easy access throughout algorithm.
@@ -241,6 +241,7 @@ namespace MBHEngine.Behaviour
 
             // DEBUG
             // If the user presses A set the player's current location as a new destination.
+            /*
             if (false && InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
             {
                 mDestination = mParentGOH.pOrientation.mPosition;
@@ -253,6 +254,7 @@ namespace MBHEngine.Behaviour
                 curLvl.OnMessage(mGetTileAtPositionMsg);
                 mDestinationTile = mGetTileAtPositionMsg.mTile;
             }
+            */
 
             // Does this instance of the behaviour just want to automatically update the source
             // based on our parents position?
@@ -299,21 +301,7 @@ namespace MBHEngine.Behaviour
             // If the path has become invalid, we need to restart the pathing algorithm.
             if (mPathInvalidated)
             {
-                // Clear all the open nodes, and remember to return them to the unused pool!
-                for (Int32 i = 0; i < mOpenNodes.Count; i++)
-                {
-                    mOpenNodes[i].Reset();
-                    mUnusedNodes.Push(mOpenNodes[i]);
-                }
-                mOpenNodes.Clear();
-
-                // Clear all the closed nodes and remember to return them to the unused pool!
-                for (Int32 i = 0; i < mClosedNodes.Count; i++)
-                {
-                    mClosedNodes[i].Reset();
-                    mUnusedNodes.Push(mClosedNodes[i]);
-                }
-                mClosedNodes.Clear();
+                ClearNodeLists();
 
                 // First thing we need to do is add the first node to the open list.
                 PathNode p = mUnusedNodes.Pop();
@@ -489,6 +477,28 @@ namespace MBHEngine.Behaviour
             {
                 DrawPath(mCurBest);
             }
+        }
+
+        /// <summary>
+        /// Cleans up all the open and closed nodes.
+        /// </summary>
+        private void ClearNodeLists()
+        {
+            // Clear all the open nodes, and remember to return them to the unused pool!
+            for (Int32 i = 0; i < mOpenNodes.Count; i++)
+            {
+                mOpenNodes[i].Reset();
+                mUnusedNodes.Push(mOpenNodes[i]);
+            }
+            mOpenNodes.Clear();
+
+            // Clear all the closed nodes and remember to return them to the unused pool!
+            for (Int32 i = 0; i < mClosedNodes.Count; i++)
+            {
+                mClosedNodes[i].Reset();
+                mUnusedNodes.Push(mClosedNodes[i]);
+            }
+            mClosedNodes.Clear();
         }
 
         /// <summary>
@@ -684,6 +694,17 @@ namespace MBHEngine.Behaviour
             };
 
             return false;
+        }
+
+        /// <summary>
+        /// The number of nodes in the static list of unused nodes.
+        /// </summary>
+        static public Int32 pNumUnusedNodes
+        {
+            get
+            {
+                return mUnusedNodes.Count;
+            }
         }
     }
 }

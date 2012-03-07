@@ -10,10 +10,14 @@
     <mBehaviourFileNames>
       <Item>Sprite</Item>
       <Item>PathFind</Item>
+      <Item>TileCollision</Item>
+      <Item>Explosive</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
       <Item>MBHEngine.Code.Behaviour.PathFind</Item>
+      <Item>MBHEngine.Code.Behaviour.TileCollision</Item>
+      <Item>ZombieTaxi.Behaviours.Explosive</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

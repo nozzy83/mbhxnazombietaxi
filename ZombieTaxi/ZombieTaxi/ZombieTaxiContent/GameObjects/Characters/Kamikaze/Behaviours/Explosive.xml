@@ -5,7 +5,7 @@
     <mAnimationsToPlay>
       <Item>Explode</Item>
     </mAnimationsToPlay>
-    <mManualExplosion>false</mManualExplosion>
+    <mManualExplosion>true</mManualExplosion>
   </Asset>
 </XnaContent>
 

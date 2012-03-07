@@ -7,6 +7,7 @@
       <Item>Spark2</Item>
       <Item>Spark3</Item>
     </mAnimationsToPlay>
+    <mManualExplosion>false</mManualExplosion>
   </Asset>
 </XnaContent>
 

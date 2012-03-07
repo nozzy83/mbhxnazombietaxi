@@ -125,6 +125,7 @@ namespace ZombieTaxi
             GameObject bg = new GameObject();
             MBHEngine.Behaviour.Behaviour t = new InfiniteBG(bg, null);
             bg.AttachBehaviour(t);
+            bg.pRenderPriority = 25;
             GameObjectManager.pInstance.Add(bg);
 
             WorldManager.pInstance.Initialize();
@@ -141,12 +142,29 @@ namespace ZombieTaxi
             // Store the player for easy access.
             GameObjectManager.pInstance.pPlayer = player;
 
+            /*
             GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
             t = new Kamikaze(enemy, null);
-            enemy.AttachBehaviour( t );
+            enemy.AttachBehaviour(t);
+            enemy.pOrientation.mPosition.X = 50;
+            enemy.pOrientation.mPosition.Y = 50;
             GameObjectManager.pInstance.Add(enemy);
-
+            */
+            
+            for (Int32 i = 0; i < 2000; i++)
+            {
+                GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
+                t = new Kamikaze(enemy, null);
+                enemy.AttachBehaviour(t);
+                enemy.pOrientation.mPosition.X = RandomManager.pInstance.RandomNumber() % (200 * 8);
+                enemy.pOrientation.mPosition.Y = RandomManager.pInstance.RandomNumber() % (200 * 8);
+                GameObjectManager.pInstance.Add(enemy);
+            }
+            
             mVingetting = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
+#if SMALL_WINDOW
+            mVingetting.pOrientation.mScale = new Vector2(0.5f, 0.5f);
+#endif
             //GameObjectManager.pInstance.Add(ving);
 
             //OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");
@@ -186,6 +204,7 @@ namespace ZombieTaxi
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Game-Time Delta: " + gameTime.ElapsedGameTime.TotalSeconds);
+            DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + PathFind.pNumUnusedNodes);
 #endif
             GameObjectManager.pInstance.Update(gameTime);
             PhysicsManager.pInstance.Update(gameTime);

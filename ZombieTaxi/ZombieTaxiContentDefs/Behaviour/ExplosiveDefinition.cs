@@ -18,5 +18,10 @@ namespace ZombieTaxiContentDefs
         /// It will pick one at random.
         /// </summary>
         public List<String> mAnimationsToPlay;
+
+        /// <summary>
+        /// Is this explosive triggered manually?
+        /// </summary>
+        public Boolean mManualExplosion;
     }
 }
