@@ -23,5 +23,10 @@ namespace ZombieTaxiContentDefs
         /// Is this explosive triggered manually?
         /// </summary>
         public Boolean mManualExplosion;
+
+        /// <summary>
+        /// The amount of damage that is caused by this explosion.
+        /// </summary>
+        public Single mDamageCaused;
     }
 }
