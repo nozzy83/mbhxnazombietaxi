@@ -16,6 +16,13 @@ namespace ZombieTaxi.Behaviours
     class Explosive : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
+        /// Tells the Explosive to detonate right now.
+        /// </summary>
+        public class DetonateMessage : BehaviourMessage
+        {
+        }
+
+        /// <summary>
         /// When an explosive explodes there is an explosion effect that needs to be shown.  This is it.
         /// </summary>
         private GameObject mExplosionEffect;
@@ -34,7 +41,12 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Preallocate our messages so that we don't trigger the garbage collector later.
         /// </summary>
-        SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
+        private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
+
+        /// <summary>
+        /// Keeps track of whether this explosion is manually triggered using the DetonateMessage.
+        /// </summary>
+        private Boolean mManualExplosion;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -61,6 +73,8 @@ namespace ZombieTaxi.Behaviours
             GameObjectManager.pInstance.Add(mExplosionEffect);
 
             mExplosionAnimationNames = def.mAnimationsToPlay;
+
+            mManualExplosion = def.mManualExplosion;
 
             mExploded = false;
 
@@ -94,24 +108,35 @@ namespace ZombieTaxi.Behaviours
         public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
-            if ((!mExploded) &&
-                (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage || 
-                msg is MBHEngine.Behaviour.Timer.OnTimerCompleteMessage))
+            if ((!mExploded) && (!mManualExplosion) &&
+                (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage || msg is MBHEngine.Behaviour.Timer.OnTimerCompleteMessage))
             {
-                // Pick a random animation to play.
-                Int32 index = RandomManager.pInstance.RandomNumber() % mExplosionAnimationNames.Count;
-                mSetActiveAnimationMessage.mAnimationSetName = mExplosionAnimationNames[index];
-                mSetActiveAnimationMessage.mReset = true;
-
-                mExplosionEffect.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
-                mExplosionEffect.OnMessage(mSetActiveAnimationMessage);
-                mExplosionEffect.pDoRender = mExplosionEffect.pDoUpdate = true;
-
-                mParentGOH.pDoRender = false;
-                mParentGOH.pDirection.mForward = Vector2.Zero;
-
-                mExploded = true;
+                Detonate();
             }
+            else if (!mExploded && msg is DetonateMessage)
+            {
+                Detonate();
+            }
+        }
+
+        /// <summary>
+        /// Trigger the explosive to detonate.
+        /// </summary>
+        private void Detonate()
+        {
+            // Pick a random animation to play.
+            Int32 index = RandomManager.pInstance.RandomNumber() % mExplosionAnimationNames.Count;
+            mSetActiveAnimationMessage.mAnimationSetName = mExplosionAnimationNames[index];
+            mSetActiveAnimationMessage.mReset = true;
+
+            mExplosionEffect.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+            mExplosionEffect.OnMessage(mSetActiveAnimationMessage);
+            mExplosionEffect.pDoRender = mExplosionEffect.pDoUpdate = true;
+
+            mParentGOH.pDoRender = false;
+            mParentGOH.pDirection.mForward = Vector2.Zero;
+
+            mExploded = true;
         }
     }
 }

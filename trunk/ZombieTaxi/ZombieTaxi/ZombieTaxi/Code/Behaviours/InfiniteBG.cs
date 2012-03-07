@@ -136,6 +136,7 @@ namespace ZombieTaxi.Behaviours
 
                     // Add this tile to the batch render.
                     batch.Draw(mFill, mBlock, col);
+                    //batch.Draw(mFill, mBlock, null, col, 0, Vector2.Zero, SpriteEffects.None, 0);
 
                     // Reset the alpha so that the compare below works.
                     col.A = 255;
