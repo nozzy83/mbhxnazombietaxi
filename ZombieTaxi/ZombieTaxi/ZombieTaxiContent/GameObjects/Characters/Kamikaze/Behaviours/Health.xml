@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.HealthDefinition">
+    <mCurrentHealth>25</mCurrentHealth>
+    <mMaxHealth>25</mMaxHealth>
+  </Asset>
+</XnaContent>
+

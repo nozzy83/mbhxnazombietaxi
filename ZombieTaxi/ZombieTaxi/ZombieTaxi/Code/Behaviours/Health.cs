@@ -90,7 +90,7 @@ namespace ZombieTaxi.Behaviours
         public override void Update(GameTime gameTime)
         {
 #if ALLOW_GARBAGE
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Health: " + mCurrentHealth + "/" + mMaxHealth);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("Health: " + mCurrentHealth + "/" + mMaxHealth);
 #endif        
         }
 

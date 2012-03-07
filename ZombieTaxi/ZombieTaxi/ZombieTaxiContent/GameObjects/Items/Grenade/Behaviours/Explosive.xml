@@ -6,6 +6,7 @@
       <Item>Explode</Item>
     </mAnimationsToPlay>
     <mManualExplosion>false</mManualExplosion>
+    <mDamageCaused>100</mDamageCaused>
   </Asset>
 </XnaContent>
 

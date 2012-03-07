@@ -162,7 +162,7 @@ namespace MBHEngine.GameObject
                 }
             }
 
-            // First update every object we are managing.
+            // Update every object we are managing.
             //
             for (int i = 0; i < mGameObjects.Count; i++)
             {
@@ -316,6 +316,23 @@ namespace MBHEngine.GameObject
             {
                 //go.Shutdown();
                 mGameObjectsToRemove.Add(go);
+            }
+        }
+
+        /// <summary>
+        /// Populates a list of all the objects within a certain range of a position.
+        /// </summary>
+        /// <param name="centerPoint">The position to test from.</param>
+        /// <param name="radius">The radius from that position that the other objects must be within.</param>
+        /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.  </param>
+        public void GetGameObjectsInRange(Vector2 centerPoint, Single radius, ref List<GameObject> refObjects)
+        {
+            for (int i = 0; i < mGameObjects.Count; i++)
+            {
+                if (Vector2.Distance(centerPoint, mGameObjects[i].pOrientation.mPosition) < radius)
+                {
+                    refObjects.Add(mGameObjects[i]);
+                }
             }
         }
 

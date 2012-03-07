@@ -39,14 +39,27 @@ namespace ZombieTaxi.Behaviours
         private List<String> mExplosionAnimationNames;
 
         /// <summary>
-        /// Preallocate our messages so that we don't trigger the garbage collector later.
-        /// </summary>
-        private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
-
-        /// <summary>
         /// Keeps track of whether this explosion is manually triggered using the DetonateMessage.
         /// </summary>
         private Boolean mManualExplosion;
+
+        /// <summary>
+        /// The amount of damage this explosive causes when exploding.
+        /// </summary>
+        private Single mDamagedCaused;
+
+        /// <summary>
+        /// Used to store all the objects in range of this explosion so that it can
+        /// apply damage to them.
+        /// Preallocated to avoid GC.
+        /// </summary>
+        private List<GameObject> mObjectsInRange;
+
+        /// <summary>
+        /// Preallocate our messages so that we don't trigger the garbage collector later.
+        /// </summary>
+        private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
+        private Health.OnApplyDamage mOnApplyDamageMsg; 
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -76,9 +89,14 @@ namespace ZombieTaxi.Behaviours
 
             mManualExplosion = def.mManualExplosion;
 
+            mDamagedCaused = def.mDamageCaused;
+
             mExploded = false;
 
+            mObjectsInRange = new List<GameObject>(16);
+
             mSetActiveAnimationMessage = new SpriteRender.SetActiveAnimationMessage();
+            mOnApplyDamageMsg = new Health.OnApplyDamage(mDamagedCaused);
         }
 
         /// <summary>
@@ -107,15 +125,18 @@ namespace ZombieTaxi.Behaviours
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
-            // Which type of message was sent to us?
-            if ((!mExploded) && (!mManualExplosion) &&
-                (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage || msg is MBHEngine.Behaviour.Timer.OnTimerCompleteMessage))
+            if (!mExploded)
             {
-                Detonate();
-            }
-            else if (!mExploded && msg is DetonateMessage)
-            {
-                Detonate();
+                // Which type of message was sent to us?
+                if (!mManualExplosion &&
+                    (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage || msg is MBHEngine.Behaviour.Timer.OnTimerCompleteMessage))
+                {
+                    Detonate();
+                }
+                else if (msg is DetonateMessage || msg is Health.OnZeroHealth)
+                {
+                    Detonate();
+                }
             }
         }
 
@@ -135,6 +156,14 @@ namespace ZombieTaxi.Behaviours
 
             mParentGOH.pDoRender = false;
             mParentGOH.pDirection.mForward = Vector2.Zero;
+
+            // Find all the objects near by and apply some damage to them.
+            mObjectsInRange.Clear();
+            GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH.pOrientation.mPosition, 10, ref mObjectsInRange);
+            for (Int32 i = 0; i < mObjectsInRange.Count; i++)
+            {
+                mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);
+            }
 
             mExploded = true;
         }
