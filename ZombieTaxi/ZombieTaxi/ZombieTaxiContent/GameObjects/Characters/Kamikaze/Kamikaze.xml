@@ -7,6 +7,7 @@
     <mPosition>0 0</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
+    <mClassifications>1</mClassifications>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
       <Item>PathFind</Item>

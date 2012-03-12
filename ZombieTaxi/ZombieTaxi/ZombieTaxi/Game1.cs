@@ -92,6 +92,7 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Initialize(Content, mGraphics);
             PhysicsManager.pInstance.Initialize(mGraphics, mSpriteBatch);
             GameObject.AddBehaviourCreator(new ClientBehaviourCreator());
+            GameObjectFactory.pInstance.Initialize();
             CameraManager.pInstance.Initialize(mGraphics.GraphicsDevice);
 
             // By default draw all deug information.
@@ -122,6 +123,8 @@ namespace ZombieTaxi
             // Keep the sprites looking Crisp.
             mSpriteSamplerState.Filter = TextureFilter.Point;
 
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Bullet\\Bullet", 100);
+
             GameObject bg = new GameObject();
             MBHEngine.Behaviour.Behaviour t = new InfiniteBG(bg, null);
             bg.AttachBehaviour(t);
@@ -151,7 +154,7 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Add(enemy);
             */
             
-            for (Int32 i = 0; i < 2000; i++)
+            for (Int32 i = 0; i < 200; i++)
             {
                 GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
                 t = new Kamikaze(enemy, null);

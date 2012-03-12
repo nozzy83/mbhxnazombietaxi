@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using MBHEngine.Debug;
+using MBHEngineContentDefs;
 //using dreambuildplay2010.Code.Utilities;
 //using dreambuildplay2010.Code.Game.GameStates;
 
@@ -193,6 +194,13 @@ namespace MBHEngine.GameObject
             //
             for (int i = 0; i < mGameObjectsToRemove.Count; i++)
             {
+                // If this is a GameObject that was spawned throught a Factory then it needs to be
+                // returned to that Factory.
+                if (mGameObjectsToRemove[i].pFactoryInfo.pIsManaged)
+                {
+                    GameObjectFactory.pInstance.RecycleTemplate(mGameObjectsToRemove[i]);
+                }
+
                 // What happens if someone adds and removes an element within the same
                 // update?  It would mean we are about to remove an item that hasn't
                 // actually been added yet!  To get around this flaw, we will attempt to
@@ -324,14 +332,22 @@ namespace MBHEngine.GameObject
         /// </summary>
         /// <param name="centerPoint">The position to test from.</param>
         /// <param name="radius">The radius from that position that the other objects must be within.</param>
-        /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.  </param>
-        public void GetGameObjectsInRange(Vector2 centerPoint, Single radius, ref List<GameObject> refObjects)
+        /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.</param>
+        /// <param name="classifications">The types of objects to check for.</param>
+        public void GetGameObjectsInRange(Vector2 centerPoint, Single radius, ref List<GameObject> refObjects, List<GameObject.Classification> classifications)
         {
+            Single radSqr = radius * radius;
             for (int i = 0; i < mGameObjects.Count; i++)
             {
-                if (Vector2.Distance(centerPoint, mGameObjects[i].pOrientation.mPosition) < radius)
+                for (Int32 j = 0; j < classifications.Count; j++)
                 {
-                    refObjects.Add(mGameObjects[i]);
+                    if (mGameObjects[i].pClassifications.Contains(classifications[j]))
+                    {
+                        if (Vector2.DistanceSquared(centerPoint, mGameObjects[i].pOrientation.mPosition) < radSqr)
+                        {
+                            refObjects.Add(mGameObjects[i]);
+                        }
+                    }
                 }
             }
         }

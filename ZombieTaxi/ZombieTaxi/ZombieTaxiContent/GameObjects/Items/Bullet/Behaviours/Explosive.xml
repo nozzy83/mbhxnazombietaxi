@@ -8,7 +8,8 @@
       <Item>Spark3</Item>
     </mAnimationsToPlay>
     <mManualExplosion>false</mManualExplosion>
-    <mDamageCaused>10</mDamageCaused>
+    <mDamageCaused>0</mDamageCaused>
+    <mDamageAppliedTo>1</mDamageAppliedTo>
   </Asset>
 </XnaContent>
 

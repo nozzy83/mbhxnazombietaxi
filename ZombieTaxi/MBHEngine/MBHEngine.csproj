@@ -128,6 +128,7 @@
     <Compile Include="Code\Debug\DebugMessageDisplay.cs" />
     <Compile Include="Code\Debug\DebugShapeDisplay.cs" />
     <Compile Include="Code\GameObject\GameObject.cs" />
+    <Compile Include="Code\GameObject\GameObjectFactory.cs" />
     <Compile Include="Code\GameObject\GameObjectManager.cs" />
     <Compile Include="Code\Input\InputManager.cs" />
     <Compile Include="Code\IO\CommandLineManager.cs" />

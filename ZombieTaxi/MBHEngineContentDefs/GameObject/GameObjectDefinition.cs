@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace MBHEngineContentDefs
 {
@@ -38,6 +39,12 @@ namespace MBHEngineContentDefs
         /// The scale of the object in both the x and y axis independently.
         /// </summary>
         public Vector2 mScale;
+
+        /// <summary>
+        /// The calssifications for this game object.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public List<Int32> mClassifications;
 
         /// <summary>
         /// A list of all the behaviours this game object has.  These are indentified by

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.ProjectileDefinition">
+    <mDamageCaused>100</mDamageCaused>
+    <mDamageAppliedTo>1</mDamageAppliedTo>
+  </Asset>
+</XnaContent>
+

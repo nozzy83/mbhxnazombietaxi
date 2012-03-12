@@ -32,19 +32,9 @@ namespace ZombieTaxi.Behaviours
         private GameObject mGun;
 
         /// <summary>
-        /// The bullets fired from the gun.
-        /// </summary>
-        private GameObject[] mBullets;
-
-        /// <summary>
         /// Grenades fired with alt fire.
         /// </summary>
         private GameObject[] mGrenades;
-
-        /// <summary>
-        /// mBullets is used as a circular array, and this is the current index.
-        /// </summary>
-        private Int16 mCurrentBullet;
 
         private Int16 mCurrentGrenade;
 
@@ -75,24 +65,14 @@ namespace ZombieTaxi.Behaviours
             TwinStickDefinition def = GameObjectManager.pInstance.pContentManager.Load<TwinStickDefinition>(fileName);
 
             mMoveSpeed = def.mMoveSpeed;
-            mCurrentBullet = 0;
             mCurrentGrenade = 0;
 
-            mBullets = new GameObject[100];
-
-            for (Int16 i = 0; i < 100; i++)
-            {
-                mBullets[i] = new GameObject("GameObjects\\Items\\Bullet\\Bullet");
-                mBullets[i].pDirection.mSpeed = 1.75f;
-                GameObjectManager.pInstance.Add(mBullets[i]);
-            }
 
             mGrenades = new GameObject[6];
             for (Int16 i = 0; i < mGrenades.Length; i++)
             {
                 mGrenades[i] = new GameObject("GameObjects\\Items\\Grenade\\Grenade");
                 mGrenades[i].pDirection.mSpeed = 0.25f;
-                GameObjectManager.pInstance.Add(mGrenades[i]);
             } 
 
             mGun = new GameObject("GameObjects\\Items\\Gun\\Gun");
@@ -231,51 +211,56 @@ namespace ZombieTaxi.Behaviours
                 Vector2 finalUp = new Vector2(-finalDir.Y, -finalDir.X);
                 if (finalDir.X < 0) finalUp *= -1;
 
-                // If the bullet is not reset the explosive behaviour will only work once.
-                mBullets[mCurrentBullet].ResetBehaviours();
+                GameObject bullet = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Bullet\\Bullet");
 
-                // Update the game object with all the new data.
-                mBullets[mCurrentBullet].pOrientation.mPosition = mGun.pOrientation.mPosition;
-                mBullets[mCurrentBullet].pOrientation.mRotation = (Single)angle;
-                mBullets[mCurrentBullet].pDirection.mForward = finalDir;
-
-                finalDir.Y *= -1;
-                mBullets[mCurrentBullet].pOrientation.mPosition += finalUp * 1.0f;
-                mBullets[mCurrentBullet].pOrientation.mPosition += finalDir * 3.5f;
-
-                // The screen's y direction is opposite the controller.
-                mBullets[mCurrentBullet].pDirection.mForward.Y *= -1;
-
-                // By default the bullets have their renderer turned off.
-                mBullets[mCurrentBullet].pDoRender = true;
-
-                if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
+                if (bullet != null)
                 {
-                    GameObject go = mGrenades[mCurrentGrenade];
-                    go.ResetBehaviours();
-                    go.pOrientation.mPosition = mBullets[mCurrentBullet].pOrientation.mPosition;
-                    go.pOrientation.mRotation = mBullets[mCurrentBullet].pOrientation.mRotation;
-                    go.pDirection.mForward = mBullets[mCurrentBullet].pDirection.mForward;
-                    go.pDoRender = true;
+                    // If the bullet is not reset the explosive behaviour will only work once.
+                    bullet.ResetBehaviours();
+
                     mToggleTimerMsg.mActivate = true;
                     mToggleTimerMsg.mReset = true;
-                    go.OnMessage(mToggleTimerMsg);
+                    bullet.OnMessage(mToggleTimerMsg);
 
-                    mCurrentGrenade++;
+                    bullet.pDirection.mSpeed = 1.75f;
 
-                    if (mCurrentGrenade >= mGrenades.Length)
+                    // Update the game object with all the new data.
+                    bullet.pOrientation.mPosition = mGun.pOrientation.mPosition;
+                    bullet.pOrientation.mRotation = (Single)angle;
+                    bullet.pDirection.mForward = finalDir;
+
+                    finalDir.Y *= -1;
+                    bullet.pOrientation.mPosition += finalUp * 1.0f;
+                    bullet.pOrientation.mPosition += finalDir * 3.5f;
+
+                    // The screen's y direction is opposite the controller.
+                    bullet.pDirection.mForward.Y *= -1;
+
+                    // By default the bullets have their renderer turned off.
+                    bullet.pDoRender = true;
+
+                    GameObjectManager.pInstance.Add(bullet);
+
+                    if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
                     {
-                        mCurrentGrenade = 0;
+                        GameObject go = mGrenades[mCurrentGrenade];
+                        go.ResetBehaviours();
+                        go.pOrientation.mPosition = bullet.pOrientation.mPosition;
+                        go.pOrientation.mRotation = bullet.pOrientation.mRotation;
+                        go.pDirection.mForward = bullet.pDirection.mForward;
+                        go.pDoRender = true;
+                        GameObjectManager.pInstance.Add(go);
+                        mToggleTimerMsg.mActivate = true;
+                        mToggleTimerMsg.mReset = true;
+                        go.OnMessage(mToggleTimerMsg);
+
+                        mCurrentGrenade++;
+
+                        if (mCurrentGrenade >= mGrenades.Length)
+                        {
+                            mCurrentGrenade = 0;
+                        }
                     }
-                }
-
-                // Next time fire a new bullet.
-                mCurrentBullet++;
-
-                // Make sure the array gets looped around.
-                if (mCurrentBullet >= mBullets.Length)
-                {
-                    mCurrentBullet = 0;
                 }
             }
 
