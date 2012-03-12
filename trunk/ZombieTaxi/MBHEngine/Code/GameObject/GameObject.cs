@@ -23,6 +23,15 @@ namespace MBHEngine.GameObject
     public class GameObject
     {
         /// <summary>
+        /// The different types of GameObjects used for filtering at run time.
+        /// </summary>
+        public enum Classification
+        {
+            Player = 0,
+            Enemy,
+        };
+
+        /// <summary>
         /// Wrapper class for all the orientation data: position, rotation and scale.
         /// </summary>
         public class Orientation
@@ -59,6 +68,19 @@ namespace MBHEngine.GameObject
             public Single mSpeed = 0.0f;
         };
 
+
+        /// <summary>
+        /// A static list of behaviour creators which each instance will attempt to use to create behaviours
+        /// before moving on to the engine behaviours.
+        /// </summary>
+        static protected List<Behaviour.BehaviourCreator> mBehaviourCreators = new List<BehaviourCreator>();
+
+        /// <summary>
+        /// To make debuging easier, we give each game object a unique id.  That id is just this static which
+        /// gets incremented every time one is created.
+        /// </summary>
+        private static Int32 mUniqueIDCounter = 0;
+
         /// <summary>
         /// Determines the order at which GameObjects should be rendered.
         /// The higher the number the later it will be rendered.
@@ -86,15 +108,26 @@ namespace MBHEngine.GameObject
         protected Direction mDirection;
 
         /// <summary>
+        /// A list of classifications which this game objects fits into.  This can be used to filter
+        /// larger lists of game objects into smaller ones.
+        /// </summary>
+        protected List<Classification> mClassifications;
+
+        /// <summary>
+        /// Information about how (and if) this object was spawned from a Factory.  This information is needed
+        /// for recycling the object when it dies.
+        /// </summary>
+        protected GameObjectFactory.FactoryInfo mFactoryInfo;
+
+        /// <summary>
         /// A collection of all the behaviors associated with this GameObject.
         /// </summary>
         protected List<Behaviour.Behaviour> mBehaviours = new List<MBHEngine.Behaviour.Behaviour>();
 
         /// <summary>
-        /// A static list of behaviour creators which each instance will attempt to use to create behaviours
-        /// before moving on to the engine behaviours.
+        /// Each Game Object is given a unique id to make debuging easier.
         /// </summary>
-        static protected List<Behaviour.BehaviourCreator> mBehaviourCreators = new List<BehaviourCreator>();
+        protected Int32 mID;
 
         /// <summary>
         /// Default Constructor.  Does nothing but needed to be overwritten so that
@@ -117,8 +150,14 @@ namespace MBHEngine.GameObject
         /// <param name="fileName">The file to load from.</param>
         public virtual void LoadContent(String fileName)
         {
+            // Give this object a unique id and increment the counter so that the next
+            // object gets a unique id as well.
+            mID = mUniqueIDCounter++;
+
             mDirection = new Direction();
             mOrientation = new Orientation();
+            mFactoryInfo = new GameObjectFactory.FactoryInfo();
+            mClassifications = new List<Classification>();
 
             if (null != fileName)
             {
@@ -130,6 +169,11 @@ namespace MBHEngine.GameObject
                 mOrientation.mPosition = def.mPosition;
                 mOrientation.mRotation = def.mRotation;
                 mOrientation.mScale = def.mScale;
+
+                for (Int32 i = 0; def.mClassifications != null && i < def.mClassifications.Count; i++)
+                {
+                    mClassifications.Add((Classification)def.mClassifications[i]);
+                }
 
                 for (Int32 i = 0; i < def.mBehaviourFileNames.Count; i++)
                 {
@@ -302,6 +346,27 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// The game object factory will call this for each Game Object it creates so that it can
+        /// later be return to the factory.
+        /// </summary>
+        /// <param name="templateName"></param>
+        public void SetAsFactoryManaged(String templateName)
+        {
+            mFactoryInfo.pTemplateName = templateName;
+        }
+
+        /// <summary>
+        /// The factory information for this game object.
+        /// </summary>
+        public GameObjectFactory.FactoryInfo pFactoryInfo
+        {
+            get
+            {
+                return mFactoryInfo;
+            }
+        }
+
+        /// <summary>
         /// Use this function to register client implementation of behaviour creators.
         /// </summary>
         /// <param name="b">An implementation of the BehaviourCreator Interface</param>
@@ -338,6 +403,9 @@ namespace MBHEngine.GameObject
             set { mDoRender = value; }
         }
 
+        /// <summary>
+        /// The position, scale and rotation of the object.
+        /// </summary>
         public Orientation pOrientation
         {
             get { return mOrientation; }
@@ -350,6 +418,9 @@ namespace MBHEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// The forward vector that this object is pointing in, and the speed at which it is moving.
+        /// </summary>
         public Direction pDirection
         {
             get { return mDirection; }
@@ -357,6 +428,14 @@ namespace MBHEngine.GameObject
             { 
                 mDirection.mForward = value.mForward;
                 mDirection.mSpeed = value.mSpeed; 
+            }
+        }
+
+        public List<Classification> pClassifications
+        {
+            get
+            {
+                return mClassifications;
             }
         }
     }

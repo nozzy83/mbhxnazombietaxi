@@ -141,6 +141,7 @@
       <Name>Player</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -366,6 +367,20 @@
   <ItemGroup>
     <Compile Include="GameObjects\Characters\Kamikaze\Behaviours\Health.xml">
       <Name>Health</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Items\Bullet\Behaviours\Projectile.xml">
+      <Name>Projectile</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Items\Bullet\Behaviours\Timer.xml">
+      <Name>Timer</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
 using ZombieTaxiContentDefs;
 using MBHEngine.Math;
+using MBHEngineContentDefs;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -56,6 +57,11 @@ namespace ZombieTaxi.Behaviours
         private List<GameObject> mObjectsInRange;
 
         /// <summary>
+        /// A list of the types of objects that this does damage to when exploding.
+        /// </summary>
+        private List<GameObject.Classification> mDamageAppliedTo;
+
+        /// <summary>
         /// Preallocate our messages so that we don't trigger the garbage collector later.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
@@ -91,6 +97,12 @@ namespace ZombieTaxi.Behaviours
 
             mDamagedCaused = def.mDamageCaused;
 
+            mDamageAppliedTo = new List<GameObject.Classification>();
+
+            for (Int32 i = 0; i < def.mDamageAppliedTo.Count; i++)
+            {
+                mDamageAppliedTo.Add((GameObject.Classification)def.mDamageAppliedTo[i]);
+            }
             mExploded = false;
 
             mObjectsInRange = new List<GameObject>(16);
@@ -145,6 +157,10 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         private void Detonate()
         {
+            // Do this now so that if another event is sent from within this function it will not trigger
+            // a second detonation.
+            mExploded = true;
+
             // Pick a random animation to play.
             Int32 index = RandomManager.pInstance.RandomNumber() % mExplosionAnimationNames.Count;
             mSetActiveAnimationMessage.mAnimationSetName = mExplosionAnimationNames[index];
@@ -159,13 +175,14 @@ namespace ZombieTaxi.Behaviours
 
             // Find all the objects near by and apply some damage to them.
             mObjectsInRange.Clear();
-            GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH.pOrientation.mPosition, 10, ref mObjectsInRange);
+            GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH.pOrientation.mPosition, 10, ref mObjectsInRange, mDamageAppliedTo);
             for (Int32 i = 0; i < mObjectsInRange.Count; i++)
             {
                 mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);
             }
 
-            mExploded = true;
+            // This guy is exploded so he should be cleaned up.
+            GameObjectManager.pInstance.Remove(mParentGOH);
         }
     }
 }

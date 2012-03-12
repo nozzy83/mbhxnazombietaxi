@@ -7,6 +7,7 @@
     </mAnimationsToPlay>
     <mManualExplosion>false</mManualExplosion>
     <mDamageCaused>100</mDamageCaused>
+    <mDamageAppliedTo>1</mDamageAppliedTo>
   </Asset>
 </XnaContent>
 

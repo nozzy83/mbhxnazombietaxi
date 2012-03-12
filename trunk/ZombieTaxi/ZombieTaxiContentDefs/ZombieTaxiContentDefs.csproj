@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="Behaviour\ExplosiveDefinition.cs" />
     <Compile Include="Behaviour\HealthDefinition.cs" />
+    <Compile Include="Behaviour\ProjectileDefinition.cs" />
     <Compile Include="Behaviour\TwinStickDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
