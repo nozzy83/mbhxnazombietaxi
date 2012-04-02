@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
-    <mRenderPriority>50</mRenderPriority>
+    <mRenderPriority>49</mRenderPriority>
     <mDoUpdate>true</mDoUpdate>
     <mDoRender>true</mDoRender>
     <mPosition>0 0</mPosition>

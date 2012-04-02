@@ -97,6 +97,8 @@ namespace MBHEngine.GameObject
         /// <summary>
         /// Used to sort the game objects based on render priority.  We want the higher
         /// priority (which is a smaller number) to appear later on the list.
+        /// This implementation also sorts top to bottom in screen space.  This is for 
+        /// top down view points.
         /// </summary>
         /// <param name="x">Left side.</param>
         /// <param name="y">Right side.</param>
@@ -128,10 +130,27 @@ namespace MBHEngine.GameObject
             {
                 if (x.pRenderPriority == y.pRenderPriority)
                 {
-                    // The have the same render priority
-                    return 0;
+                    // The have the same render priority, so now we should check who is
+                    // closer to the bottom of the screen and render them on top of the
+                    // other.
+
+                    if (x.pOrientation.mPosition.Y < y.pOrientation.mPosition.Y)
+                    {
+                        // Y is closer to the bottom.
+                        return -1;
+                    }
+                    else if (x.pOrientation.mPosition.Y > y.pOrientation.mPosition.Y)
+                    {
+                        // X is closer to the bottom.
+                        return 1;
+                    }
+                    else
+                    {
+                        // The are at the exact same position and have the same render priority.
+                        return 0;
+                    }
                 }
-                else if (x.pRenderPriority < y.pRenderPriority)
+                else if (x.pRenderPriority > y.pRenderPriority)
                 {
                     // Y is greater
                     return 1;
@@ -276,6 +295,8 @@ namespace MBHEngine.GameObject
         /// <param name="batch">Where sprites will be rendered to.</param>
         public void Render(SpriteBatch batch)
         {
+            mGameObjects.Sort(CompareByRenderPriority);
+
             for (int i = 0; i < mGameObjects.Count; i++)
             {
                 if (mGameObjects[i].pDoRender == true)
