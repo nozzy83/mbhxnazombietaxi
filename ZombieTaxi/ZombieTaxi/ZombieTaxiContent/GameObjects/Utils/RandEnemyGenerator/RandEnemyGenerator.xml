@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
+    <mRenderPriority>50</mRenderPriority>
+    <mDoUpdate>false</mDoUpdate>
+    <mDoRender>false</mDoRender>
+    <mPosition>0 0</mPosition>
+    <mRotation>0</mRotation>
+    <mScale>1 1</mScale>
+    <mClassifications>0</mClassifications>
+    <mBehaviourFileNames>
+      <Item>RandomEnemyGenerator</Item>
+    </mBehaviourFileNames>
+    <mBehaviourClassNames>
+      <Item>ZombieTaxi.Behaviours.RandomEnemyGenerator</Item>
+    </mBehaviourClassNames>
+  </Asset>
+</XnaContent>
+

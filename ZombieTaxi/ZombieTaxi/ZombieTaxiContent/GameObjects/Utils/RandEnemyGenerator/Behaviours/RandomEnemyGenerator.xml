@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.RandomEnemyGeneratorDefinition">
+    <mNumEnemies>200</mNumEnemies>
+    <mConstraints>0 0 1600 1600</mConstraints>
+  </Asset>
+</XnaContent>
+

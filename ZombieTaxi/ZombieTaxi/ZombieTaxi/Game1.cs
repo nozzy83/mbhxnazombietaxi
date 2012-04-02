@@ -153,16 +153,9 @@ namespace ZombieTaxi
             enemy.pOrientation.mPosition.Y = 50;
             GameObjectManager.pInstance.Add(enemy);
             */
-            
-            for (Int32 i = 0; i < 200; i++)
-            {
-                GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
-                t = new Kamikaze(enemy, null);
-                enemy.AttachBehaviour(t);
-                enemy.pOrientation.mPosition.X = RandomManager.pInstance.RandomNumber() % (200 * 8);
-                enemy.pOrientation.mPosition.Y = RandomManager.pInstance.RandomNumber() % (200 * 8);
-                GameObjectManager.pInstance.Add(enemy);
-            }
+
+            // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager/
+            GameObject enemy = new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
             
             mVingetting = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
 #if SMALL_WINDOW

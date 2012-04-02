@@ -376,11 +376,26 @@
       <Name>Projectile</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameObjects\Items\Bullet\Behaviours\Timer.xml">
       <Name>Timer</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Utils\RandEnemyGenerator\RandEnemyGenerator.xml">
+      <Name>RandEnemyGenerator</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Utils\RandEnemyGenerator\Behaviours\RandomEnemyGenerator.xml">
+      <Name>RandomEnemyGenerator</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>
