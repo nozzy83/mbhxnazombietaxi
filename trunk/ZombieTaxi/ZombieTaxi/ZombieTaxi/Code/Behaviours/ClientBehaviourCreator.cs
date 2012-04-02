@@ -43,6 +43,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new Projectile(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.RandomEnemyGenerator":
+                    {
+                        return new RandomEnemyGenerator(go, fileName);
+                    }
                 default:
                     {
                         return null;
