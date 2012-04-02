@@ -10,9 +10,17 @@ namespace ZombieTaxi
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1(args))
+            // We wrap the entire game loop in an exception handler so that when things go wrong we can 
+            // find out what, rather than just getting a "application failed to run" message.
+            try
             {
-                game.Run();
+                using (Game1 game = new Game1(args))
+                    game.Run();
+            }
+
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show(e.ToString());
             }
         }
     }
