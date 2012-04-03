@@ -29,6 +29,12 @@ namespace MBHEngine.Render
         private Matrix mTransform;
 
         /// <summary>
+        /// The camera transform as it should be used for UI.  Essentially just the scale,
+        /// without any translation or centering.
+        /// </summary>
+        private Matrix mTransformUI;
+
+        /// <summary>
         /// The center of the screen, used for offsetting the matrix.
         /// </summary>
         private Matrix mScreenCenter;
@@ -85,8 +91,10 @@ namespace MBHEngine.Render
             mTransform =
                 Matrix.CreateTranslation(-new Vector3(0f, 0f, 0.0f)) *
                 //Matrix.CreateRotationZ(Rotation) *
-                Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1.0f)) *
+                Matrix.CreateScale(new Vector3(mZoomAmount)) *
                 mScreenCenter;
+
+            mTransformUI = Matrix.CreateScale(new Vector3(mZoomAmount));
 
             mViewRectangle = new Math.Rectangle();
         }
@@ -110,6 +118,10 @@ namespace MBHEngine.Render
                 Matrix.CreateScale(new Vector3(mZoomAmount)) *
                 //Matrix.CreateScale(new Vector3(1.0f, 1.0f, 1.0f)) *
                 mScreenCenter;
+
+            // Ideally this would only happen when the zoom property changes, but I am worried I will forget and
+            // set it directly from within this class.
+            mTransformUI = Matrix.CreateScale(new Vector3(mZoomAmount));
 
             // Update the view area.
             mViewRectangle.pCenterPoint = pTargetPosition;
@@ -154,6 +166,19 @@ namespace MBHEngine.Render
             get
             {
                 return mTransform;
+            }
+        }
+
+        /// <summary>
+        /// Returns the current transform of the camera for use with rendering UI.  This transform
+        /// will not include things like translation and screen centering.  It is pretty much just 
+        /// scale.
+        /// </summary>
+        public Matrix pFinalTransformUI
+        {
+            get
+            {
+                return mTransformUI;
             }
         }
 
