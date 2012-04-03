@@ -294,13 +294,19 @@ namespace ZombieTaxi.Behaviours
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
+#if ALLOW_GARBAGE            
             // Which type of message was sent to us?
             if (msg is Health.OnZeroHealth)
             {
-#if ALLOW_GARBAGE
                 DebugMessageDisplay.pInstance.AddConstantMessage("Player Died");
-#endif
             }
+            else if (msg is Health.OnApplyDamage)
+            {
+                Health.OnApplyDamage temp = (Health.OnApplyDamage)msg;
+
+                DebugMessageDisplay.pInstance.AddConstantMessage("Player took damage: " + temp.mDamagaAmount);
+            }
+#endif        
         }
     }
 }
