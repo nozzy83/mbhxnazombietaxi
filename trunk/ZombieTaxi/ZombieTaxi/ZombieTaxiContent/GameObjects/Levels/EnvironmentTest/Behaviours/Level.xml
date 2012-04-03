@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.LevelDefinition">
-    <mOgmoLevel>OgmoProjects\\Sandbox\\EnvironmentTest</mOgmoLevel>
-    <mGridLayer>collision</mGridLayer>
-    <mTileLayers>
-      <Item>
-        <mName>environment</mName>
-        <mUsesTextureIndex>true</mUsesTextureIndex>
-      </Item>
-    </mTileLayers>
   </Asset>
 </XnaContent>
 

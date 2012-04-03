@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
-  <Asset Type="MBHEngineContentDefs.LevelDefinition">
+  <Asset Type="MBHEngineContentDefs.OgmoRenderDefinition">
     <mOgmoLevel>OgmoProjects\\Demo\\DemoLevel1</mOgmoLevel>
     <mGridLayer>floors</mGridLayer>
     <mTileLayers>

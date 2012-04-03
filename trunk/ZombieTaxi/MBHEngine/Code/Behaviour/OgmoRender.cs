@@ -100,7 +100,7 @@ namespace MBHEngine.Behaviour
         /// <param name="fileName">The file to load from.</param>
         public override void LoadContent(String fileName)
         {
-            LevelDefinition def = GameObjectManager.pInstance.pContentManager.Load<LevelDefinition>(fileName);
+            OgmoRenderDefinition def = GameObjectManager.pInstance.pContentManager.Load<OgmoRenderDefinition>(fileName);
 
             // Load the actual level file.
             OgmoLevel level = GameObjectManager.pInstance.pContentManager.Load<OgmoLevel>(def.mOgmoLevel);

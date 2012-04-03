@@ -47,6 +47,23 @@ namespace MBHEngineContentDefs
         public List<Int32> mClassifications;
 
         /// <summary>
+        /// The different types of blending that a gameobject can use when rendering.
+        /// </summary>
+        public enum BlendMode
+        {
+            UNDEFINED = 0,
+            STANDARD = 1,
+            MULTIPLY = 2,
+            MULTIPLY_UI = 3,
+        };
+
+        /// <summary>
+        /// The type of blending to be used when rendering this object.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public BlendMode mBlendMode = BlendMode.STANDARD;
+
+        /// <summary>
         /// A list of all the behaviours this game object has.  These are indentified by
         /// the name of the definition file for each.
         /// </summary>
