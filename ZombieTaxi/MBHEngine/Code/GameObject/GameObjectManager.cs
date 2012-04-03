@@ -238,7 +238,7 @@ namespace MBHEngine.GameObject
             //
             for (int i = 0; i < mGameObjectsToRemove.Count; i++)
             {
-                // If this is a GameObject that was spawned throught a Factory then it needs to be
+                // If this is a GameObject that was spawned through a Factory then it needs to be
                 // returned to that Factory.
                 if (mGameObjectsToRemove[i].pFactoryInfo.pIsManaged)
                 {
@@ -271,41 +271,45 @@ namespace MBHEngine.GameObject
             int curIndex = 0;
             for (int j = 0; j < mGameObjectsToAdd.Count; j++)
             {
-                bool alreadyAdded = false;
-
-                // Loop through all the currently exisiting game objects.  We continue moving
-                // forward even after inserting a new object.  This can be done because we assume
-                // the mGameObjectsToAdd is also sorted by render priority, which means the next
-                // element must be placed somewhere after the current one.
-                for (; curIndex < mGameObjects.Count; curIndex++)
+                // If this game object is already in the list, don't add it again.
+                if (!mGameObjects.Contains(mGameObjectsToAdd[j]))
                 {
-                    if (mGameObjectsToAdd[j].pRenderPriority < mGameObjects[curIndex].pRenderPriority)
-                    {
-                        // We have found the proper place for this element.
-                        mGameObjects.Insert(curIndex, mGameObjectsToAdd[j]);
+                    bool alreadyAdded = false;
 
-                        // We don't want to test against the elemt we just added.  Since it was
+                    // Loop through all the currently exisiting game objects.  We continue moving
+                    // forward even after inserting a new object.  This can be done because we assume
+                    // the mGameObjectsToAdd is also sorted by render priority, which means the next
+                    // element must be placed somewhere after the current one.
+                    for (; curIndex < mGameObjects.Count; curIndex++)
+                    {
+                        if (mGameObjectsToAdd[j].pRenderPriority < mGameObjects[curIndex].pRenderPriority)
+                        {
+                            // We have found the proper place for this element.
+                            mGameObjects.Insert(curIndex, mGameObjectsToAdd[j]);
+
+                            // We don't want to test against the elemt we just added.  Since it was
+                            // inserted at i, the object we just compared against is actually at i + 1
+                            // now.  Let's start the next comparison there.
+                            curIndex++;
+
+                            alreadyAdded = true;
+
+                            break;
+                        }
+                    }
+
+                    if (!alreadyAdded)
+                    {
+                        // If we make it to this point all the remaining elements have a greater or equal
+                        // render priority to the highest priority item already existing.
+                        // This will also take care of the cases where this is the first item being added.
+                        mGameObjects.Add(mGameObjectsToAdd[j]);
+
+                        // We don't want to test against the element we just added.  Since it was
                         // inserted at i, the object we just compared against is actually at i + 1
                         // now.  Let's start the next comparison there.
                         curIndex++;
-
-                        alreadyAdded = true;
-
-                        break;
                     }
-                }
-
-                if (!alreadyAdded)
-                {
-                    // If we make it to this point all the remaining elements have a greater or equal
-                    // render priority to the highest priority item already existing.
-                    // This will also take care of the cases where this is the first item being added.
-                    mGameObjects.Add(mGameObjectsToAdd[j]);
-
-                    // We don't want to test against the element we just added.  Since it was
-                    // inserted at i, the object we just compared against is actually at i + 1
-                    // now.  Let's start the next comparison there.
-                    curIndex++;
                 }
             }
             if (mGameObjectsToAdd.Count != 0)
