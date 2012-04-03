@@ -114,6 +114,11 @@ namespace MBHEngine.GameObject
         protected List<Classification> mClassifications;
 
         /// <summary>
+        /// The type of blending to be used when rendering this object.
+        /// </summary>
+        protected GameObjectDefinition.BlendMode mBlendMode;
+
+        /// <summary>
         /// Information about how (and if) this object was spawned from a Factory.  This information is needed
         /// for recycling the object when it dies.
         /// </summary>
@@ -175,6 +180,8 @@ namespace MBHEngine.GameObject
                     mClassifications.Add((Classification)def.mClassifications[i]);
                 }
 
+                mBlendMode = def.mBlendMode;
+
                 for (Int32 i = 0; i < def.mBehaviourFileNames.Count; i++)
                 {
                     String goRootPath = System.IO.Path.GetDirectoryName(fileName);
@@ -187,6 +194,7 @@ namespace MBHEngine.GameObject
                 mRenderPriority = 50;
                 mDoUpdate = true;
                 mDoRender = true;
+                mBlendMode = GameObjectDefinition.BlendMode.STANDARD;
             }
         }
 
@@ -431,11 +439,25 @@ namespace MBHEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// A list of the classifications this game object has been declared to fall under.
+        /// </summary>
         public List<Classification> pClassifications
         {
             get
             {
                 return mClassifications;
+            }
+        }
+
+        /// <summary>
+        /// The type of blending to be used when rendering this object.
+        /// </summary>
+        public GameObjectDefinition.BlendMode pBlendMode
+        {
+            get
+            {
+                return mBlendMode;
             }
         }
     }

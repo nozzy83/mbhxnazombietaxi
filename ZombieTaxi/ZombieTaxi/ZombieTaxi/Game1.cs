@@ -30,22 +30,6 @@ namespace ZombieTaxi
         SpriteBatch mSpriteBatch;
 
         /// <summary>
-        /// Reder state for rendering clear, crisp sprites.
-        /// </summary>
-        RasterizerState mSpriteRasterState; // Prevent the edge of the sprite showing garabage.
-        SamplerState mSpriteSamplerState; // Keep the sprites looking Crisp.
-
-        /// <summary>
-        /// This will defined as a multiply blend state.
-        /// </summary>
-        BlendState mMultiply;
-
-        /// <summary>
-        /// Graphic for the vingette.
-        /// </summary>
-        GameObject mVingetting;
-
-        /// <summary>
         /// Whether or not to draw debug information.
         /// </summary>
         Boolean mDebugDrawEnabled;
@@ -110,38 +94,37 @@ namespace ZombieTaxi
             // Create a new SpriteBatch, which can be used to draw textures.
             mSpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            mSpriteRasterState = new RasterizerState();
-            mSpriteSamplerState = new SamplerState();
-
-            mMultiply = new BlendState();
-            mMultiply.ColorSourceBlend = Blend.Zero;
-            mMultiply.ColorDestinationBlend = Blend.SourceColor;
-
-            // Prevent the edge of the sprite showing garabage.
-            mSpriteRasterState.MultiSampleAntiAlias = false;
-
-            // Keep the sprites looking Crisp.
-            mSpriteSamplerState.Filter = TextureFilter.Point;
-
+            // Add any objects desired to the Game Object Factory.  These will be allocated now and can
+            // be retrived later without any heap allocations.
+            //
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Bullet\\Bullet", 100);
 
+            // The tiled background image that travels will the player creating the illusion of
+            // an infinite background image.
             GameObject bg = new GameObject();
             MBHEngine.Behaviour.Behaviour t = new InfiniteBG(bg, null);
             bg.AttachBehaviour(t);
             bg.pRenderPriority = 25;
             GameObjectManager.pInstance.Add(bg);
 
+            // The place where the player must bring back recused characters to.
+            GameObject safeHouse = new GameObject("GameObjects\\Environments\\SafeHouse\\SafeHouse");
+            GameObjectManager.pInstance.Add(safeHouse);
+
+            // Create the level.
             WorldManager.pInstance.Initialize();
 
+            // Debug display for different states in the game.  This by creating new behaviours, additional
+            // stats can be displayed.
             GameObject debugStatsDisplay = new GameObject();
             MBHEngine.Behaviour.Behaviour fps = new MBHEngine.Behaviour.FrameRateDisplay(debugStatsDisplay, null);
             debugStatsDisplay.AttachBehaviour(fps);
             GameObjectManager.pInstance.Add(debugStatsDisplay);
 
+            // The player himself.
             GameObject player = new GameObject("GameObjects\\Characters\\Player\\Player");
-            //t = new TwinStick(player, null);
-            //player.AttachBehaviour(t);
             GameObjectManager.pInstance.Add(player);
+
             // Store the player for easy access.
             GameObjectManager.pInstance.pPlayer = player;
 
@@ -157,13 +140,12 @@ namespace ZombieTaxi
             // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager/
             GameObject enemy = new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
             
-            mVingetting = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
+            // The vingette effect used to dim out the edges of the screen.
+            GameObject ving = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
 #if SMALL_WINDOW
-            mVingetting.pOrientation.mScale = new Vector2(0.5f, 0.5f);
+            ving.pOrientation.mScale = new Vector2(0.5f, 0.5f);
 #endif
-            //GameObjectManager.pInstance.Add(ving);
-
-            //OgmoLevel ogmoLevel = this.Content.Load<OgmoLevel>("Levels\\Sample\\SampleLevel");
+            GameObjectManager.pInstance.Add(ving);
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
@@ -190,6 +172,7 @@ namespace ZombieTaxi
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
+            // Toggle the debug drawing with a click of the left stick.
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.L3, true))
             {
                 mDebugDrawEnabled ^= true;
@@ -207,11 +190,6 @@ namespace ZombieTaxi
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
 
-            //DebugShapeDisplay.pInstance.AddSegment(new Vector2(0, 0), new Vector2(32, 32), Color.Black);
-            //DebugShapeDisplay.pInstance.AddSolidCircle(new Vector2(0.0f, 0.0f), 8, new Vector2(1, 0), Color.Magenta);
-            //DebugShapeDisplay.pInstance.AddTransform(new Vector2(0.0f, 0.0f));
-            //DebugShapeDisplay.pInstance.AddAABB(new Vector2(32.0f, 32.0f), 8.0f, 16.0f, Color.Green);
-
             base.Update(gameTime);
         }
 
@@ -224,19 +202,7 @@ namespace ZombieTaxi
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // First draw all the objects managed by the game object manager.
-            mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, CameraManager.pInstance.pFinalTransform);
-            // Keep the sprites looking crisp.
-            mSpriteBatch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-            mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
             GameObjectManager.pInstance.Render(mSpriteBatch);
-            mSpriteBatch.End();
-
-            // Cheap hack for now to add Vingetting around the edge of the screen.  Ultimatly we will need a more
-            // formal way to sort by render stlyes while still respecting render priority.
-            mSpriteBatch.Begin(SpriteSortMode.Immediate, mMultiply);
-            mVingetting.Render(mSpriteBatch);
-            mSpriteBatch.End();
-
 
             if (mDebugDrawEnabled)
             {
@@ -244,8 +210,6 @@ namespace ZombieTaxi
 
                 // We need to go back to standard alpha blend before drawing the debug layer.
                 mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-                mSpriteBatch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-                mSpriteBatch.GraphicsDevice.RasterizerState = mSpriteRasterState;
                 DebugMessageDisplay.pInstance.Render(mSpriteBatch);
                 mSpriteBatch.End();
             }
