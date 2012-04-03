@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
-    <mRenderPriority>500</mRenderPriority>
+    <mRenderPriority>1000</mRenderPriority>
     <mDoUpdate>true</mDoUpdate>
     <mDoRender>true</mDoRender>
-    <mPosition>0 0</mPosition>
+    <mPosition>8 8</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
-    <mBlendMode>MULTIPLY_UI</mBlendMode>
+    <mBlendMode>STANDARD_UI</mBlendMode>
     <mBehaviourFileNames>
-      <Item>Sprite</Item>
+      <Item>PlayerHealthBar</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>ZombieTaxi.Behaviours.PlayerHealthBar</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

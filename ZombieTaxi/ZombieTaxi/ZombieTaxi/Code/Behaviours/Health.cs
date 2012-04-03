@@ -45,6 +45,22 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
+        /// Retrives data about this Health behaviour.  Things like the min and max health.
+        /// </summary>
+        public class GetHealthMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The amount of health the GO currently has.
+            /// </summary>
+            public Single mCurrentHealth;
+
+            /// <summary>
+            /// The max amount of health this GO can have.
+            /// </summary>
+            public Single mMaxHealth;
+        }
+
+        /// <summary>
         /// The current amount of health.
         /// </summary>
         private Single mCurrentHealth;
@@ -112,6 +128,13 @@ namespace ZombieTaxi.Behaviours
                 OnApplyDamage temp = (OnApplyDamage)msg;
 
                 ApplyDamage(temp.mDamagaAmount);
+            }
+            else if (msg is GetHealthMessage)
+            {
+                GetHealthMessage temp = (GetHealthMessage)msg;
+
+                temp.mCurrentHealth = mCurrentHealth;
+                temp.mMaxHealth = mMaxHealth;
             }
         }
 

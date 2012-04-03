@@ -47,6 +47,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new RandomEnemyGenerator(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.PlayerHealthBar":
+                    {
+                        return new PlayerHealthBar(go, fileName);
+                    }
                 default:
                     {
                         return null;

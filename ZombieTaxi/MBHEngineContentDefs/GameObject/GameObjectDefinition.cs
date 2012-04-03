@@ -52,9 +52,10 @@ namespace MBHEngineContentDefs
         public enum BlendMode
         {
             UNDEFINED = 0,
-            STANDARD = 1,
-            MULTIPLY = 2,
-            MULTIPLY_UI = 3,
+            STANDARD,
+            MULTIPLY,
+            STANDARD_UI,
+            MULTIPLY_UI,
         };
 
         /// <summary>

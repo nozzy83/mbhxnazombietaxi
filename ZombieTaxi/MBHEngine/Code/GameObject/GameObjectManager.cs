@@ -373,6 +373,22 @@ namespace MBHEngine.GameObject
                             batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
                             batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
                         }
+                        else if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.STANDARD_UI)
+                        {
+                            batch.Begin(
+                                SpriteSortMode.Immediate, 
+                                BlendState.AlphaBlend, 
+                                null, null, null, null,
+                                CameraManager.pInstance.pFinalTransformUI);
+
+                            // Keep the sprites looking crisp.
+                            batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+                            batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                        }
+                        else if (mGameObjects[i].pBlendMode != GameObjectDefinition.BlendMode.UNDEFINED)
+                        {
+                            throw new Exception("Unhandled blend mode.");
+                        }
                     }
 
                     mGameObjects[i].Render(batch);

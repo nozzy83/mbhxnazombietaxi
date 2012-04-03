@@ -79,9 +79,13 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.Initialize();
             CameraManager.pInstance.Initialize(mGraphics.GraphicsDevice);
 
-            // By default draw all deug information.
+#if DEBUG
+            // By default, in DEBUG the debug drawing is enabled.
             mDebugDrawEnabled = true;
-
+#else
+            // In release it is not.
+            mDebugDrawEnabled = false;
+#endif
             base.Initialize();
         }
 
@@ -146,6 +150,10 @@ namespace ZombieTaxi
             ving.pOrientation.mScale = new Vector2(0.5f, 0.5f);
 #endif
             GameObjectManager.pInstance.Add(ving);
+
+            // The HUD element representing the player's health.
+            GameObject health = new GameObject("GameObjects\\Interface\\PlayerHealthBar\\PlayerHealthBar");
+            GameObjectManager.pInstance.Add(health);
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
