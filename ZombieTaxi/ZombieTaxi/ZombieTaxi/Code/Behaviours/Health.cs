@@ -54,6 +54,9 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         private Single mMaxHealth;
 
+        /// <summary>
+        /// Preallocated messages so that we don't trigger garbage collection during gameplay.
+        /// </summary>
         private OnZeroHealth mOnZeroHealthMsg;
 
         /// <summary>
