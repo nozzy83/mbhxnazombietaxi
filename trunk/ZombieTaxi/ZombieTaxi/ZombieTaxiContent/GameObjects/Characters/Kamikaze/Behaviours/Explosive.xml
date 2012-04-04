@@ -7,7 +7,11 @@
     </mAnimationsToPlay>
     <mManualExplosion>true</mManualExplosion>
     <mDamageCaused>25</mDamageCaused>
-    <mDamageAppliedTo>0 1</mDamageAppliedTo>
+    <mDamageAppliedTo>
+      <Item>PLAYER</Item>
+      <Item>ENEMY</Item>
+      <Item>ALLY</Item>
+    </mDamageAppliedTo>
   </Asset>
 </XnaContent>
 

@@ -7,7 +7,6 @@
     <mPosition>0 0</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
-    <mClassifications>0</mClassifications>
     <mBehaviourFileNames>
       <Item>RandomEnemyGenerator</Item>
     </mBehaviourFileNames>

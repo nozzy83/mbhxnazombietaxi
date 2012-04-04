@@ -9,7 +9,9 @@
     </mAnimationsToPlay>
     <mManualExplosion>false</mManualExplosion>
     <mDamageCaused>0</mDamageCaused>
-    <mDamageAppliedTo>1</mDamageAppliedTo>
+    <mDamageAppliedTo>
+      <Item>ENEMY</Item>
+    </mDamageAppliedTo>
   </Asset>
 </XnaContent>
 

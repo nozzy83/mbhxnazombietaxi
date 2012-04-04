@@ -59,7 +59,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// A list of the types of objects that this does damage to when exploding.
         /// </summary>
-        private List<GameObject.Classification> mDamageAppliedTo;
+        private List<GameObjectDefinition.Classifications> mDamageAppliedTo;
 
         /// <summary>
         /// Preallocate our messages so that we don't trigger the garbage collector later.
@@ -98,11 +98,11 @@ namespace ZombieTaxi.Behaviours
 
             mDamagedCaused = def.mDamageCaused;
 
-            mDamageAppliedTo = new List<GameObject.Classification>();
+            mDamageAppliedTo = new List<GameObjectDefinition.Classifications>();
 
             for (Int32 i = 0; i < def.mDamageAppliedTo.Count; i++)
             {
-                mDamageAppliedTo.Add((GameObject.Classification)def.mDamageAppliedTo[i]);
+                mDamageAppliedTo.Add(def.mDamageAppliedTo[i]);
             }
             mExploded = false;
 

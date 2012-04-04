@@ -10,6 +10,17 @@ namespace MBHEngineContentDefs
     public class GameObjectDefinition
     {
         /// <summary>
+        /// Different categories of game objects.  Used by both the game object system and 
+        /// behaviours for things like limiting collision to a certain group of Game Objects.
+        /// </summary>
+        public enum Classifications
+        {
+            PLAYER = 0,
+            ENEMY,
+            ALLY,
+        }
+
+        /// <summary>
         /// Determines the order at which IGameObjects should be rendered.
         /// The higher the number the later it will be rendered.
         /// </summary>
@@ -50,7 +61,7 @@ namespace MBHEngineContentDefs
         /// The calssifications for this game object.
         /// </summary>
         [ContentSerializer(Optional = true)]
-        public List<Int32> mClassifications;
+        public List<Classifications> mClassifications;
 
         /// <summary>
         /// The different types of blending that a gameobject can use when rendering.
