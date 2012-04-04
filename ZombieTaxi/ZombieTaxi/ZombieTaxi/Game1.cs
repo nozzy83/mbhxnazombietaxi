@@ -134,11 +134,6 @@ namespace ZombieTaxi
 
             GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
             GameObjectManager.pInstance.Add(chef);
-
-            SpriteRender.SetActiveAnimationMessage msg = new SpriteRender.SetActiveAnimationMessage();
-            msg.mAnimationSetName = "Hide";
-            chef.OnMessage(msg);
-
             
             //GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
             //t = new Kamikaze(enemy, null);

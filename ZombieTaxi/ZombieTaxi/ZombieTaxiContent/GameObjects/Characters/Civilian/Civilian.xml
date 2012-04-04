@@ -12,9 +12,13 @@
     </mClassifications>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
+      <Item>Civilian</Item>
+      <Item>PathFind</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>ZombieTaxi.Behaviours.Civilian</Item>
+      <Item>MBHEngine.Code.Behaviour.PathFind</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

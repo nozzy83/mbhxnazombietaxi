@@ -92,6 +92,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviour\CivilianDefinition.cs" />
     <Compile Include="Behaviour\ExplosiveDefinition.cs" />
     <Compile Include="Behaviour\HealthDefinition.cs" />
     <Compile Include="Behaviour\PlayerHealthBarDefinition.cs" />
