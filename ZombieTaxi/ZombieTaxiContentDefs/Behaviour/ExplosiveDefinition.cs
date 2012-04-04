@@ -32,6 +32,6 @@ namespace ZombieTaxiContentDefs
         /// <summary>
         /// A list of the types of objects that this does damage to when exploding.
         /// </summary>
-        public List<Int32> mDamageAppliedTo;
+        public List<GameObjectDefinition.Classifications> mDamageAppliedTo;
     }
 }

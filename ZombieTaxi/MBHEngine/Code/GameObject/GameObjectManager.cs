@@ -452,7 +452,7 @@ namespace MBHEngine.GameObject
         /// <param name="radius">The radius from that position that the other objects must be within.</param>
         /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.</param>
         /// <param name="classifications">The types of objects to check for.</param>
-        public void GetGameObjectsInRange(Vector2 centerPoint, Single radius, ref List<GameObject> refObjects, List<GameObject.Classification> classifications)
+        public void GetGameObjectsInRange(Vector2 centerPoint, Single radius, ref List<GameObject> refObjects, List<GameObjectDefinition.Classifications> classifications)
         {
             Single radSqr = radius * radius;
             for (int i = 0; i < mGameObjects.Count; i++)
@@ -480,7 +480,7 @@ namespace MBHEngine.GameObject
         /// <param name="refObjects">The list which will be populated with game objects that overlap "source".</param>
         /// <param name="classifications">Since we likely don't want to test against every object in the world, 
         /// these classifications narrow down the search.  This data is set in the Game Object definition XML.</param>
-        public void GetGameObjectsInRange(GameObject source, ref List<GameObject> refObjects, List<GameObject.Classification> classifications)
+        public void GetGameObjectsInRange(GameObject source, ref List<GameObject> refObjects, List<GameObjectDefinition.Classifications> classifications)
         {
             // Loop through every object being managed.
             for (int i = 0; i < mGameObjects.Count; i++)

@@ -28,7 +28,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// A list of the types of objects that this does damage to when exploding.
         /// </summary>
-        private List<GameObject.Classification> mDamageAppliedTo;
+        private List<GameObjectDefinition.Classifications> mDamageAppliedTo;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -51,11 +51,11 @@ namespace ZombieTaxi.Behaviours
 
             ProjectileDefinition def = GameObjectManager.pInstance.pContentManager.Load<ProjectileDefinition>(fileName);
 
-            mDamageAppliedTo = new List<GameObject.Classification>();
+            mDamageAppliedTo = new List<GameObjectDefinition.Classifications>();
 
             for (Int32 i = 0; i < def.mDamageAppliedTo.Count; i++)
             {
-                mDamageAppliedTo.Add((GameObject.Classification)def.mDamageAppliedTo[i]);
+                mDamageAppliedTo.Add(def.mDamageAppliedTo[i]);
             }
 
             mObjectsInRange = new List<GameObject>(16);

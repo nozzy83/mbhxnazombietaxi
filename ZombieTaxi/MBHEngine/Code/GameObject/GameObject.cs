@@ -24,15 +24,6 @@ namespace MBHEngine.GameObject
     public class GameObject
     {
         /// <summary>
-        /// The different types of GameObjects used for filtering at run time.
-        /// </summary>
-        public enum Classification
-        {
-            Player = 0,
-            Enemy,
-        };
-
-        /// <summary>
         /// Wrapper class for all the orientation data: position, rotation and scale.
         /// </summary>
         public class Orientation
@@ -118,7 +109,7 @@ namespace MBHEngine.GameObject
         /// A list of classifications which this game objects fits into.  This can be used to filter
         /// larger lists of game objects into smaller ones.
         /// </summary>
-        protected List<Classification> mClassifications;
+        protected List<GameObjectDefinition.Classifications> mClassifications;
 
         /// <summary>
         /// The type of blending to be used when rendering this object.
@@ -169,7 +160,7 @@ namespace MBHEngine.GameObject
             mDirection = new Direction();
             mOrientation = new Orientation();
             mFactoryInfo = new GameObjectFactory.FactoryInfo();
-            mClassifications = new List<Classification>();
+            mClassifications = new List<GameObjectDefinition.Classifications>();
             mCollisionRectangle = new Math.Rectangle();
 
             if (null != fileName)
@@ -186,7 +177,7 @@ namespace MBHEngine.GameObject
 
                 for (Int32 i = 0; def.mClassifications != null && i < def.mClassifications.Count; i++)
                 {
-                    mClassifications.Add((Classification)def.mClassifications[i]);
+                    mClassifications.Add(def.mClassifications[i]);
                 }
 
                 mBlendMode = def.mBlendMode;
@@ -468,7 +459,7 @@ namespace MBHEngine.GameObject
         /// <summary>
         /// A list of the classifications this game object has been declared to fall under.
         /// </summary>
-        public List<Classification> pClassifications
+        public List<GameObjectDefinition.Classifications> pClassifications
         {
             get
             {
