@@ -180,7 +180,7 @@ namespace ZombieTaxi.Behaviours
 
             // Find all the objects near by and apply some damage to them.
             mObjectsInRange.Clear();
-            GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH.pOrientation.mPosition, 10, ref mObjectsInRange, mDamageAppliedTo);
+            GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH, ref mObjectsInRange, mDamageAppliedTo);
             for (Int32 i = 0; i < mObjectsInRange.Count; i++)
             {
                 mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);

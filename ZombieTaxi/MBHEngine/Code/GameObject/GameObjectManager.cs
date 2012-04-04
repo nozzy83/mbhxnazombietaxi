@@ -464,6 +464,41 @@ namespace MBHEngine.GameObject
                         if (Vector2.DistanceSquared(centerPoint, mGameObjects[i].pOrientation.mPosition) < radSqr)
                         {
                             refObjects.Add(mGameObjects[i]);
+
+                            // This object has already been added, so move on to the next object.
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Populates a list of all the objects that overlap the source gameobject.
+        /// </summary>
+        /// <param name="source">The object to test all other game objects against.</param>
+        /// <param name="refObjects">The list which will be populated with game objects that overlap "source".</param>
+        /// <param name="classifications">Since we likely don't want to test against every object in the world, 
+        /// these classifications narrow down the search.  This data is set in the Game Object definition XML.</param>
+        public void GetGameObjectsInRange(GameObject source, ref List<GameObject> refObjects, List<GameObject.Classification> classifications)
+        {
+            // Loop through every object being managed.
+            for (int i = 0; i < mGameObjects.Count; i++)
+            {
+                // For each object, check each of its classifications (if it has any).
+                for (Int32 j = 0; j < classifications.Count; j++)
+                {
+                    // Does this game object have one of the classifications we are interested in?
+                    if (mGameObjects[i].pClassifications.Contains(classifications[j]))
+                    {
+                        // Does this game object overlap the source object?
+                        if (source.pCollisionRect.Intersects(mGameObjects[i].pCollisionRect))
+                        {
+                            // Add it to the preallocated list which was passed in.
+                            refObjects.Add(mGameObjects[i]);
+
+                            // This object has already been added, so move on to the next object.
+                            break;
                         }
                     }
                 }

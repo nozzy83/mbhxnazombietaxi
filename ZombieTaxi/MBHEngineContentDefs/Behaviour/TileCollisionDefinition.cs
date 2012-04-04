@@ -8,9 +8,5 @@ namespace MBHEngineContentDefs
 {
     public class TileCollisionDefinition : BehaviourDefinition
     {
-        /// <summary>
-        /// The width and height of the collision box.
-        /// </summary>
-        public Vector2 mCollisionBoxDimensions;
     }
 }
