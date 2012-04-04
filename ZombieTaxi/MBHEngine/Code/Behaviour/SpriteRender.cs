@@ -52,9 +52,26 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// An event that gets sent when not looping animations complete.
         /// </summary>
-        public class OnAnimationCompleteMesage : BehaviourMessage
+        public class OnAnimationCompleteMessage : BehaviourMessage
         {
             public String mAnimationSetName;
+        }
+
+        /// <summary>
+        /// Message used for retriving a named attachment point from a sprite.
+        /// </summary>
+        public class GetAttachmentPointMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// Set this to the name of the attachment point you wish to get.
+            /// </summary>
+            public String mName;
+
+            /// <summary>
+            /// The attachment position gets stored here.  Note that it is
+            /// in world space.
+            /// </summary>
+            public Vector2 mPoisitionInWorld;
         }
 
         /// <summary>
@@ -145,9 +162,15 @@ namespace MBHEngine.Behaviour
         private Vector2 mMotionRoot;
 
         /// <summary>
+        /// A list of position offsets (offset from the motion root) indexed by name.
+        /// Used for attaching things to objects without having hard coded values.
+        /// </summary>
+        private Dictionary<String, Vector2> mAttachmentPoints;
+
+        /// <summary>
         /// Preallocated messages to avoid garbage collection during gameplay.
         /// </summary>
-        private OnAnimationCompleteMesage mOnAnimationCompleteMsg;
+        private OnAnimationCompleteMessage mOnAnimationCompleteMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -172,6 +195,14 @@ namespace MBHEngine.Behaviour
 
             mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
             mMotionRoot = def.mMotionRoot;
+            mAttachmentPoints = new Dictionary<string, Vector2>();
+            if (def.mAttachmentPoints != null)
+            {
+                for (Int32 i = 0; i < def.mAttachmentPoints.Count; i++)
+                {
+                    mAttachmentPoints.Add(def.mAttachmentPoints[i].mName, def.mAttachmentPoints[i].mOffset);
+                }
+            }
             mHasShadow = def.mHasShadow;
             Single colHeight = mTexture.Height;
             if (def.mFrameHeight > 0)
@@ -209,7 +240,7 @@ namespace MBHEngine.Behaviour
             mCurrentFrame = 0;
             mActiveAnimation = 0;
 
-            mOnAnimationCompleteMsg = new OnAnimationCompleteMesage();
+            mOnAnimationCompleteMsg = new OnAnimationCompleteMessage();
         }
 
         /// <summary>
@@ -312,6 +343,14 @@ namespace MBHEngine.Behaviour
                                0);
                 }
             }
+
+#if ALLOW_GARBAGE
+            foreach (KeyValuePair<String, Vector2> pair in mAttachmentPoints)
+            {
+                //DebugShapeDisplay.pInstance.AddTransform(mParentGOH.pOrientation.mPosition + pair.Value);
+                DebugShapeDisplay.pInstance.AddPoint(mParentGOH.pOrientation.mPosition + pair.Value, 1.0f, Color.Purple);
+            }
+#endif
         }
 
         /// <summary>
@@ -369,6 +408,15 @@ namespace MBHEngine.Behaviour
 
                 }
                 
+            }
+            else if (msg is GetAttachmentPointMessage)
+            {
+                GetAttachmentPointMessage temp = (GetAttachmentPointMessage)msg;
+
+                if (mAttachmentPoints.ContainsKey(temp.mName))
+                {
+                    temp.mPoisitionInWorld = mAttachmentPoints[temp.mName] + mParentGOH.pOrientation.mPosition;
+                }
             }
         }
 

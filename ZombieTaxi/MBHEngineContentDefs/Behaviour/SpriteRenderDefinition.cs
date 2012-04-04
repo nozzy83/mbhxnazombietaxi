@@ -42,6 +42,22 @@ namespace MBHEngineContentDefs
         };
 
         /// <summary>
+        /// A point on the sprite where things can be attached to.
+        /// </summary>
+        public class AtachmentPoint
+        {
+            /// <summary>
+            /// The name of this attachment point.  Used for looking it up at runtime.
+            /// </summary>
+            public String mName;
+
+            /// <summary>
+            /// The offset from the motion root.
+            /// </summary>
+            public Vector2 mOffset;
+        };
+
+        /// <summary>
         /// The name of the file which contains the sprite image.
         /// </summary>
         public String mSpriteFileName;
@@ -63,6 +79,12 @@ namespace MBHEngineContentDefs
         /// </summary>
         [ContentSerializer(Optional = true)]
         public Vector2 mMotionRoot;
+
+        /// <summary>
+        /// A list of attachment points, relative to the motion root.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public List<AtachmentPoint> mAttachmentPoints;
 
         /// <summary>
         /// A list of all the animations contained in this sprite set.

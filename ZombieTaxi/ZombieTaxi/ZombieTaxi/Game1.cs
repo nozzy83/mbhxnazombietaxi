@@ -132,6 +132,13 @@ namespace ZombieTaxi
             // Store the player for easy access.
             GameObjectManager.pInstance.pPlayer = player;
 
+            GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
+            GameObjectManager.pInstance.Add(chef);
+
+            SpriteRender.SetActiveAnimationMessage msg = new SpriteRender.SetActiveAnimationMessage();
+            msg.mAnimationSetName = "Hide";
+            chef.OnMessage(msg);
+
             /*
             GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
             t = new Kamikaze(enemy, null);
@@ -153,7 +160,7 @@ namespace ZombieTaxi
 
             // The HUD element representing the player's health.
             GameObject health = new GameObject("GameObjects\\Interface\\PlayerHealthBar\\PlayerHealthBar");
-            GameObjectManager.pInstance.Add(health);
+            GameObjectManager.pInstance.Add(health);            
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\\Characters\\Chef</mSpriteFileName>
+    <mFrameHeight>8</mFrameHeight>
+    <mHasShadow>true</mHasShadow>
+    <mMotionRoot>4 4</mMotionRoot>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>60</mTicksPerFrame>
+        <mName>Idle</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>6</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+      <Item>
+        <mTicksPerFrame>10</mTicksPerFrame>
+        <mName>Walk</mName>
+        <mStartingFrame>6</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+      <Item>
+        <mTicksPerFrame>25</mTicksPerFrame>
+        <mName>Hide</mName>
+        <mStartingFrame>8</mStartingFrame>
+        <mNumFrames>15</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+

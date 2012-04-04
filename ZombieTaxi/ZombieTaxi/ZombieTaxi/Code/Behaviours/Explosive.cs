@@ -65,7 +65,8 @@ namespace ZombieTaxi.Behaviours
         /// Preallocate our messages so that we don't trigger the garbage collector later.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
-        private Health.OnApplyDamage mOnApplyDamageMsg; 
+        private Health.OnApplyDamage mOnApplyDamageMsg;
+        private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -109,6 +110,7 @@ namespace ZombieTaxi.Behaviours
 
             mSetActiveAnimationMessage = new SpriteRender.SetActiveAnimationMessage();
             mOnApplyDamageMsg = new Health.OnApplyDamage(mDamagedCaused);
+            mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
         }
 
         /// <summary>
@@ -166,7 +168,10 @@ namespace ZombieTaxi.Behaviours
             mSetActiveAnimationMessage.mAnimationSetName = mExplosionAnimationNames[index];
             mSetActiveAnimationMessage.mReset = true;
 
-            mExplosionEffect.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+            mGetAttachmentPointMsg.mName = "Ground";
+            mGetAttachmentPointMsg.mPoisitionInWorld = mParentGOH.pOrientation.mPosition; // Set a default incase it doesn't have a Ground attachment point.
+            mParentGOH.OnMessage(mGetAttachmentPointMsg);
+            mExplosionEffect.pOrientation.mPosition = mGetAttachmentPointMsg.mPoisitionInWorld;
             mExplosionEffect.OnMessage(mSetActiveAnimationMessage);
             mExplosionEffect.pDoRender = mExplosionEffect.pDoUpdate = true;
 
