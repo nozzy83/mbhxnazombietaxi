@@ -129,6 +129,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\Behaviours\Civilian.cs" />
     <Compile Include="Code\Behaviours\ClientBehaviourCreator.cs" />
     <Compile Include="Code\Behaviours\Explosive.cs" />
     <Compile Include="Code\Behaviours\Health.cs" />

@@ -51,6 +51,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new PlayerHealthBar(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.Civilian":
+                    {
+                        return new Civilian(go, fileName);
+                    }
                 default:
                     {
                         return null;
