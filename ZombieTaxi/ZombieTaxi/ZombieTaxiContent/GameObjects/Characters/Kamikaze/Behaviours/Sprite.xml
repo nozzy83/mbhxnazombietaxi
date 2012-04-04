@@ -2,14 +2,17 @@
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
     <mSpriteFileName>Sprites\\Characters\\CommandoShorts</mSpriteFileName>
+    <mFrameHeight>8</mFrameHeight>
     <mHasShadow>true</mHasShadow>
     <mMotionRoot>4 4</mMotionRoot>
-    <mAttachmentPoints>
+    <mAnimationSets>
       <Item>
-        <mName>Ground</mName>
-        <mOffset>0 4</mOffset>
+        <mTicksPerFrame>10</mTicksPerFrame>
+        <mName>Walk</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
       </Item>
-    </mAttachmentPoints>
+    </mAnimationSets>
   </Asset>
 </XnaContent>
-
