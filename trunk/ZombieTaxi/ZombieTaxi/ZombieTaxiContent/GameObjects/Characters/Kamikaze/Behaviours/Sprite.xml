@@ -4,6 +4,12 @@
     <mSpriteFileName>Sprites\\Characters\\CommandoShorts</mSpriteFileName>
     <mHasShadow>true</mHasShadow>
     <mMotionRoot>4 4</mMotionRoot>
+    <mAttachmentPoints>
+      <Item>
+        <mName>Ground</mName>
+        <mOffset>0 4</mOffset>
+      </Item>
+    </mAttachmentPoints>
   </Asset>
 </XnaContent>
 

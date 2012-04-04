@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
+    <mRenderPriority>50</mRenderPriority>
+    <mDoUpdate>true</mDoUpdate>
+    <mDoRender>true</mDoRender>
+    <mPosition>116 116</mPosition>
+    <mRotation>0</mRotation>
+    <mScale>1 1</mScale>
+    <mClassifications>2</mClassifications>
+    <mBehaviourFileNames>
+      <Item>Sprite</Item>
+    </mBehaviourFileNames>
+    <mBehaviourClassNames>
+      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+    </mBehaviourClassNames>
+  </Asset>
+</XnaContent>
+
