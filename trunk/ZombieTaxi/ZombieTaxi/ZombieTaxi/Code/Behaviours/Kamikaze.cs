@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
 using MBHEngine.Behaviour;
+using MBHEngine.Input;
+using MBHEngine.Debug;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -78,7 +80,7 @@ namespace ZombieTaxi.Behaviours
             base.LoadContent(fileName);
 
             mCurrentFollowType = FollowType.None;
-            mCloseRangeDistanceSqr = 80 * 80;
+            mCloseRangeDistanceSqr = 88 * 88;
             mFrozenDistanceSqr = 160 * 160;
             mExplodeDistanceSqr = 8 * 8;
 
@@ -104,6 +106,18 @@ namespace ZombieTaxi.Behaviours
             // Don't try anything until the player has actually be loaded.
             if (player == null) return;
 
+            /*
+            if (!InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
+            {
+                mParentGOH.pDirection.mForward = Vector2.Zero;
+                return;
+            }
+            else
+            {
+                DebugMessageDisplay.pInstance.AddConstantMessage("Updated!");
+            }
+            */
+
             mParentGOH.pDoRender = true;
 
             // Once the Kamikaze gets close to the player it stops trying to path find, and starts charging at the player.
@@ -112,6 +126,8 @@ namespace ZombieTaxi.Behaviours
             // Once they are close enough, exlode!
             if (distToPlayer < mExplodeDistanceSqr)
             {
+                //DebugMessageDisplay.pInstance.AddConstantMessage("Reached explosion Distance.");
+
                 mParentGOH.OnMessage(mDetonateMsg);
                 mParentGOH.pDoUpdate = false;
                 GameObjectManager.pInstance.Remove(mParentGOH);
@@ -120,6 +136,8 @@ namespace ZombieTaxi.Behaviours
             // making sure the player doesnt have every enemy in the game attacking at the same time.
             else if (distToPlayer > mFrozenDistanceSqr)
             {
+                //DebugMessageDisplay.pInstance.AddConstantMessage("In Frozen Distance.");
+
                 mCurrentFollowType = FollowType.Frozen;
                 mParentGOH.pDirection.mSpeed = 0.0f;
                 mParentGOH.pDoRender = false;
@@ -158,19 +176,26 @@ namespace ZombieTaxi.Behaviours
 
                     // Traverse back towards the source node until the previous one has already been reached.
                     // That means the current one is the next one that has not been reached yet.
-                    while (p.mPrev != null && !p.mPrev.mReached)
+                    // We also want to make sure we don't try to get to the starting node since we should be 
+                    // standing on top of it already (hence the check for prev.prev).
+                    while (p.mPrev != null && p.mPrev.mPrev != null && !p.mPrev.mReached)
                     {
                         p = p.mPrev;
                     }
 
+                    // The distance to check agaist is based on the move speed, since that is the amount
+                    // we will move this frame, and we want to avoid trying to hit the center point directly, since
+                    // that will only happen if moving in 1 pixel increments.
+                    // Also, we check double move speed because we are going to move this frame no matter what,
+                    // so what we are really checking is, are we going to be ther NEXT update.
+                    Single minDist = mParentGOH.pDirection.mSpeed * 2.0f;
 
                     // Once we are within one unit of the target consider it reached.
-                    // TODO: This should realy take into account the movement speed of the GOH.
-                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterPoint, mParentGOH.pOrientation.mPosition) <= 1.0f)
+                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterPoint, mParentGOH.pOrientation.mPosition) <= minDist)
                     {
                         // This node has been reached, so next update it will start moving towards the next node.
                         p.mReached = true;
-
+                        
                         // However, if this is the destination node (or the closest we have found so far), then
                         // recalculate a path starting here.
                         //if (mGetCurrentBestNodeMsg.mBest == p)
@@ -178,14 +203,20 @@ namespace ZombieTaxi.Behaviours
                         // Recalculate the path every time we reach a node in the path.  This accounts for things like
                         // the target moving.
                         {
+                            //DebugMessageDisplay.pInstance.AddConstantMessage("Reached target.  Setting new destination.");
+
                             mSetSourceMsg.mSource = mParentGOH.pOrientation.mPosition;
                             mParentGOH.OnMessage(mSetSourceMsg);
                             mSetDestinationMsg.mDestination = player.pOrientation.mPosition;
                             mParentGOH.OnMessage(mSetDestinationMsg);
                         }
                     }
-                    else
+                    //else
+
+                    // Regardless of whether or not we are going to do a recalculation next update, move towards the 
+                    // current target now.
                     {
+                        //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
 
                         // Move towards the nodes center point.
                         Vector2 d = p.mTile.mCollisionRect.pCenterPoint - mParentGOH.pOrientation.mPosition;
@@ -197,9 +228,12 @@ namespace ZombieTaxi.Behaviours
                 {
                     if (mCurrentFollowType != FollowType.PathFinding)
                     {
+                        //DebugMessageDisplay.pInstance.AddConstantMessage("Starting Path Finding.");
                         mParentGOH.pDirection.mSpeed = mMoveSpeedPathFinding;
                         mCurrentFollowType = FollowType.PathFinding;
                     }
+
+                    //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
 
                     // If we don't have a destination set yet, set it up now.
                     mSetSourceMsg.mSource = mParentGOH.pOrientation.mPosition;

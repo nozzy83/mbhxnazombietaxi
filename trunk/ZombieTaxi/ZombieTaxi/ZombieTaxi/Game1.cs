@@ -47,8 +47,8 @@ namespace ZombieTaxi
             mGraphics.PreferredBackBufferWidth = 640;
             mGraphics.PreferredBackBufferHeight = 360;
 #else
-            mGraphics.PreferredBackBufferWidth = 1280;
-            mGraphics.PreferredBackBufferHeight = 720;
+            mGraphics.PreferredBackBufferWidth = 1280; // 1366; // 1280;
+            mGraphics.PreferredBackBufferHeight = 720; // 768; // 720;
 #endif
             //mGraphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
@@ -139,14 +139,14 @@ namespace ZombieTaxi
             msg.mAnimationSetName = "Hide";
             chef.OnMessage(msg);
 
-            /*
-            GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
-            t = new Kamikaze(enemy, null);
-            enemy.AttachBehaviour(t);
-            enemy.pOrientation.mPosition.X = 50;
-            enemy.pOrientation.mPosition.Y = 50;
-            GameObjectManager.pInstance.Add(enemy);
-            */
+            
+            //GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
+            //t = new Kamikaze(enemy, null);
+            //enemy.AttachBehaviour(t);
+            //enemy.pOrientation.mPosition.X = 50;
+            //enemy.pOrientation.mPosition.Y = 50;
+            //GameObjectManager.pInstance.Add(enemy);
+            
 
             // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager/
             GameObject enemy = new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");

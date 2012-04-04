@@ -40,8 +40,11 @@ namespace ZombieTaxi.Behaviours
                 GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
                 Behaviour t = new Kamikaze(enemy, null);
                 enemy.AttachBehaviour(t);
-                enemy.pOrientation.mPosition.X = (RandomManager.pInstance.RandomNumber() % (rangeX)) + def.mConstraints.Left;
-                enemy.pOrientation.mPosition.Y = (RandomManager.pInstance.RandomNumber() % (rangeY)) + def.mConstraints.Top;
+
+                // Position it somewhere inside the constaints, and offset by half the width of a tile (4) so that
+                // it is centered on the tile.
+                enemy.pOrientation.mPosition.X = (RandomManager.pInstance.RandomNumber() % (rangeX)) + def.mConstraints.Left + 4.0f;
+                enemy.pOrientation.mPosition.Y = (RandomManager.pInstance.RandomNumber() % (rangeY)) + def.mConstraints.Top + 4.0f;
                 GameObjectManager.pInstance.Add(enemy);
             }
         }
