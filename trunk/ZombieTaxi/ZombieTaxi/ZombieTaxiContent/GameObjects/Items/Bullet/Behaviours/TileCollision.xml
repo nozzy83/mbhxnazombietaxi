@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.TileCollisionDefinition">
-    <mCollisionBoxDimensions>1.0 1.0</mCollisionBoxDimensions>
   </Asset>
 </XnaContent>
 

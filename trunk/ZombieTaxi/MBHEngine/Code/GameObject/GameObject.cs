@@ -14,6 +14,7 @@ using MBHEngineContentDefs;
 using MBHEngine;
 using MBHEngine.Behaviour;
 using System.IO;
+using MBHEngine.Debug;
 
 namespace MBHEngine.GameObject
 {
@@ -108,6 +109,12 @@ namespace MBHEngine.GameObject
         protected Direction mDirection;
 
         /// <summary>
+        /// A rectangle surrounding this Game Object.  Used for all collision
+		/// detection routines.
+        /// </summary>
+        private MBHEngine.Math.Rectangle mCollisionRectangle;
+
+        /// <summary>
         /// A list of classifications which this game objects fits into.  This can be used to filter
         /// larger lists of game objects into smaller ones.
         /// </summary>
@@ -163,6 +170,7 @@ namespace MBHEngine.GameObject
             mOrientation = new Orientation();
             mFactoryInfo = new GameObjectFactory.FactoryInfo();
             mClassifications = new List<Classification>();
+            mCollisionRectangle = new Math.Rectangle();
 
             if (null != fileName)
             {
@@ -174,6 +182,7 @@ namespace MBHEngine.GameObject
                 mOrientation.mPosition = def.mPosition;
                 mOrientation.mRotation = def.mRotation;
                 mOrientation.mScale = def.mScale;
+                mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
 
                 for (Int32 i = 0; def.mClassifications != null && i < def.mClassifications.Count; i++)
                 {
@@ -236,6 +245,11 @@ namespace MBHEngine.GameObject
             {
                 mBehaviours[i].PostUpdate(gameTime);
             }
+
+            // With all behaviours done updating, it should be safe to
+            // now draw the collision volume for this object.
+            pCollisionRect.pCenterPoint = pOrientation.mPosition;
+            DebugShapeDisplay.pInstance.AddAABB(pCollisionRect, Color.Green);
         }
 
         /// <summary>
@@ -436,6 +450,18 @@ namespace MBHEngine.GameObject
             { 
                 mDirection.mForward = value.mForward;
                 mDirection.mSpeed = value.mSpeed; 
+            }
+        }
+
+        /// <summary>
+        /// A rectangle representing the collision volume around this object.
+        /// Can be a volume of 0 if there is none.
+        /// </summary>
+        public Math.Rectangle pCollisionRect
+        {
+            get
+            {
+                return mCollisionRectangle;
             }
         }
 

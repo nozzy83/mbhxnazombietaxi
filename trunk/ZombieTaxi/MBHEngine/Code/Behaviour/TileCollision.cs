@@ -13,22 +13,9 @@ namespace MBHEngine.Behaviour
 {
     public class TileCollision : MBHEngine.Behaviour.Behaviour
     {
-        /// <summary>
-        /// Get the collision boundaries for the current animation.
-        /// </summary>
-        public class GetCollisionRectangleMessage : BehaviourMessage
-        {
-            public MBHEngine.Math.Rectangle mBounds;
-        }
-
         public class OnTileCollisionMessage : BehaviourMessage
         {
         }
-
-        /// <summary>
-        /// The collision boundary of this animation set.
-        /// </summary>
-        private MBHEngine.Math.Rectangle mCollisionRectangle;
 
         /// <summary>
         /// Store the previous position so that in the event of a collision we can go back.
@@ -63,9 +50,7 @@ namespace MBHEngine.Behaviour
             TileCollisionDefinition def = GameObjectManager.pInstance.pContentManager.Load<TileCollisionDefinition>(fileName);
 
             //mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
-
-            mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
-
+            
             // Start the previous position at the current position.  It will get overwritten in th update anyway.
             mPreviousPos = mParentGOH.pOrientation.mPosition;
 
@@ -95,9 +80,9 @@ namespace MBHEngine.Behaviour
         public override void PostUpdate(GameTime gameTime)
         {
             // Copy the current data into the message used for checking collision against the level.
-            mLevelCollisionMsg.mDesiredRect.Copy(mCollisionRectangle);
+            mLevelCollisionMsg.mDesiredRect.Copy(mParentGOH.pCollisionRect);
             mLevelCollisionMsg.mDesiredRect.pCenterPoint = mParentGOH.pOrientation.mPosition;
-            mLevelCollisionMsg.mOriginalRect.Copy(mCollisionRectangle);
+            mLevelCollisionMsg.mOriginalRect.Copy(mParentGOH.pCollisionRect);
 
             // Check for collision against the current level.
             WorldManager.pInstance.pCurrentLevel.OnMessage(mLevelCollisionMsg);
@@ -119,11 +104,11 @@ namespace MBHEngine.Behaviour
                     // If we collided along the x-axis, but the object directly against that collision point.
                     if (mParentGOH.pOrientation.mPosition.X > mPreviousPos.X)
                     {
-                        mParentGOH.pOrientation.mPosition.X = mLevelCollisionMsg.mCollisionPointX - mCollisionRectangle.pDimensionsHalved.X;// mPreviousPos.X;
+                        mParentGOH.pOrientation.mPosition.X = mLevelCollisionMsg.mCollisionPointX - mParentGOH.pCollisionRect.pDimensionsHalved.X;// mPreviousPos.X;
                     }
                     else if (mParentGOH.pOrientation.mPosition.X < mPreviousPos.X)
                     {
-                        mParentGOH.pOrientation.mPosition.X = mLevelCollisionMsg.mCollisionPointX + mCollisionRectangle.pDimensionsHalved.X;// mPreviousPos.X;
+                        mParentGOH.pOrientation.mPosition.X = mLevelCollisionMsg.mCollisionPointX + mParentGOH.pCollisionRect.pDimensionsHalved.X;// mPreviousPos.X;
                     }
                 }
                 if (mLevelCollisionMsg.mCollisionDetectedY)
@@ -134,21 +119,16 @@ namespace MBHEngine.Behaviour
 
                     if (mParentGOH.pOrientation.mPosition.Y > mPreviousPos.Y)
                     {
-                        mParentGOH.pOrientation.mPosition.Y = mLevelCollisionMsg.mCollisionPointY - mCollisionRectangle.pDimensionsHalved.Y;// mPreviousPos.X;
+                        mParentGOH.pOrientation.mPosition.Y = mLevelCollisionMsg.mCollisionPointY - mParentGOH.pCollisionRect.pDimensionsHalved.Y;// mPreviousPos.X;
                     }
                     else if (mParentGOH.pOrientation.mPosition.Y < mPreviousPos.Y)
                     {
-                        mParentGOH.pOrientation.mPosition.Y = mLevelCollisionMsg.mCollisionPointY + mCollisionRectangle.pDimensionsHalved.Y;// mPreviousPos.X;
+                        mParentGOH.pOrientation.mPosition.Y = mLevelCollisionMsg.mCollisionPointY + mParentGOH.pCollisionRect.pDimensionsHalved.Y;// mPreviousPos.X;
                     }
                 }
 
                 mParentGOH.OnMessage(mOnTileCollisionMsg);
             }
-
-            // Update the collision rectangle's position based on the final position of the parent game object.
-            mCollisionRectangle.pCenterPoint = mParentGOH.pOrientation.mPosition;
-
-            DebugShapeDisplay.pInstance.AddAABB(mCollisionRectangle, Color.Green);
         }
 
         /// <summary>
@@ -157,24 +137,6 @@ namespace MBHEngine.Behaviour
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
-        }
-
-        /// <summary>
-        /// The main interface for communicating between behaviours.  Using polymorphism, we
-        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
-        /// can then check for particular upcasted messahe types, and either grab some data 
-        /// from it (set message) or store some data in it (get message).
-        /// </summary>
-        /// <param name="msg">The message being communicated to the behaviour.</param>
-        public override void OnMessage(ref BehaviourMessage msg)
-        {
-            // Which type of message was sent to us?
-            if (msg is GetCollisionRectangleMessage)
-            {
-                GetCollisionRectangleMessage temp = (GetCollisionRectangleMessage)msg;
-                temp.mBounds = mCollisionRectangle;
-                msg = temp;
-            }
         }
     }
 }

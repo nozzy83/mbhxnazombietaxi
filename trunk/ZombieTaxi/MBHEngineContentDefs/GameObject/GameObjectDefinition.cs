@@ -41,6 +41,12 @@ namespace MBHEngineContentDefs
         public Vector2 mScale;
 
         /// <summary>
+        /// The width and height of the collision box.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Vector2 mCollisionBoxDimensions;
+
+        /// <summary>
         /// The calssifications for this game object.
         /// </summary>
         [ContentSerializer(Optional = true)]
