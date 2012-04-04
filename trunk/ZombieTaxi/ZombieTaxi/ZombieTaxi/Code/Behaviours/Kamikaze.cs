@@ -56,6 +56,7 @@ namespace ZombieTaxi.Behaviours
         private PathFind.SetSourceMessage mSetSourceMsg;
         private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
         private Explosive.DetonateMessage mDetonateMsg;
+        private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -89,6 +90,7 @@ namespace ZombieTaxi.Behaviours
             mSetSourceMsg = new PathFind.SetSourceMessage();
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
             mDetonateMsg = new Explosive.DetonateMessage();
+            mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
         }
 
         /// <summary>
@@ -205,6 +207,17 @@ namespace ZombieTaxi.Behaviours
                     mSetDestinationMsg.mDestination = player.pOrientation.mPosition;
                     mParentGOH.OnMessage(mSetDestinationMsg);
                 }
+            }
+
+            if (mParentGOH.pDirection.mForward.X < 0)
+            {
+                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                mParentGOH.OnMessage( mSetSpriteFxMsg );
+            }
+            else if (mParentGOH.pDirection.mForward.X > 0)
+            {
+                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mParentGOH.OnMessage(mSetSpriteFxMsg);
             }
         }
     }
