@@ -20,6 +20,13 @@
         <mNumFrames>2</mNumFrames>
         <mLooping>true</mLooping>
       </Item>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>Run</mName>
+        <mStartingFrame>10</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
     </mAnimationSets>
   </Asset>
 </XnaContent>

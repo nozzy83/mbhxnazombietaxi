@@ -21,6 +21,13 @@
         <mLooping>true</mLooping>
       </Item>
       <Item>
+        <mTicksPerFrame>6</mTicksPerFrame>
+        <mName>Run</mName>
+        <mStartingFrame>6</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+      <Item>
         <mTicksPerFrame>25</mTicksPerFrame>
         <mName>Hide</mName>
         <mStartingFrame>8</mStartingFrame>

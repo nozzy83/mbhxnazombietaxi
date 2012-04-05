@@ -117,7 +117,7 @@ namespace ZombieTaxi.Behaviours
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
                 mParentGOH.OnMessage(mSpriteFxMsg);
-                mSpriteActiveAnimMsg.mAnimationSetName = "Walk";
+                mSpriteActiveAnimMsg.mAnimationSetName = "Run";
                 mParentGOH.OnMessage(mSpriteActiveAnimMsg);
 
                 // Initially the gun is positioned assuming the R-Stick is not pressed.  Just point straight
@@ -131,7 +131,7 @@ namespace ZombieTaxi.Behaviours
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
                 mParentGOH.OnMessage(mSpriteFxMsg);
-                mSpriteActiveAnimMsg.mAnimationSetName = "Walk";
+                mSpriteActiveAnimMsg.mAnimationSetName = "Run";
                 mParentGOH.OnMessage(mSpriteActiveAnimMsg);
 
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;

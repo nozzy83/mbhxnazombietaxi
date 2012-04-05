@@ -73,6 +73,39 @@ namespace MBHEngine.Math
         }
 
         /// <summary>
+        /// Checks if a point in space is inside this Rectangle.
+        /// </summary>
+        /// <param name="other">A point to check against.</param>
+        /// <returns>True if the rectangle intersect.</returns>
+        public Boolean Intersects(Vector2 other)
+        {
+            // We will determine intersection by seeing if the distance between the rectangle and point
+            // is less than the rectangle's half-widths.
+            //
+
+            // Start by getting the distance between the two rectangles.
+            Vector2 seperation = mCenterPoint - other;
+
+            // Now get the minimum amont of seperation required to avoid a collision.
+            Single safeSeperationX = mHalfWidth;
+            Single safeSeperationY = mHalfHeight;
+
+            // Is the distance between the two greater than the minumum safe distance?
+            if (System.Math.Abs(seperation.X) >= safeSeperationX)
+            {
+                return false;
+            }
+
+            if (System.Math.Abs(seperation.Y) >= safeSeperationY)
+            {
+                return false;
+            }
+
+            // If we make it to this point we have at least one collision.
+            return true;
+        }
+
+        /// <summary>
         /// Checks if this Rectangle intersects with another Rectangle.
         /// </summary>
         /// <param name="other">The other rectangle to check against.</param>
