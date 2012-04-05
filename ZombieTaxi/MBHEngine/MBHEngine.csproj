@@ -116,6 +116,7 @@
     <Compile Include="Code\Behaviour\Behaviour.cs" />
     <Compile Include="Code\Behaviour\BehaviourCreator.cs" />
     <Compile Include="Code\Behaviour\BehaviourMessage.cs" />
+    <Compile Include="Code\Behaviour\FiniteStateMachine.cs" />
     <Compile Include="Code\Behaviour\FrameRateDisplay.cs" />
     <Compile Include="Code\Behaviour\Level.cs" />
     <Compile Include="Code\Behaviour\OgmoRender.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Code\Render\DebugDrawBox2D.cs" />
     <Compile Include="Code\Render\DebugDrawBox2DSpritePoly.cs" />
     <Compile Include="Code\Render\DebugSpritePoly.cs" />
+    <Compile Include="Code\StateMachine\FSMState.cs" />
     <Compile Include="Code\World\WorldManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
