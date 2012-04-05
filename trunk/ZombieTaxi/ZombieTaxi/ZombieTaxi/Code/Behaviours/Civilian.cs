@@ -6,6 +6,7 @@ using MBHEngine.Behaviour;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
 using ZombieTaxiContentDefs;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -62,6 +63,7 @@ namespace ZombieTaxi.Behaviours
         private PathFind.SetDestinationMessage mSetDestinationMsg;
         private PathFind.SetSourceMessage mSetSourceMsg;
         private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
+        private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -93,6 +95,7 @@ namespace ZombieTaxi.Behaviours
             mSetDestinationMsg = new PathFind.SetDestinationMessage();
             mSetSourceMsg = new PathFind.SetSourceMessage();
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
+            mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
         }
 
         /// <summary>
@@ -228,6 +231,17 @@ namespace ZombieTaxi.Behaviours
                     {
                         throw new Exception("Unhandled state.");
                     }
+            }
+
+            if (mParentGOH.pDirection.mForward.X < 0)
+            {
+                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                mParentGOH.OnMessage(mSetSpriteFxMsg);
+            }
+            else if (mParentGOH.pDirection.mForward.X > 0)
+            {
+                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mParentGOH.OnMessage(mSetSpriteFxMsg);
             }
         }
 
