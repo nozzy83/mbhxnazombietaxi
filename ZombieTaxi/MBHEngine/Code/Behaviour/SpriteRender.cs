@@ -322,12 +322,28 @@ namespace MBHEngine.Behaviour
 
                 if (mHasShadow)
                 {
+                    // By default, just flip from the motion root.  This works when we want the 
+                    // shadow to line up with the button of the animation frame.  
+                    Vector2 shadowAttachmentPoint = mMotionRoot;
+
+                    // Having the shadow line up to the buttom of the frame is great most of
+                    // the time, but for cases where we want the shadow slightly embedded into the 
+                    // frame, or spaced out, we allow the user to override the anchor point with a 
+                    // special attachment point called "shadow".
+                    if (mAttachmentPoints.ContainsKey("Shadow"))
+                    {
+                        // Note: The attachment point is stored as an offset from the motion root, 
+                        //       it gets added to the achor which is currently storing the motion 
+                        //       root.
+                        shadowAttachmentPoint += mAttachmentPoints["Shadow"];
+                    }
+
                     batch.Draw(mTexture,
-                               mParentGOH.pOrientation.mPosition + new Vector2(0, mFrameHeight),
+                               mParentGOH.pOrientation.mPosition,
                                rect,
                                new Color(0, 0, 0, 128),
                                mParentGOH.pOrientation.mRotation,
-                               mMotionRoot,
+                               new Vector2(mMotionRoot.X, -(mFrameHeight - shadowAttachmentPoint.Y)),
                                mParentGOH.pOrientation.mScale,
                                mSpriteEffects | SpriteEffects.FlipVertically,
                                0);

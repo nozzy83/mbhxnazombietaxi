@@ -3,11 +3,17 @@
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
     <mSpriteFileName>Sprites\\Effects\\Explosion</mSpriteFileName>
     <mFrameHeight>32</mFrameHeight>
-    <mHasShadow>false</mHasShadow>
+    <mHasShadow>true</mHasShadow>
     <mMotionRoot>16 30</mMotionRoot>
+    <mAttachmentPoints>
+      <Item>
+        <mName>Shadow</mName>
+        <mOffset>0 4</mOffset>
+      </Item>
+    </mAttachmentPoints>
     <mAnimationSets>
       <Item>
-        <mTicksPerFrame>5</mTicksPerFrame>
+        <mTicksPerFrame>3</mTicksPerFrame>
         <mName>Explode</mName>
         <mStartingFrame>0</mStartingFrame>
         <mNumFrames>8</mNumFrames>
