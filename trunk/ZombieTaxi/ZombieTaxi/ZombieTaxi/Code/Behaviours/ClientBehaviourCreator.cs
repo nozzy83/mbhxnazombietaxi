@@ -55,6 +55,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new Civilian(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.DamageFlash":
+                    {
+                        return new DamageFlash(go, fileName);
+                    }
                 default:
                     {
                         return null;

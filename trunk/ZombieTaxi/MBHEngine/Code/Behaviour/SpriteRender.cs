@@ -75,6 +75,14 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Update the color that the sprite is tinted with when rendering.
+        /// </summary>
+        public class SetColorMessage : BehaviourMessage
+        {
+            public Color mColor;
+        }
+
+        /// <summary>
         /// Defines a single set of animation.  A sprite sheet will usually contain a number of animation
         /// sets.
         /// </summary>
@@ -173,6 +181,12 @@ namespace MBHEngine.Behaviour
         private OnAnimationCompleteMessage mOnAnimationCompleteMsg;
 
         /// <summary>
+        /// Color used to tint the sprite when rendering.  White means render as it appears
+        /// outside the game.
+        /// </summary>
+        private Color mColor;
+
+        /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
         /// </summary>
@@ -239,6 +253,7 @@ namespace MBHEngine.Behaviour
             mFrameCounter = 0;
             mCurrentFrame = 0;
             mActiveAnimation = 0;
+            mColor = Color.White;
 
             mOnAnimationCompleteMsg = new OnAnimationCompleteMessage();
         }
@@ -298,7 +313,7 @@ namespace MBHEngine.Behaviour
                 batch.Draw(mTexture,
                            mParentGOH.pOrientation.mPosition,
                            rect,
-                           Color.White,
+                           mColor,
                            mParentGOH.pOrientation.mRotation,
                            mMotionRoot,
                            mParentGOH.pOrientation.mScale,
@@ -323,7 +338,7 @@ namespace MBHEngine.Behaviour
                 batch.Draw(mTexture,
                            mParentGOH.pOrientation.mPosition,
                            null,
-                           Color.White,
+                           mColor,
                            mParentGOH.pOrientation.mRotation,
                            mMotionRoot,
                            mParentGOH.pOrientation.mScale,
@@ -417,6 +432,11 @@ namespace MBHEngine.Behaviour
                 {
                     temp.mPoisitionInWorld = mAttachmentPoints[temp.mName] + mParentGOH.pOrientation.mPosition;
                 }
+            }
+            else if (msg is SetColorMessage)
+            {
+                SetColorMessage temp = (SetColorMessage)msg;
+                mColor = temp.mColor;
             }
         }
 
