@@ -17,6 +17,7 @@
       <Item>Health</Item>
       <Item>TwinStick</Item>
       <Item>PathFind</Item>
+      <Item>DamageFlash</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
@@ -24,6 +25,7 @@
       <Item>ZombieTaxi.Behaviours.Health</Item>
       <Item>ZombieTaxi.Behaviours.TwinStick</Item>
       <Item>MBHEngine.Code.Behaviour.PathFind</Item>
+      <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
