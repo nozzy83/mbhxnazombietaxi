@@ -93,10 +93,21 @@ namespace MBHEngine.Behaviour
             };
 
             /// <summary>
+            /// The different types of tiles.
+            /// </summary>
+            public enum TileTypes
+            {
+                Empty = 0,
+                Solid,
+                SolidWithCollision,
+                SolidWithCollisionChecked,
+            };
+
+            /// <summary>
             /// The type of tile this is.
             /// </summary>
             /// <remarks>Right now this is just 0 (not solid), 1 (solid), 2 (temp - solid with collision)</remarks>
-            public Int32 mType = 0;
+            public TileTypes mType = TileTypes.Empty;
 
             /// <summary>
             /// Bits representing while walls this tile can have.  & it with a WallType to determine
@@ -251,7 +262,7 @@ namespace MBHEngine.Behaviour
                     // Give it a random chance to be solid.
                     if (RandomManager.pInstance.RandomPercent() <= 0.05f)
                     {
-                        mCollisionGrid[x,y].mType = 1;
+                        mCollisionGrid[x,y].mType = Level.Tile.TileTypes.Solid;
                     }
                 }
             }
@@ -296,15 +307,15 @@ namespace MBHEngine.Behaviour
             {
                 for (Int32 x = 0; x < mMapWidth; x++)
                 {
-                    if (mCollisionGrid[x, y].mType == 1)
+                    if (mCollisionGrid[x, y].mType == Level.Tile.TileTypes.Solid)
                     {
-                        if (y == 0 || mCollisionGrid[x, y - 1].mType != 1)
+                        if (y == 0 || mCollisionGrid[x, y - 1].mType != Level.Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Top;
-                        if (x == mMapWidth - 1 || mCollisionGrid[x + 1, y].mType != 1)
+                        if (x == mMapWidth - 1 || mCollisionGrid[x + 1, y].mType != Level.Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Right;
-                        if (y == mMapHeight - 1 || mCollisionGrid[x, y + 1].mType != 1)
+                        if (y == mMapHeight - 1 || mCollisionGrid[x, y + 1].mType != Level.Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Bottom;
-                        if (x == 0 || mCollisionGrid[x - 1, y].mType != 1)
+                        if (x == 0 || mCollisionGrid[x - 1, y].mType != Level.Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Left;
                     }
                 }
@@ -353,15 +364,15 @@ namespace MBHEngine.Behaviour
                         Color c = Color.Black;
 
                         // But if a collision was detected on it, render it red.
-                        if (mCollisionGrid[x, y].mType == 2)
+                        if (mCollisionGrid[x, y].mType == Level.Tile.TileTypes.SolidWithCollision)
                             c = Color.Red;
                         // If a collision was even checked for, render it Orange.
-                        else if (mCollisionGrid[x, y].mType == 3)
+                        else if (mCollisionGrid[x, y].mType == Level.Tile.TileTypes.SolidWithCollisionChecked)
                             c = Color.OrangeRed;
 
                         // Reset the collision type (assuming that if it entered this if statement it should,
                         // be type 1.
-                        mCollisionGrid[x, y].mType = 1;
+                        mCollisionGrid[x, y].mType = Level.Tile.TileTypes.Solid;
 
                         if (!CameraManager.pInstance.IsOnCamera(mCollisionGrid[x, y].mCollisionRect))
                         {
@@ -508,7 +519,7 @@ namespace MBHEngine.Behaviour
                     {
                         // This tile has been considered for a collision.  It will be changed to type 2 if there is a
                         // collision.
-                        mCollisionGrid[x, y].mType = 3;
+                        mCollisionGrid[x, y].mType = Level.Tile.TileTypes.SolidWithCollisionChecked;
 
                         // Calculate the center point of the tile.
                         Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));
@@ -608,7 +619,7 @@ namespace MBHEngine.Behaviour
 #endif
 
                             // Set the collision type temporarily to 2, to signal that it collided.
-                            mCollisionGrid[x, y].mType = 2;
+                            mCollisionGrid[x, y].mType = Level.Tile.TileTypes.SolidWithCollision;
 
                             // If we make it to this point there was a collision of some type.
                             hit = true;

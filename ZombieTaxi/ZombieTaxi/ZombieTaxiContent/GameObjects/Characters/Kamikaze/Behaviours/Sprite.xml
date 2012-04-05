@@ -13,8 +13,8 @@
     </mAttachmentPoints>
     <mAnimationSets>
       <Item>
-        <mTicksPerFrame>10</mTicksPerFrame>
-        <mName>Walk</mName>
+        <mTicksPerFrame>2</mTicksPerFrame>
+        <mName>Run</mName>
         <mStartingFrame>0</mStartingFrame>
         <mNumFrames>2</mNumFrames>
         <mLooping>true</mLooping>

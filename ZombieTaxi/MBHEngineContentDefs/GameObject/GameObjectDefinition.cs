@@ -18,6 +18,7 @@ namespace MBHEngineContentDefs
             PLAYER = 0,
             ENEMY,
             ALLY,
+            SAFE_HOUSE,
         }
 
         /// <summary>
