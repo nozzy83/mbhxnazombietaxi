@@ -174,6 +174,7 @@ namespace MBHEngine.GameObject
                 mOrientation.mRotation = def.mRotation;
                 mOrientation.mScale = def.mScale;
                 mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
+                mCollisionRectangle.pCenterPoint = mOrientation.mPosition;
 
                 for (Int32 i = 0; def.mClassifications != null && i < def.mClassifications.Count; i++)
                 {

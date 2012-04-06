@@ -485,6 +485,12 @@ namespace MBHEngine.GameObject
             // Loop through every object being managed.
             for (int i = 0; i < mGameObjects.Count; i++)
             {
+                // Make sure we aren't finding ourselves.
+                if (mGameObjects[i] == source)
+                {
+                    continue;
+                }
+
                 // For each object, check each of its classifications (if it has any).
                 for (Int32 j = 0; j < classifications.Count; j++)
                 {

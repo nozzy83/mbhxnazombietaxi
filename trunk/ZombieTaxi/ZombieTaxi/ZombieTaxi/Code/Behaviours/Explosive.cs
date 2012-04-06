@@ -119,6 +119,16 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
+            if (!mManualExplosion)
+            {
+                // Find all the objects near by and apply some damage to them.
+                mObjectsInRange.Clear();
+                GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH, ref mObjectsInRange, mDamageAppliedTo);
+                if (mObjectsInRange.Count > 0)
+                {
+                    Detonate();
+                }
+            }
         }
 
         /// <summary>

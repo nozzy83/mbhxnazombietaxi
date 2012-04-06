@@ -2,13 +2,13 @@
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
     <mSpriteFileName>Sprites\\Effects\\Explosion</mSpriteFileName>
-    <mFrameHeight>32</mFrameHeight>
+    <mFrameHeight>16</mFrameHeight>
     <mHasShadow>true</mHasShadow>
-    <mMotionRoot>16 30</mMotionRoot>
+    <mMotionRoot>8 15</mMotionRoot>
     <mAttachmentPoints>
       <Item>
         <mName>Shadow</mName>
-        <mOffset>0 4</mOffset>
+        <mOffset>0 -2</mOffset>
       </Item>
     </mAttachmentPoints>
     <mAnimationSets>

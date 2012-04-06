@@ -6,7 +6,7 @@
       <Item>Explode</Item>
     </mAnimationsToPlay>
     <mManualExplosion>true</mManualExplosion>
-    <mDamageCaused>25</mDamageCaused>
+    <mDamageCaused>100</mDamageCaused>
     <mDamageAppliedTo>
       <Item>PLAYER</Item>
       <Item>ENEMY</Item>

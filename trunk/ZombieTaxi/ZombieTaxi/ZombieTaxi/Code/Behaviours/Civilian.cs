@@ -137,7 +137,9 @@ namespace ZombieTaxi.Behaviours
                 // Are we intersecting with any safehouses?
                 if (mSafeHouseInRange.Count != 0)
                 {
+#if ALLOW_GARBAGE
                     DebugMessageDisplay.pInstance.AddConstantMessage("Reached SafeHouse.");
+#endif
 
                     // If there are multiple safehouses overlapping we just take the first one we find.
                     mSetSafeHouseMsg.mSafeHouse = mSafeHouseInRange[0];
