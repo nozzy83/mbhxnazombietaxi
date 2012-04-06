@@ -376,14 +376,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameObjects\Items\Bullet\Behaviours\Projectile.xml">
-      <Name>Projectile</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-      <SubType>Designer</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="GameObjects\Items\Bullet\Behaviours\Timer.xml">
       <Name>Timer</Name>
       <Importer>XmlImporter</Importer>

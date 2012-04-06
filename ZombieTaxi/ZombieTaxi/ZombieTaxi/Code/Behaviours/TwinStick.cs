@@ -273,7 +273,7 @@ namespace ZombieTaxi.Behaviours
             {
                 mParentGOH.OnMessage(new Health.OnApplyDamage(113));
             }
-
+            
             CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
         }
 

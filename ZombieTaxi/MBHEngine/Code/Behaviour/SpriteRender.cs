@@ -324,7 +324,7 @@ namespace MBHEngine.Behaviour
                 {
                     // By default, just flip from the motion root.  This works when we want the 
                     // shadow to line up with the button of the animation frame.  
-                    Vector2 shadowAttachmentPoint = mMotionRoot;
+                    Vector2 shadowAttachmentPoint = new Vector2(0, (mFrameHeight - mMotionRoot.Y) * 2.0f);
 
                     // Having the shadow line up to the buttom of the frame is great most of
                     // the time, but for cases where we want the shadow slightly embedded into the 
@@ -339,13 +339,13 @@ namespace MBHEngine.Behaviour
                     }
 
                     batch.Draw(mTexture,
-                               mParentGOH.pOrientation.mPosition,
+                               mParentGOH.pOrientation.mPosition + shadowAttachmentPoint,
                                rect,
                                new Color(0, 0, 0, 128),
-                               mParentGOH.pOrientation.mRotation,
-                               new Vector2(mMotionRoot.X, -(mFrameHeight - shadowAttachmentPoint.Y)),
+                               -mParentGOH.pOrientation.mRotation + MathHelper.ToRadians(180),
+                               mMotionRoot,
                                mParentGOH.pOrientation.mScale,
-                               mSpriteEffects | SpriteEffects.FlipVertically,
+                               mSpriteEffects ^ SpriteEffects.FlipHorizontally,
                                0);
                 }
             }
@@ -363,14 +363,30 @@ namespace MBHEngine.Behaviour
 
                 if (mHasShadow)
                 {
+                    // By default, just flip from the motion root.  This works when we want the 
+                    // shadow to line up with the button of the animation frame.  
+                    Vector2 shadowAttachmentPoint = new Vector2(0, (mTexture.Height - mMotionRoot.Y) * 2.0f);
+
+                    // Having the shadow line up to the buttom of the frame is great most of
+                    // the time, but for cases where we want the shadow slightly embedded into the 
+                    // frame, or spaced out, we allow the user to override the anchor point with a 
+                    // special attachment point called "shadow".
+                    if (mAttachmentPoints.ContainsKey("Shadow"))
+                    {
+                        // Note: The attachment point is stored as an offset from the motion root, 
+                        //       it gets added to the achor which is currently storing the motion 
+                        //       root.
+                        shadowAttachmentPoint += mAttachmentPoints["Shadow"];
+                    }
+
                     batch.Draw(mTexture,
-                               mParentGOH.pOrientation.mPosition + new Vector2(0, mTexture.Height),
+                               mParentGOH.pOrientation.mPosition + shadowAttachmentPoint,
                                null,
                                new Color(0, 0, 0, 128),
-                               mParentGOH.pOrientation.mRotation,
+                               -mParentGOH.pOrientation.mRotation + MathHelper.ToRadians(180),
                                mMotionRoot,
                                mParentGOH.pOrientation.mScale,
-                               mSpriteEffects | SpriteEffects.FlipVertically,
+                               mSpriteEffects ^ SpriteEffects.FlipHorizontally,
                                0);
                 }
             }
