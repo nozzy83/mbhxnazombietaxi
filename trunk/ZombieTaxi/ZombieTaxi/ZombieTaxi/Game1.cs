@@ -137,8 +137,6 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Add(chef);
             
             //GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
-            //t = new Kamikaze(enemy, null);
-            //enemy.AttachBehaviour(t);
             //enemy.pOrientation.mPosition.X = 50;
             //enemy.pOrientation.mPosition.Y = 50;
             //GameObjectManager.pInstance.Add(enemy);

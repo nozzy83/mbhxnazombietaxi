@@ -38,8 +38,6 @@ namespace ZombieTaxi.Behaviours
                 Single rangeY = def.mConstraints.Bottom - def.mConstraints.Top;
 
                 GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
-                Behaviour t = new Kamikaze(enemy, null);
-                enemy.AttachBehaviour(t);
 
                 // Position it somewhere inside the constaints, and offset by half the width of a tile (4) so that
                 // it is centered on the tile.

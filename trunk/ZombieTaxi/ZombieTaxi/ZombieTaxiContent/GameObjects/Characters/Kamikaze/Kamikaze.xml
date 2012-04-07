@@ -18,6 +18,7 @@
       <Item>Explosive</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
+      <Item>Kamikaze</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
@@ -26,6 +27,7 @@
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
       <Item>ZombieTaxi.Behaviours.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>ZombieTaxi.Behaviours.Kamikaze</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
