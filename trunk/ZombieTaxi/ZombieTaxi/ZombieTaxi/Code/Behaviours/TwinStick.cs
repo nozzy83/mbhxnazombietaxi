@@ -32,12 +32,23 @@ namespace ZombieTaxi.Behaviours
         private GameObject mGun;
 
         /// <summary>
+        /// The amount of time that needs to pass between shots of the gun.
+        /// </summary>
+        private StopWatch mGunCooldown;
+
+        /// <summary>
         /// Grenades fired with alt fire.
         /// </summary>
         private GameObject[] mGrenades;
 
+        /// <summary>
+        /// Which grenade should be used next.
+        /// </summary>
         private Int16 mCurrentGrenade;
 
+        /// <summary>
+        /// Preallocated messages to avoid GC.
+        /// </summary>
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
         private SpriteRender.GetSpriteEffectsMessage mGetSpriteFxMsg;
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
@@ -67,7 +78,6 @@ namespace ZombieTaxi.Behaviours
             mMoveSpeed = def.mMoveSpeed;
             mCurrentGrenade = 0;
 
-
             mGrenades = new GameObject[6];
             for (Int16 i = 0; i < mGrenades.Length; i++)
             {
@@ -80,6 +90,9 @@ namespace ZombieTaxi.Behaviours
             mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
             mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
             //mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
+
+            mGunCooldown = StopWatchManager.pInstance.GetNewStopWatch();
+            mGunCooldown.pLifeTime = 5; // 1 bullet fired every 5 frames.
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
@@ -211,55 +224,69 @@ namespace ZombieTaxi.Behaviours
                 Vector2 finalUp = new Vector2(-finalDir.Y, -finalDir.X);
                 if (finalDir.X < 0) finalUp *= -1;
 
-                GameObject bullet = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Bullet\\Bullet");
-
-                if (bullet != null)
+                if (mGunCooldown.IsExpired())
                 {
-                    // If the bullet is not reset the explosive behaviour will only work once.
-                    bullet.ResetBehaviours();
+                    mGunCooldown.Restart();
 
-                    mToggleTimerMsg.mActivate = true;
-                    mToggleTimerMsg.mReset = true;
-                    bullet.OnMessage(mToggleTimerMsg);
+                    GameObject bullet = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Bullet\\Bullet");
 
-                    bullet.pDirection.mSpeed = 1.75f;
-
-                    // Update the game object with all the new data.
-                    bullet.pOrientation.mPosition = mGun.pOrientation.mPosition;
-                    bullet.pOrientation.mRotation = (Single)angle;
-                    bullet.pDirection.mForward = finalDir;
-
-                    finalDir.Y *= -1;
-                    bullet.pOrientation.mPosition += finalUp * 1.0f;
-                    bullet.pOrientation.mPosition += finalDir * 3.5f;
-
-                    // The screen's y direction is opposite the controller.
-                    bullet.pDirection.mForward.Y *= -1;
-
-                    // By default the bullets have their renderer turned off.
-                    bullet.pDoRender = true;
-
-                    GameObjectManager.pInstance.Add(bullet);
-
-                    if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
+                    if (bullet != null)
                     {
-                        GameObject go = mGrenades[mCurrentGrenade];
-                        go.ResetBehaviours();
-                        go.pOrientation.mPosition = bullet.pOrientation.mPosition;
-                        go.pOrientation.mRotation = bullet.pOrientation.mRotation;
-                        go.pDirection.mForward = bullet.pDirection.mForward;
-                        go.pDoRender = true;
-                        GameObjectManager.pInstance.Add(go);
+                        // Store the direction locally so as to not alter it and screw things
+                        // up for the grenade afterwards.
+                        Vector2 bulletDir = finalDir;
+
+                        // If the bullet is not reset the explosive behaviour will only work once.
+                        bullet.ResetBehaviours();
+
                         mToggleTimerMsg.mActivate = true;
                         mToggleTimerMsg.mReset = true;
-                        go.OnMessage(mToggleTimerMsg);
+                        bullet.OnMessage(mToggleTimerMsg);
 
-                        mCurrentGrenade++;
+                        bullet.pDirection.mSpeed = 1.75f;
 
-                        if (mCurrentGrenade >= mGrenades.Length)
-                        {
-                            mCurrentGrenade = 0;
-                        }
+                        // Update the game object with all the new data.
+                        bullet.pOrientation.mPosition = mGun.pOrientation.mPosition;
+                        bullet.pOrientation.mRotation = (Single)angle;
+                        bullet.pDirection.mForward = bulletDir;
+
+                        bulletDir.Y *= -1;
+                        bullet.pOrientation.mPosition += finalUp * 1.0f;
+                        bullet.pOrientation.mPosition += bulletDir * 3.5f;
+
+                        // The screen's y direction is opposite the controller.
+                        bullet.pDirection.mForward.Y *= -1;
+
+                        // By default the bullets have their renderer turned off.
+                        bullet.pDoRender = true;
+
+                        GameObjectManager.pInstance.Add(bullet);
+                    }
+                }
+
+                if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
+                {
+                    GameObject go = mGrenades[mCurrentGrenade];
+                    go.ResetBehaviours();
+                    Vector2 grenadeDir = finalDir;
+                    grenadeDir.Y *= -1;
+                    go.pOrientation.mPosition = mGun.pOrientation.mPosition;
+                    go.pOrientation.mPosition += finalUp * 1.0f;
+                    go.pOrientation.mPosition += grenadeDir * 3.5f;
+                    go.pOrientation.mPosition = go.pOrientation.mPosition;
+                    go.pOrientation.mRotation = (Single)angle;
+                    go.pDirection.mForward = grenadeDir;
+                    go.pDoRender = true;
+                    GameObjectManager.pInstance.Add(go);
+                    mToggleTimerMsg.mActivate = true;
+                    mToggleTimerMsg.mReset = true;
+                    go.OnMessage(mToggleTimerMsg);
+
+                    mCurrentGrenade++;
+
+                    if (mCurrentGrenade >= mGrenades.Length)
+                    {
+                        mCurrentGrenade = 0;
                     }
                 }
             }
