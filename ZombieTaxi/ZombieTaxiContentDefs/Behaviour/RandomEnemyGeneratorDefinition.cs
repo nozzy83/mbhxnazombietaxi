@@ -18,5 +18,10 @@ namespace ZombieTaxiContentDefs
         /// A rectangle defining the area that the enemies can be spawned in.
         /// </summary>
         public Rectangle mConstraints;
+
+        /// <summary>
+        /// The template defining the Game Object to spawn.
+        /// </summary>
+        public String mGameObjectFilePath;
     }
 }
