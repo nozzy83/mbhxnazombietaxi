@@ -78,6 +78,7 @@ namespace ZombieTaxi
             GameObject.AddBehaviourCreator(new ClientBehaviourCreator());
             GameObjectFactory.pInstance.Initialize();
             CameraManager.pInstance.Initialize(mGraphics.GraphicsDevice);
+            StopWatchManager.pInstance.Initialize();
 
 #if DEBUG
             // By default, in DEBUG the debug drawing is enabled.
@@ -195,6 +196,7 @@ namespace ZombieTaxi
             DebugMessageDisplay.pInstance.AddDynamicMessage("Game-Time Delta: " + gameTime.ElapsedGameTime.TotalSeconds);
             DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + PathFind.pNumUnusedNodes);
 #endif
+            StopWatchManager.pInstance.Update();
             GameObjectManager.pInstance.Update(gameTime);
             PhysicsManager.pInstance.Update(gameTime);
             InputManager.pInstance.UpdateEnd();

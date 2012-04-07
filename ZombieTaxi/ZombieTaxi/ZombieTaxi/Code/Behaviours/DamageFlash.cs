@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
 using MBHEngine.Debug;
 using ZombieTaxiContentDefs;
+using MBHEngine.Math;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -17,28 +18,18 @@ namespace ZombieTaxi.Behaviours
     class DamageFlash : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
-        /// Tracks how long it has been since this Game Object last took damage.
+        /// The amount of time that needs to pass after taking damage for the effect to stop playing.
+        /// If more damage is taken before this hits zero, the timer is reset, thus taking consistant 
+        /// damage in succession will cause th effect to stay running.
         /// </summary>
-        private Single mFramesSinceLastDamage;
-
-        /// <summary>
-        /// Once the time since this Game Object last took damage reaches this value, 
-        /// the color is set back to white, and the behaviour waits for the next
-        /// damage message to come in.
-        /// </summary>
-        private Single mFramesToExpire;
+        private StopWatch mDamageCooldown;
 
         /// <summary>
         /// Color is cycled between multiple colours and than happens at a set interval of frames.
         /// This keeps track of how many frames have passed since they last time the color was 
         /// cycled.
         /// </summary>
-        private Single mFramesSinceColorChange;
-
-        /// <summary>
-        /// How many frames need to pass before cycling to the next color.
-        /// </summary>
-        private Single mFramesBetweenColorChange;
+        private StopWatch mColorCooldown;
 
         /// <summary>
         /// A list of colors to cycle between as the Game Object takes damage.
@@ -67,6 +58,16 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~DamageFlash()
+        {
+            // Return the StopWatch objects to the manager when we are done with them.
+            StopWatchManager.pInstance.RecycleStopWatch(mDamageCooldown);
+            StopWatchManager.pInstance.RecycleStopWatch(mColorCooldown);
+        }
+
+        /// <summary>
         /// Call this to initialize a Behaviour with data supplied in a file.
         /// </summary>
         /// <param name="fileName">The file to load from.</param>
@@ -76,16 +77,18 @@ namespace ZombieTaxi.Behaviours
 
             DamageFlashDefinition def = GameObjectManager.pInstance.pContentManager.Load<DamageFlashDefinition>(fileName);
 
-            mFramesSinceLastDamage = -1;
-            mFramesToExpire = def.mFramesToReset;
+            mDamageCooldown = StopWatchManager.pInstance.GetNewStopWatch();
+            mDamageCooldown.pLifeTime = def.mFramesToReset;
 
-            mFramesSinceColorChange = 0;
-            mFramesBetweenColorChange = def.mFramesBetweenColorChange;
+            mColorCooldown = StopWatchManager.pInstance.GetNewStopWatch();
+            mColorCooldown.pLifeTime = def.mFramesBetweenColorChange;
 
-            if (mFramesToExpire < mFramesBetweenColorChange)
+#if DEBUG
+            if (def.mFramesToReset < def.mFramesBetweenColorChange)
             {
                 throw new Exception("mFramesBetweenColorChange must be less than mFramesToReset.");
             }
+#endif
 
             mColors = def.mColors;
             mCurrentColor = 0;
@@ -99,16 +102,11 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
-            // If the mFramesSinceLastDamage it means it has already expired.  Nothing to do but wait
-            // for the next damage event.
-            if (mFramesSinceLastDamage != -1)
+            // When the DamageCooldown StopWatch 
+            if (!mDamageCooldown.pIsPaused)
             {
-                // Increment the frame counters.
-                mFramesSinceLastDamage++;
-                mFramesSinceColorChange++;
-
                 // Has the effect experied?
-                if (mFramesSinceLastDamage > mFramesToExpire)
+                if (mDamageCooldown.IsExpired())
                 {
                     // TODO: This should not assume the original colour was white.
                     mSetColorMsg.mColor = Color.White;
@@ -116,18 +114,18 @@ namespace ZombieTaxi.Behaviours
 
                     // Next time through the Update function, this will tell it that the
                     // effect has already expired.
-                    mFramesSinceLastDamage = -1;
+                    mDamageCooldown.pIsPaused = true;
 
                     // Next time damage is registered we want the color to change right away.
-                    mFramesSinceColorChange = mFramesBetweenColorChange;
+                    mColorCooldown.ForceExpire();
                 }
                 else
                 {
                     // Has enough time passed to switch to the next color?
-                    if (mFramesSinceColorChange >= mFramesBetweenColorChange)
+                    if (mColorCooldown.IsExpired())
                     {
                         // If it has, reset the timer.
-                        mFramesSinceColorChange = 0;
+                        mColorCooldown.Restart();
 
                         // Move on to the next color.
                         mCurrentColor++;
@@ -163,7 +161,8 @@ namespace ZombieTaxi.Behaviours
                 // If it was previous expired, this will trigger it to start again.
                 // If it was already running, than this will give us more time before we
                 // hit the mFramesToExpire.
-                mFramesSinceLastDamage = 0;
+                mDamageCooldown.pIsPaused = false;
+                mDamageCooldown.Restart();
             }
         }
     }
