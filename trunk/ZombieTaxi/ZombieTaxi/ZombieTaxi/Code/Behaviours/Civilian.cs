@@ -302,12 +302,7 @@ namespace ZombieTaxi.Behaviours
             /// Waiting in the safe house cycles between this state and FSMStateWanderInSafeHouse.  In this state
             /// we stand around for a set period of time.  This is that time.
             /// </summary>
-            private Single mFramesToWait;
-
-            /// <summary>
-            /// How many frames have we been standing here?
-            /// </summary>
-            private Single mCurrentFrameCount;
+            private StopWatch mWatch;
 
             /// <summary>
             /// Preallocate messages to avoid GC.
@@ -319,10 +314,18 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             public FSMStateWaitInSafeHouse()
             {
-                mCurrentFrameCount = 0;
-                mFramesToWait = 90;
+                mWatch = StopWatchManager.pInstance.GetNewStopWatch();
+                mWatch.pLifeTime = 90;
                 
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
+            }
+
+            /// <summary>
+            /// Destrucor.
+            /// </summary>
+            ~FSMStateWaitInSafeHouse()
+            {
+                StopWatchManager.pInstance.RecycleStopWatch(mWatch);
             }
 
             /// <summary>
@@ -333,7 +336,7 @@ namespace ZombieTaxi.Behaviours
                 mSetActiveAnimationMsg.mAnimationSetName = "Idle";
                 pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
-                mCurrentFrameCount = 0;
+                mWatch.Restart();
             }
 
             /// <summary>
@@ -342,10 +345,8 @@ namespace ZombieTaxi.Behaviours
             /// <returns>Identifier of a state to transition to.</returns>
             public override String OnUpdate()
             {
-                mCurrentFrameCount++;
-
                 // Has enough time passed that we should try moving to a new space?
-                if (mCurrentFrameCount >= mFramesToWait)
+                if (mWatch.IsExpired())
                 {
                     return "WanderInSafeHouse";
                 }
