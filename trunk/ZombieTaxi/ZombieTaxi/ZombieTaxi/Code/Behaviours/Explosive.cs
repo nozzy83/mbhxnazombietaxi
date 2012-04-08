@@ -26,7 +26,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// When an explosive explodes there is an explosion effect that needs to be shown.  This is it.
         /// </summary>
-        private GameObject mExplosionEffect;
+        private String mExplosionEffect;
 
         /// <summary>
         /// Keep track of whether or not this explosive has actually exploded yet.
@@ -89,8 +89,7 @@ namespace ZombieTaxi.Behaviours
 
             ExplosiveDefinition def = GameObjectManager.pInstance.pContentManager.Load<ExplosiveDefinition>(fileName);
 
-            mExplosionEffect = new GameObject(def.mEffectFileName);
-            GameObjectManager.pInstance.Add(mExplosionEffect);
+            mExplosionEffect = def.mEffectFileName;
 
             mExplosionAnimationNames = def.mAnimationsToPlay;
 
@@ -104,13 +103,14 @@ namespace ZombieTaxi.Behaviours
             {
                 mDamageAppliedTo.Add(def.mDamageAppliedTo[i]);
             }
-            mExploded = false;
 
             mObjectsInRange = new List<GameObject>(16);
 
             mSetActiveAnimationMessage = new SpriteRender.SetActiveAnimationMessage();
             mOnApplyDamageMsg = new Health.OnApplyDamage(mDamagedCaused);
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
+
+            Reset();
         }
 
         /// <summary>
@@ -136,7 +136,6 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         public override void Reset()
         {
-            mExplosionEffect.ResetBehaviours();
             mExploded = false;
         }
 
@@ -178,14 +177,13 @@ namespace ZombieTaxi.Behaviours
             mSetActiveAnimationMessage.mAnimationSetName = mExplosionAnimationNames[index];
             mSetActiveAnimationMessage.mReset = true;
 
+            GameObject fx = GameObjectFactory.pInstance.GetTemplate(mExplosionEffect);
             mGetAttachmentPointMsg.mName = "Ground";
             mGetAttachmentPointMsg.mPoisitionInWorld = mParentGOH.pOrientation.mPosition; // Set a default incase it doesn't have a Ground attachment point.
             mParentGOH.OnMessage(mGetAttachmentPointMsg);
-            mExplosionEffect.pOrientation.mPosition = mGetAttachmentPointMsg.mPoisitionInWorld;
-            mExplosionEffect.OnMessage(mSetActiveAnimationMessage);
-            mExplosionEffect.pDoRender = mExplosionEffect.pDoUpdate = true;
-
-            mParentGOH.pDirection.mForward = Vector2.Zero;
+            fx.pOrientation.mPosition = mGetAttachmentPointMsg.mPoisitionInWorld;
+            fx.OnMessage(mSetActiveAnimationMessage);
+            GameObjectManager.pInstance.Add(fx);
 
             // Find all the objects near by and apply some damage to them.
             mObjectsInRange.Clear();

@@ -253,9 +253,6 @@ namespace ZombieTaxi.Behaviours
                         // The screen's y direction is opposite the controller.
                         bullet.pDirection.mForward.Y *= -1;
 
-                        // By default the bullets have their renderer turned off.
-                        bullet.pDoRender = true;
-
                         GameObjectManager.pInstance.Add(bullet);
                     }
                 }

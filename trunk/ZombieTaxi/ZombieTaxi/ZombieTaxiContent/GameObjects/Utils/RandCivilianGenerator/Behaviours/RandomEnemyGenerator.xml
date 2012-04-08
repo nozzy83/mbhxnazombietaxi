@@ -3,7 +3,7 @@
   <Asset Type="ZombieTaxiContentDefs.RandomEnemyGeneratorDefinition">
     <mNumEnemies>200</mNumEnemies>
     <mConstraints>0 0 1600 1600</mConstraints>
-    <mGameObjectFilePath>GameObjects\\Characters\\Civilian\\Civilian</mGameObjectFilePath>
+    <mGameObjectFilePath>GameObjects\Characters\Civilian\Civilian</mGameObjectFilePath>
   </Asset>
 </XnaContent>
 
