@@ -37,14 +37,9 @@ namespace ZombieTaxi.Behaviours
         private StopWatch mGunCooldown;
 
         /// <summary>
-        /// Grenades fired with alt fire.
+        /// The amont of time that needs to pass between grenades being thrown.
         /// </summary>
-        private GameObject[] mGrenades;
-
-        /// <summary>
-        /// Which grenade should be used next.
-        /// </summary>
-        private Int16 mCurrentGrenade;
+        private StopWatch mGrenadeCooldown;
 
         /// <summary>
         /// Preallocated messages to avoid GC.
@@ -66,6 +61,15 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~TwinStick()
+        {
+            StopWatchManager.pInstance.RecycleStopWatch(mGunCooldown);
+            StopWatchManager.pInstance.RecycleStopWatch(mGrenadeCooldown);
+        }
+
+        /// <summary>
         /// Call this to initialize a Behaviour with data supplied in a file.
         /// </summary>
         /// <param name="fileName">The file to load from.</param>
@@ -76,14 +80,6 @@ namespace ZombieTaxi.Behaviours
             TwinStickDefinition def = GameObjectManager.pInstance.pContentManager.Load<TwinStickDefinition>(fileName);
 
             mMoveSpeed = def.mMoveSpeed;
-            mCurrentGrenade = 0;
-
-            mGrenades = new GameObject[6];
-            for (Int16 i = 0; i < mGrenades.Length; i++)
-            {
-                mGrenades[i] = new GameObject("GameObjects\\Items\\Grenade\\Grenade");
-                mGrenades[i].pDirection.mSpeed = 0.25f;
-            } 
 
             mGun = new GameObject("GameObjects\\Items\\Gun\\Gun");
             GameObjectManager.pInstance.Add(mGun);
@@ -93,6 +89,9 @@ namespace ZombieTaxi.Behaviours
 
             mGunCooldown = StopWatchManager.pInstance.GetNewStopWatch();
             mGunCooldown.pLifeTime = 5; // 1 bullet fired every 5 frames.
+
+            mGrenadeCooldown = StopWatchManager.pInstance.GetNewStopWatch();
+            mGrenadeCooldown.pLifeTime = 60;
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
@@ -236,9 +235,6 @@ namespace ZombieTaxi.Behaviours
                         // up for the grenade afterwards.
                         Vector2 bulletDir = finalDir;
 
-                        // If the bullet is not reset the explosive behaviour will only work once.
-                        bullet.ResetBehaviours();
-
                         mToggleTimerMsg.mActivate = true;
                         mToggleTimerMsg.mReset = true;
                         bullet.OnMessage(mToggleTimerMsg);
@@ -264,29 +260,27 @@ namespace ZombieTaxi.Behaviours
                     }
                 }
 
+
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
                 {
-                    GameObject go = mGrenades[mCurrentGrenade];
-                    go.ResetBehaviours();
-                    Vector2 grenadeDir = finalDir;
-                    grenadeDir.Y *= -1;
-                    go.pOrientation.mPosition = mGun.pOrientation.mPosition;
-                    go.pOrientation.mPosition += finalUp * 1.0f;
-                    go.pOrientation.mPosition += grenadeDir * 3.5f;
-                    go.pOrientation.mPosition = go.pOrientation.mPosition;
-                    go.pOrientation.mRotation = (Single)angle;
-                    go.pDirection.mForward = grenadeDir;
-                    go.pDoRender = true;
-                    GameObjectManager.pInstance.Add(go);
-                    mToggleTimerMsg.mActivate = true;
-                    mToggleTimerMsg.mReset = true;
-                    go.OnMessage(mToggleTimerMsg);
-
-                    mCurrentGrenade++;
-
-                    if (mCurrentGrenade >= mGrenades.Length)
+                    if (mGrenadeCooldown.IsExpired())
                     {
-                        mCurrentGrenade = 0;
+                        mGrenadeCooldown.Restart();
+
+                        GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Grenade\\Grenade");
+                        Vector2 grenadeDir = finalDir;
+                        grenadeDir.Y *= -1;
+                        go.pOrientation.mPosition = mGun.pOrientation.mPosition;
+                        go.pOrientation.mPosition += finalUp * 1.0f;
+                        go.pOrientation.mPosition += grenadeDir * 3.5f;
+                        go.pOrientation.mPosition = go.pOrientation.mPosition;
+                        go.pOrientation.mRotation = (Single)angle;
+                        go.pDirection.mForward = grenadeDir;
+                        go.pDirection.mSpeed = 0.25f;
+                        GameObjectManager.pInstance.Add(go);
+                        mToggleTimerMsg.mActivate = true;
+                        mToggleTimerMsg.mReset = true;
+                        go.OnMessage(mToggleTimerMsg);
                     }
                 }
             }

@@ -103,6 +103,7 @@ namespace ZombieTaxi
             // be retrived later without any heap allocations.
             //
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Bullet\\Bullet", 100);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Grenade\\Grenade", 10);
 
             // The tiled background image that travels will the player creating the illusion of
             // an infinite background image.

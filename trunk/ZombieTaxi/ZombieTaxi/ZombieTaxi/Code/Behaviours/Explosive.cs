@@ -185,7 +185,6 @@ namespace ZombieTaxi.Behaviours
             mExplosionEffect.OnMessage(mSetActiveAnimationMessage);
             mExplosionEffect.pDoRender = mExplosionEffect.pDoUpdate = true;
 
-            mParentGOH.pDoRender = false;
             mParentGOH.pDirection.mForward = Vector2.Zero;
 
             // Find all the objects near by and apply some damage to them.
