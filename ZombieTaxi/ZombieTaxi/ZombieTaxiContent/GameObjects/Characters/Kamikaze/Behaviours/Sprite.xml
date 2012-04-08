@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
-    <mSpriteFileName>Sprites\\Characters\\CommandoShorts</mSpriteFileName>
+    <mSpriteFileName>Sprites\Characters\CommandoShorts</mSpriteFileName>
     <mFrameHeight>8</mFrameHeight>
     <mHasShadow>true</mHasShadow>
     <mMotionRoot>4 4</mMotionRoot>

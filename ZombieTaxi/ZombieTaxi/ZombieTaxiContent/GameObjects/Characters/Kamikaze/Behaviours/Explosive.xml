@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.ExplosiveDefinition">
-    <mEffectFileName>GameObjects\\Effects\\Explosion\\Explosion</mEffectFileName>
+    <mEffectFileName>GameObjects\Effects\Explosion\Explosion</mEffectFileName>
     <mAnimationsToPlay>
       <Item>Explode</Item>
     </mAnimationsToPlay>

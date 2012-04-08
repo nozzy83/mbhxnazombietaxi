@@ -129,7 +129,6 @@ namespace ZombieTaxi.Behaviours
                 //DebugMessageDisplay.pInstance.AddConstantMessage("Reached explosion Distance.");
 
                 mParentGOH.OnMessage(mDetonateMsg);
-                mParentGOH.pDoUpdate = false;
                 GameObjectManager.pInstance.Remove(mParentGOH);
             }
             // When they are really faraway, freeze them in place.  This is for performance issues, as well as

@@ -39,6 +39,13 @@ namespace MBHEngineContentDefs
             /// Does this animation loop?
             /// </summary>
             public Boolean mLooping;
+
+            /// <summary>
+            /// When this animation completes, should the parent GameObject be removed from the GameObjectManager.
+            /// This is useful for things like death animations.
+            /// </summary>
+            [ContentSerializer(Optional = true)]
+            public Boolean mRemoveGameObjectOnComplete;
         };
 
         /// <summary>

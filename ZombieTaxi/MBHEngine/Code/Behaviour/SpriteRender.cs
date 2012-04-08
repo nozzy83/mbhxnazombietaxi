@@ -114,6 +114,12 @@ namespace MBHEngine.Behaviour
             public Boolean mLooping;
 
             /// <summary>
+            /// When this animation completes, should the parent GameObject be removed from the GameObjectManager.
+            /// This is useful for things like death animations.
+            /// </summary>
+            public Boolean mRemoveGameObjectOnComplete;
+
+            /// <summary>
             /// Has a non-looping animation completed?
             /// </summary>
             public Boolean mAnimationComplete;
@@ -239,6 +245,7 @@ namespace MBHEngine.Behaviour
                     temp.mName = def.mAnimationSets[i].mName;
                     temp.mStartingFrame = def.mAnimationSets[i].mStartingFrame;
                     temp.mLooping = def.mAnimationSets[i].mLooping;
+                    temp.mRemoveGameObjectOnComplete = def.mAnimationSets[i].mRemoveGameObjectOnComplete;
                     temp.mAnimationComplete = false;
                     mAnimations.Add(temp);
                 }
@@ -293,6 +300,11 @@ namespace MBHEngine.Behaviour
                         {
                             // In the case of a looping animation we simple go back to the first frame.
                             mCurrentFrame = 0;
+                        }
+
+                        if (mAnimations[mActiveAnimation].mRemoveGameObjectOnComplete)
+                        {
+                            GameObjectManager.pInstance.Remove(mParentGOH);
                         }
                     }
                     mFrameCounter = 0;
