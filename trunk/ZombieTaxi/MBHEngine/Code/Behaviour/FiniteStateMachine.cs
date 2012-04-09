@@ -117,21 +117,7 @@ namespace MBHEngine.Behaviour
                         // Update the state which will potentially return a new state in which to transition to.
                         String nextState = mCurrentState.OnUpdate();
 
-                        // If they passed a value state name...
-                        if (!String.IsNullOrEmpty(nextState))
-                        {
-                            // ...and it is one that we are managing.
-                            if (mStates.ContainsKey(nextState))
-                            {
-                                // Request a new state and move to the END pass of this flow.
-                                mNextState = mStates[nextState];
-                                mCurrentFlowState = FlowStates.END;
-                            }
-                            else
-                            {
-                                throw new Exception("FSMState returned a new state which is not managed by this state machine: " + nextState);
-                            }
-                        }
+                        AdvanceToState(nextState);
 
                         break;
                     }
@@ -174,7 +160,7 @@ namespace MBHEngine.Behaviour
         /// </summary>
         /// <param name="state">Implementation of the FSMState.</param>
         /// <param name="id">An indentifier used to manage and transition between states.</param>
-        public void AddState(FSMState state, String id)
+        protected void AddState(FSMState state, String id)
         {
             // The state will be expecting to access the Parent GameObject a lot.
             state.pParentGOH = mParentGOH;
@@ -195,6 +181,29 @@ namespace MBHEngine.Behaviour
             {
                 mCurrentState = mNextState = state;
                 mCurrentFlowState = FlowStates.INITIAL_STATE;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to advance to a new state, checking for unknown and null states.
+        /// </summary>
+        /// <param name="nextState">The name of the state to go to (as sent to AddState).</param>
+        protected void AdvanceToState(String nextState)
+        {
+            // If they passed a value state name...
+            if (!String.IsNullOrEmpty(nextState))
+            {
+                // ...and it is one that we are managing.
+                if (mStates.ContainsKey(nextState))
+                {
+                    // Request a new state and move to the END pass of this flow.
+                    mNextState = mStates[nextState];
+                    mCurrentFlowState = FlowStates.END;
+                }
+                else
+                {
+                    throw new Exception("FSMState returned a new state which is not managed by this state machine: " + nextState);
+                }
             }
         }
     }

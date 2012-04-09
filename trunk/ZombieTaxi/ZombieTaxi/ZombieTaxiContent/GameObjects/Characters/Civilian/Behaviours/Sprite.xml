@@ -34,6 +34,13 @@
         <mNumFrames>15</mNumFrames>
         <mLooping>true</mLooping>
       </Item>
+      <Item>
+        <mTicksPerFrame>0</mTicksPerFrame>
+        <mName>Dead</mName>
+        <mStartingFrame>23</mStartingFrame>
+        <mNumFrames>1</mNumFrames>
+        <mLooping>false</mLooping>
+      </Item>
     </mAnimationSets>
   </Asset>
 </XnaContent>
