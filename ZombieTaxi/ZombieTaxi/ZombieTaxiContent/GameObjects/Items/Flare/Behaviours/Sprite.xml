@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\Items\Flare</mSpriteFileName>
+    <mFrameHeight>2</mFrameHeight>
+    <mHasShadow>true</mHasShadow>
+    <mMotionRoot>2 1</mMotionRoot>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>60</mTicksPerFrame>
+        <mName>Lit</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+

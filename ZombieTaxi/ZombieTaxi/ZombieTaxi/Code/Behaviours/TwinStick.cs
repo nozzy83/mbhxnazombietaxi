@@ -282,6 +282,13 @@ namespace ZombieTaxi.Behaviours
                 }
             }
 
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.L1, true))
+            {
+                GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Flare\\Flare");
+                go.pOrientation.mPosition = mGun.pOrientation.mPosition;
+                GameObjectManager.pInstance.Add(go);
+            }
+
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pOrientation.mPosition);
 #endif

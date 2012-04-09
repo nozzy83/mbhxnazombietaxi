@@ -232,8 +232,16 @@ namespace MBHEngine.Behaviour
 
             if (def.mAnimationSets != null)
             {
-                mIsAnimated     = true;
-                mFrameHeight    = def.mFrameHeight;
+                mIsAnimated = true;
+
+#if DEBUG
+                if (def.mFrameHeight == 0)
+                {
+                    throw new Exception("Sprite has animations but a frame height of 0.  FrameHeight must be > 0.");
+                }
+#endif
+
+                mFrameHeight = def.mFrameHeight;
 
                 mAnimations = new List<AnimationSet>();
 
@@ -321,7 +329,7 @@ namespace MBHEngine.Behaviour
             if (mIsAnimated)
             {
                 Int32 baseIndex = (mAnimations[mActiveAnimation].mStartingFrame + mCurrentFrame) * mFrameHeight;
-                Rectangle rect = new Rectangle(0, baseIndex, mFrameHeight, mTexture.Width);
+                Rectangle rect = new Rectangle(0, baseIndex, mTexture.Width, mFrameHeight);
                 batch.Draw(mTexture,
                            mParentGOH.pOrientation.mPosition,
                            rect,
@@ -446,8 +454,9 @@ namespace MBHEngine.Behaviour
                 // If the animation is not currently playing we need to find it.
                 if (mAnimations[mActiveAnimation].mName != temp.mAnimationSetName)
                 {
+#if DEBUG
                     Boolean animationFound = false;
-                    
+#endif
                     for (int i = 0; i < mAnimations.Count; i++)
                     {
                         if (mAnimations[i].mName == temp.mAnimationSetName)
@@ -455,11 +464,12 @@ namespace MBHEngine.Behaviour
                             mActiveAnimation = i;
                             mCurrentFrame = 0;
                             mAnimations[mActiveAnimation].mAnimationComplete = false;
+#if DEBUG
                             animationFound = true;
+#endif
                             break;
                         }
                     }
-
 #if DEBUG
                     if(!animationFound)
                     {
