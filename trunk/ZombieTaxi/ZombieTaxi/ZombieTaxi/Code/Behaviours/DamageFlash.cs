@@ -83,6 +83,9 @@ namespace ZombieTaxi.Behaviours
             mColorCooldown = StopWatchManager.pInstance.GetNewStopWatch();
             mColorCooldown.pLifeTime = def.mFramesBetweenColorChange;
 
+            // We don't want the damage effect to play until they start taking damage.
+            mDamageCooldown.pIsPaused = true;
+
 #if DEBUG
             if (def.mFramesToReset < def.mFramesBetweenColorChange)
             {
