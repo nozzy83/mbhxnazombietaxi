@@ -446,6 +446,8 @@ namespace MBHEngine.Behaviour
                 // If the animation is not currently playing we need to find it.
                 if (mAnimations[mActiveAnimation].mName != temp.mAnimationSetName)
                 {
+                    Boolean animationFound = false;
+                    
                     for (int i = 0; i < mAnimations.Count; i++)
                     {
                         if (mAnimations[i].mName == temp.mAnimationSetName)
@@ -453,8 +455,17 @@ namespace MBHEngine.Behaviour
                             mActiveAnimation = i;
                             mCurrentFrame = 0;
                             mAnimations[mActiveAnimation].mAnimationComplete = false;
+                            animationFound = true;
+                            break;
                         }
                     }
+
+#if DEBUG
+                    if(!animationFound)
+                    {
+                        throw new Exception("Attempting to set unknown Animation: " + temp.mAnimationSetName);
+                    }
+#endif
                 }
                 // In the case where it is a non-looping animation which has completed, we need to reset the 
                 // animation to the beginning.

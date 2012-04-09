@@ -515,6 +515,35 @@ namespace ZombieTaxi.Behaviours
             }
         }
 
+        /// <summary>
+        /// State where the Game Object stands in place waiting for the target to get far enough away
+        /// to trigger a transition back to the follow state.
+        /// </summary>
+        private class FSMStateDead : FSMState
+        {
+            /// <summary>
+            /// Preallocate messages to avoid GC.
+            /// </summary>
+            private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            public FSMStateDead()
+            {
+                mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
+            }
+
+            /// <summary>
+            /// Called once when the state starts.
+            /// </summary>
+            public override void OnBegin()
+            {
+                mSetActiveAnimationMsg.mAnimationSetName = "Dead";
+                pParentGOH.OnMessage(mSetActiveAnimationMsg);
+            }
+        }
+
         #endregion // FSMStates
 
         /// <summary>
@@ -572,6 +601,7 @@ namespace ZombieTaxi.Behaviours
             AddState(new FSMStateStay(), "Stay");
             AddState(new FSMStateWaitInSafeHouse(), "WaitInSafeHouse");
             AddState(new FSMStateWanderInSafeHouse(), "WanderInSafeHouse");
+            AddState(new FSMStateDead(), "Dead");
 
             mParentGOH.pDirection.mSpeed = 0.5f;
 
@@ -618,6 +648,10 @@ namespace ZombieTaxi.Behaviours
             {
                 SetSafeHouseMessage temp = (SetSafeHouseMessage)msg;
                 mSafeHouse = temp.mSafeHouse;
+            }
+            else if (msg is Health.OnZeroHealth)
+            {
+                AdvanceToState("Dead");
             }
         }
     }

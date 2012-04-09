@@ -96,6 +96,15 @@ namespace ZombieTaxi.Behaviours
 
             HealthDefinition def = GameObjectManager.pInstance.pContentManager.Load<HealthDefinition>(fileName);
 
+            if( def.mMaxHealth < def.mCurrentHealth )
+            {
+#if DEBUG
+                throw new Exception("Max health must not be less than current health.");
+#else
+                def.mMaxHealth = def.mCurrentHealth;
+#endif
+            }
+
             mMaxHealth = def.mMaxHealth;
             mCurrentHealth = def.mCurrentHealth;
 

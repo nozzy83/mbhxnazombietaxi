@@ -7,6 +7,7 @@
     <mPosition>164 140</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
+    <mCollisionBoxDimensions>8.0 8.0</mCollisionBoxDimensions>
     <mClassifications>
       <Item>ALLY</Item>
     </mClassifications>
@@ -14,11 +15,15 @@
       <Item>Sprite</Item>
       <Item>Civilian</Item>
       <Item>PathFind</Item>
+      <Item>Health</Item>
+      <Item>DamageFlash</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
       <Item>ZombieTaxi.Behaviours.Civilian</Item>
       <Item>MBHEngine.Code.Behaviour.PathFind</Item>
+      <Item>ZombieTaxi.Behaviours.Health</Item>
+      <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
