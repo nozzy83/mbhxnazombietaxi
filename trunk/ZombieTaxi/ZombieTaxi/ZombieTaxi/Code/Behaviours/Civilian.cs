@@ -544,6 +544,137 @@ namespace ZombieTaxi.Behaviours
             }
         }
 
+        /// <summary>
+        /// State where the game object follows its target.
+        /// </summary>
+        private class FSMStateGoToExtraction : FSMState
+        {
+            /// <summary>
+            /// Preallocate messages to avoid GC.
+            /// </summary>
+            private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
+            private PathFind.SetDestinationMessage mSetDestinationMsg;
+            private PathFind.SetSourceMessage mSetSourceMsg;
+            private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
+            private GetExtractionPointMessage mGetExtractionPointMsg;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            public FSMStateGoToExtraction()
+            {
+                mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
+                mSetDestinationMsg = new PathFind.SetDestinationMessage();
+                mSetSourceMsg = new PathFind.SetSourceMessage();
+                mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
+                mGetExtractionPointMsg = new GetExtractionPointMessage();
+            }
+
+            /// <summary>
+            /// Called once when the state starts.
+            /// </summary>
+            public override void OnBegin()
+            {
+                mSetActiveAnimationMsg.mAnimationSetName = "Run";
+                pParentGOH.OnMessage(mSetActiveAnimationMsg);
+
+                pParentGOH.OnMessage(mGetExtractionPointMsg);
+
+                mSetSourceMsg.mSource = pParentGOH.pOrientation.mPosition;
+                pParentGOH.OnMessage(mSetSourceMsg);
+                mSetDestinationMsg.mDestination = mGetExtractionPointMsg.mExtractionPoint.pOrientation.mPosition;
+                pParentGOH.OnMessage(mSetDestinationMsg);
+            }
+
+            /// <summary>
+            /// Call repeatedly until it returns a valid new state to transition to.
+            /// </summary>
+            /// <returns>Identifier of a state to transition to.</returns>
+            public override String OnUpdate()
+            {
+                if (Follow())
+                {
+                    GameObjectManager.pInstance.Remove(pParentGOH);
+                }
+
+                return null;
+            }
+
+            /// <summary>
+            /// Called once when leaving this state.  Called the frame after the Update which returned
+            /// a valid state to transition to.
+            /// </summary>
+            public override void OnEnd()
+            {
+                // Clear the forward direction of this object so that it doesn't keep moving.
+                pParentGOH.pDirection.mForward = Vector2.Zero;
+            }
+
+            /// <summary>
+            /// Logic for basic follow behaviour.
+            /// </summary>
+            /// <returns>True if the destination has been reached.</returns>
+            /// <remarks>
+            /// This is almost identicle to what is found in the Kamikaze Behaviour.  They should be combined.
+            /// </remarks>
+            private Boolean Follow()
+            {
+                GameObject player = GameObjectManager.pInstance.pPlayer;
+
+                // Get the curent path to the player. It may not be complete at this point, but should include enough
+                // information to start moving.
+                pParentGOH.OnMessage(mGetCurrentBestNodeMsg);
+
+                // If we have a best node chosen (again maybe not a complete path, but the best so far), start
+                // moving towards the next point on the path.
+                if (mGetCurrentBestNodeMsg.mBest != null)
+                {
+                    // This is the node closest to the destination that we have found.
+                    PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest;
+
+                    // Traverse back towards the source node until the previous one has already been reached.
+                    // That means the current one is the next one that has not been reached yet.
+                    // We also want to make sure we don't try to get to the starting node since we should be 
+                    // standing on top of it already (hence the check for prev.prev).
+                    while (p.mPrev != null && p.mPrev.mPrev != null && !p.mPrev.mReached)
+                    {
+                        p = p.mPrev;
+                    }
+
+                    // The distance to check agaist is based on the move speed, since that is the amount
+                    // we will move this frame, and we want to avoid trying to hit the center point directly, since
+                    // that will only happen if moving in 1 pixel increments.
+                    // Also, we check double move speed because we are going to move this frame no matter what,
+                    // so what we are really checking is, are we going to be ther NEXT update.
+                    Single minDist = pParentGOH.pDirection.mSpeed * 2.0f;
+
+                    // Once we are within one unit of the target consider it reached.
+                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterPoint, pParentGOH.pOrientation.mPosition) <= minDist)
+                    {
+                        // This node has been reached, so next update it will start moving towards the next node.
+                        p.mReached = true;
+
+                        if (p == mGetCurrentBestNodeMsg.mBest)
+                        {
+                            return true;
+                        }
+                    }
+
+                    //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
+
+                    // Move towards the nodes center point.
+                    Vector2 d = p.mTile.mCollisionRect.pCenterPoint - pParentGOH.pOrientation.mPosition;
+                    if (d.Length() != 0.0f)
+                    {
+                        d = Vector2.Normalize(d);
+                        pParentGOH.pDirection.mForward = d;
+                    }
+                }
+
+                return false;
+            }
+        }
+
         #endregion // FSMStates
 
         /// <summary>
@@ -563,11 +694,24 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
+        /// Get the GameObject representing the current extraction point.
+        /// </summary>
+        public class GetExtractionPointMessage : BehaviourMessage
+        {
+            public GameObject mExtractionPoint;
+        }
+
+        /// <summary>
         /// Once the civilian reaches a safehouse they need to stay there.  To do so they will need
         /// access to the safehouse game object.  We hold on to it at the statemachine level so that
         /// multiple states can all access it.
         /// </summary>
         private GameObject mSafeHouse;
+
+        /// <summary>
+        /// The currently active extraction point.
+        /// </summary>
+        private GameObject mExtractionPoint;
 
         /// <summary>
         /// Preallocate messages to avoid GC.
@@ -602,6 +746,7 @@ namespace ZombieTaxi.Behaviours
             AddState(new FSMStateWaitInSafeHouse(), "WaitInSafeHouse");
             AddState(new FSMStateWanderInSafeHouse(), "WanderInSafeHouse");
             AddState(new FSMStateDead(), "Dead");
+            AddState(new FSMStateGoToExtraction(), "GoToExtraction");
 
             mParentGOH.pDirection.mSpeed = 0.5f;
 
@@ -652,6 +797,24 @@ namespace ZombieTaxi.Behaviours
             else if (msg is Health.OnZeroHealth)
             {
                 AdvanceToState("Dead");
+            }
+            else if (msg is ExtractionPoint.OnExtractionPointActivatedMessage)
+            {
+                // Store the next extraction point.
+                ExtractionPoint.OnExtractionPointActivatedMessage temp = (ExtractionPoint.OnExtractionPointActivatedMessage)msg;
+                mExtractionPoint = msg.pSender;
+
+                // If anyone is in the Safe House, they should make a run for the Extraction point now.
+                if (GetCurrentState() is FSMStateWaitInSafeHouse ||
+                    GetCurrentState() is FSMStateWanderInSafeHouse)
+                {
+                    AdvanceToState("GoToExtraction");
+                }
+            }
+            else if (msg is GetExtractionPointMessage)
+            {
+                GetExtractionPointMessage temp = (GetExtractionPointMessage)msg;
+                temp.mExtractionPoint = mExtractionPoint;
             }
         }
     }

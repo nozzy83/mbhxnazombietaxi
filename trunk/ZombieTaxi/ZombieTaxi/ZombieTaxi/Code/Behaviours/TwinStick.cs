@@ -48,6 +48,7 @@ namespace ZombieTaxi.Behaviours
         private SpriteRender.GetSpriteEffectsMessage mGetSpriteFxMsg;
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
         private Timer.ToggleTimerMessage mToggleTimerMsg;
+        private ExtractionPoint.SetExtractionPointActivateMessage mSetExtractionPointActivateMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -97,6 +98,7 @@ namespace ZombieTaxi.Behaviours
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
             mToggleTimerMsg = new Timer.ToggleTimerMessage();
+            mSetExtractionPointActivateMsg = new ExtractionPoint.SetExtractionPointActivateMessage();
         }
 
         /// <summary>
@@ -287,6 +289,8 @@ namespace ZombieTaxi.Behaviours
                 GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Flare\\Flare");
                 go.pOrientation.mPosition = mGun.pOrientation.mPosition;
                 GameObjectManager.pInstance.Add(go);
+
+                go.OnMessage(mSetExtractionPointActivateMsg);
             }
 
 #if ALLOW_GARBAGE

@@ -86,7 +86,6 @@ namespace MBHEngine.Behaviour
         /// from it (set message) or store some data in it (get message).
         /// </summary>
         /// <param name="msg">The message being communicated to the behaviour.</param>
-        /// <returns>The resulting message.  If not null, the message was handled.</returns>
         public virtual void OnMessage(ref BehaviourMessage msg) 
         {
         }
