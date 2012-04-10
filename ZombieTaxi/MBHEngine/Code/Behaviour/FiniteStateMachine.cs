@@ -206,5 +206,14 @@ namespace MBHEngine.Behaviour
                 }
             }
         }
+
+        /// <summary>
+        /// Access to the currently running state.
+        /// </summary>
+        /// <returns>The currently running state.  Used "is" keyword to determine what state it is.</returns>
+        protected FSMState GetCurrentState()
+        {
+            return mCurrentState;
+        }
     }
 }

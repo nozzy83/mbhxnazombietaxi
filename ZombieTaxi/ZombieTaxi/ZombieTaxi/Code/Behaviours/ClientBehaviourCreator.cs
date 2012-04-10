@@ -59,6 +59,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new DamageFlash(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.ExtractionPoint":
+                    {
+                        return new ExtractionPoint(go, fileName);
+                    }
                 default:
                     {
                         return null;

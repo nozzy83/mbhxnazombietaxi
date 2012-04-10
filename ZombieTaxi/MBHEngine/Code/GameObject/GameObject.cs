@@ -264,6 +264,27 @@ namespace MBHEngine.GameObject
         /// <returns>The message passed in, likely modified by handling behaviours.</returns>
         public virtual BehaviourMessage OnMessage(BehaviourMessage msg)
         {
+            return OnMessage(msg, null);
+        }
+
+        /// <summary>
+        /// Sends a message to all behaviours attached to this object.  As soon as a behaviour 
+        /// handles the message, it will return.
+        /// </summary>
+        /// <param name="msg">The message to send.</param>
+        /// <param name="sender">The GameObject sending the message.</param>
+        /// <returns>The message passed in, likely modified by handling behaviours.</returns>
+        public virtual BehaviourMessage OnMessage(BehaviourMessage msg, GameObject sender)
+        {
+            if (sender == null)
+            {
+                msg.pSender = this;
+            }
+            else
+            {
+                msg.pSender = sender;
+            }
+
             for (int i = 0; i < mBehaviours.Count; i++)
             {
                 mBehaviours[i].OnMessage(ref msg);

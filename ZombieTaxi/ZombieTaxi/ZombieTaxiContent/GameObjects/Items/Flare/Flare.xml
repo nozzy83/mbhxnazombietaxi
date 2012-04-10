@@ -9,9 +9,11 @@
     <mScale>1 1</mScale>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
+      <Item>ExtractionPoint</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>ZombieTaxi.Behaviours.ExtractionPoint</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
