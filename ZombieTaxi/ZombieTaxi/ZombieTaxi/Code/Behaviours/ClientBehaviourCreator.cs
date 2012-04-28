@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MBHEngine.Behaviour;
 using MBHEngine.GameObject;
+using ZombieTaxi.Behaviours.HUD;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -62,6 +63,10 @@ namespace ZombieTaxi.Behaviours
                 case "ZombieTaxi.Behaviours.ExtractionPoint":
                     {
                         return new ExtractionPoint(go, fileName);
+                    }
+                case "ZombieTaxi.Behaviours.HUD.PlayerScore":
+                    {
+                        return new PlayerScore(go, fileName);
                     }
                 default:
                     {

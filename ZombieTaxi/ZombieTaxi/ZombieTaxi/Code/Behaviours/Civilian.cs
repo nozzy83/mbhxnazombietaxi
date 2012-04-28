@@ -12,6 +12,7 @@ using MBHEngineContentDefs;
 using MBHEngine.Debug;
 using MBHEngine.World;
 using MBHEngine.Math;
+using ZombieTaxi.Behaviours.HUD;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -87,6 +88,7 @@ namespace ZombieTaxi.Behaviours
             private PathFind.SetSourceMessage mSetSourceMsg;
             private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
             private SetSafeHouseMessage mSetSafeHouseMsg;
+            private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
 
             /// <summary>
             /// Constructor.
@@ -106,6 +108,8 @@ namespace ZombieTaxi.Behaviours
                 mSetSourceMsg = new PathFind.SetSourceMessage();
                 mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
                 mSetSafeHouseMsg = new SetSafeHouseMessage();
+                mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
+                mIncrementScoreMsg.mAmount = 100;
             }
 
             /// <summary>
@@ -144,6 +148,9 @@ namespace ZombieTaxi.Behaviours
                     // If there are multiple safehouses overlapping we just take the first one we find.
                     mSetSafeHouseMsg.mSafeHouse = mSafeHouseInRange[0];
                     pParentGOH.OnMessage(mSetSafeHouseMsg);
+
+                    // For every civilian we save, increment the score a little.
+                    GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, pParentGOH);
 
                     // Now just stand around for a little bit.
                     return "WaitInSafeHouse";
@@ -557,6 +564,7 @@ namespace ZombieTaxi.Behaviours
             private PathFind.SetSourceMessage mSetSourceMsg;
             private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
             private GetExtractionPointMessage mGetExtractionPointMsg;
+            private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
 
             /// <summary>
             /// Constructor.
@@ -568,6 +576,8 @@ namespace ZombieTaxi.Behaviours
                 mSetSourceMsg = new PathFind.SetSourceMessage();
                 mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
                 mGetExtractionPointMsg = new GetExtractionPointMessage();
+                mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
+                mIncrementScoreMsg.mAmount = 500;
             }
 
             /// <summary>
@@ -584,6 +594,7 @@ namespace ZombieTaxi.Behaviours
                 pParentGOH.OnMessage(mSetSourceMsg);
                 mSetDestinationMsg.mDestination = mGetExtractionPointMsg.mExtractionPoint.pOrientation.mPosition;
                 pParentGOH.OnMessage(mSetDestinationMsg);
+
             }
 
             /// <summary>
@@ -594,6 +605,9 @@ namespace ZombieTaxi.Behaviours
             {
                 if (Follow())
                 {
+                    // The player gets a bunch of points for rescuing people!
+                    GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, pParentGOH);
+
                     GameObjectManager.pInstance.Remove(pParentGOH);
                 }
 

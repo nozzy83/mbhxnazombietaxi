@@ -97,6 +97,7 @@
     <Compile Include="Behaviour\ExplosiveDefinition.cs" />
     <Compile Include="Behaviour\ExtractionPointDefinition.cs" />
     <Compile Include="Behaviour\HealthDefinition.cs" />
+    <Compile Include="Behaviour\HUD\PlayerScoreDefinition.cs" />
     <Compile Include="Behaviour\KamikazeDefinition.cs" />
     <Compile Include="Behaviour\PlayerHealthBarDefinition.cs" />
     <Compile Include="Behaviour\ProjectileDefinition.cs" />

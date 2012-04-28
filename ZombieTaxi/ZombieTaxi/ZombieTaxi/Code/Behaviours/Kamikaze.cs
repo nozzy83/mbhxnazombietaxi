@@ -5,6 +5,7 @@ using MBHEngine.GameObject;
 using MBHEngine.Behaviour;
 using MBHEngine.Input;
 using MBHEngine.Debug;
+using ZombieTaxi.Behaviours.HUD;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -59,6 +60,7 @@ namespace ZombieTaxi.Behaviours
         private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
         private Explosive.DetonateMessage mDetonateMsg;
         private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
+        private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -93,6 +95,7 @@ namespace ZombieTaxi.Behaviours
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
             mDetonateMsg = new Explosive.DetonateMessage();
             mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
+            mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
         }
 
         /// <summary>
@@ -251,6 +254,24 @@ namespace ZombieTaxi.Behaviours
             {
                 mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
                 mParentGOH.OnMessage(mSetSpriteFxMsg);
+            }
+        }
+
+
+        /// <summary>
+        /// The main interface for communicating between behaviours.  Using polymorphism, we
+        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
+        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// from it (set message) or store some data in it (get message).
+        /// </summary>
+        /// <param name="msg">The message being communicated to the behaviour.</param>
+        public override void OnMessage(ref BehaviourMessage msg)
+        {
+            // Which type of message was sent to us?
+            if (msg is Health.OnZeroHealth)
+            {
+                mIncrementScoreMsg.mAmount = 10;
+                GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, mParentGOH);
             }
         }
     }
