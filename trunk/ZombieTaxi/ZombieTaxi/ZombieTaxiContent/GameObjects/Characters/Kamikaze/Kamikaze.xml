@@ -8,6 +8,7 @@
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
     <mCollisionBoxDimensions>8.0 8.0</mCollisionBoxDimensions>
+    <mMotionRoot>4 4</mMotionRoot>
     <mClassifications>
       <Item>ENEMY</Item>
     </mClassifications>

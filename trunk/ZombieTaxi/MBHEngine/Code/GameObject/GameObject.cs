@@ -133,6 +133,17 @@ namespace MBHEngine.GameObject
         protected Int32 mID;
 
         /// <summary>
+        /// The offset from 0,0 that the collision volume should be centered on.  If not suppied, it will use
+        /// mMotionRoot.
+        /// </summary>
+        private Vector2 mCollisionRoot;
+
+        /// <summary>
+        /// The offset from 0,0 that this sprite should be rendered at.
+        /// </summary>
+        private Vector2 mMotionRoot;
+
+        /// <summary>
         /// Default Constructor.  Does nothing but needed to be overwritten so that
         /// we can create an OPTIONAL version which takes a parameter.
         /// </summary>
@@ -175,6 +186,8 @@ namespace MBHEngine.GameObject
                 mOrientation.mScale = def.mScale;
                 mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
                 mCollisionRectangle.pCenterPoint = mOrientation.mPosition;
+                mCollisionRoot = def.mCollisionRoot;
+                mMotionRoot = def.mMotionRoot;
 
                 for (Int32 i = 0; def.mClassifications != null && i < def.mClassifications.Count; i++)
                 {
@@ -239,8 +252,15 @@ namespace MBHEngine.GameObject
             }
 
             // With all behaviours done updating, it should be safe to
-            // now draw the collision volume for this object.
-            pCollisionRect.pCenterPoint = pOrientation.mPosition;
+            // now update and draw the collision volume for this object.
+            //pCollisionRect.pCenterPoint = pOrientation.mPosition;
+            Vector2 offset = mCollisionRoot;
+            if (mCollisionRoot == Vector2.Zero)
+            {
+                offset = mMotionRoot;
+            }
+
+            pCollisionRect.pTopLeft = pOrientation.mPosition - offset;
             DebugShapeDisplay.pInstance.AddAABB(pCollisionRect, Color.Green);
         }
 
@@ -475,6 +495,17 @@ namespace MBHEngine.GameObject
             get
             {
                 return mCollisionRectangle;
+            }
+        }
+
+        /// <summary>
+        /// Access to the motion root offset value.
+        /// </summary>
+        public Vector2 pMotionRoot
+        {
+            get
+            {
+                return mMotionRoot;
             }
         }
 

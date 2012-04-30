@@ -4,7 +4,6 @@
     <mSpriteFileName>Sprites\Effects\Explosion</mSpriteFileName>
     <mFrameHeight>16</mFrameHeight>
     <mHasShadow>true</mHasShadow>
-    <mMotionRoot>8 15</mMotionRoot>
     <mAttachmentPoints>
       <Item>
         <mName>Shadow</mName>

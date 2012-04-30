@@ -4,7 +4,6 @@
     <mSpriteFileName>Sprites\Effects\BulletSpark</mSpriteFileName>
     <mFrameHeight>4</mFrameHeight>
     <mHasShadow>false</mHasShadow>
-    <mMotionRoot>2 2</mMotionRoot>
     <mAnimationSets>
       <Item>
         <mTicksPerFrame>5</mTicksPerFrame>

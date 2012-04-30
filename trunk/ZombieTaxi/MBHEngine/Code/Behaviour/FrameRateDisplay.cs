@@ -16,18 +16,18 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// The user facing frame rate value.
         /// </summary>
-        private Int32 frameRate = 0;
+        private Int32 mFrameRate = 0;
 
         /// <summary>
         /// Keeps tracks of how many frames have passed.
         /// </summary>
-        private Int32 frameCounter = 0;
+        private Int32 mFrameCounter = 0;
 
         /// <summary>
         /// How much time has passed since the last update to the framerate value.  Everytime this
         /// passes one second we recompute the current frame rate.
         /// </summary>
-        private TimeSpan elapsedTime = TimeSpan.Zero;
+        private TimeSpan mElapsedTime = TimeSpan.Zero;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -55,14 +55,19 @@ namespace MBHEngine.Behaviour
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
-            elapsedTime += gameTime.ElapsedGameTime;
+            mElapsedTime += gameTime.ElapsedGameTime;
 
-            if (elapsedTime > TimeSpan.FromSeconds(1))
+            if (mElapsedTime > TimeSpan.FromSeconds(1))
             {
-                elapsedTime -= TimeSpan.FromSeconds(1);
-                frameRate = frameCounter;
-                frameCounter = 0;
+                mElapsedTime -= TimeSpan.FromSeconds(1);
+                mFrameRate = mFrameCounter;
+                mFrameCounter = 0;
             }
+
+#if ALLOW_GARBAGE
+            string fps = string.Format("FPS: {0}", mFrameRate);
+            DebugMessageDisplay.pInstance.AddDynamicMessage(fps);
+#endif // ALLOW_GARBAGE
         }
 
         /// <summary>
@@ -71,12 +76,7 @@ namespace MBHEngine.Behaviour
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
-            frameCounter++;
-
-#if ALLOW_GARBAGE
-            string fps = string.Format("FPS: {0}", frameRate);
-            DebugMessageDisplay.pInstance.AddDynamicMessage(fps);
-#endif // ALLOW_GARBAGE
+            mFrameCounter++;
         }
     }
 }

@@ -4,7 +4,6 @@
     <mSpriteFileName>Sprites\Characters\Chef</mSpriteFileName>
     <mFrameHeight>8</mFrameHeight>
     <mHasShadow>true</mHasShadow>
-    <mMotionRoot>4 4</mMotionRoot>
     <mAnimationSets>
       <Item>
         <mTicksPerFrame>60</mTicksPerFrame>

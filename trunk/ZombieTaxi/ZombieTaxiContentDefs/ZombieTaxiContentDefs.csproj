@@ -94,6 +94,7 @@
   <ItemGroup>
     <Compile Include="Behaviour\CivilianDefinition.cs" />
     <Compile Include="Behaviour\DamageFlashDefinition.cs" />
+    <Compile Include="Behaviour\DamageOnContactDefinition.cs" />
     <Compile Include="Behaviour\ExplosiveDefinition.cs" />
     <Compile Include="Behaviour\ExtractionPointDefinition.cs" />
     <Compile Include="Behaviour\HealthDefinition.cs" />

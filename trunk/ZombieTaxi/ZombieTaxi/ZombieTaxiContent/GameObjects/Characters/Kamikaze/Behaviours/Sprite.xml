@@ -4,7 +4,6 @@
     <mSpriteFileName>Sprites\Characters\CommandoShorts</mSpriteFileName>
     <mFrameHeight>8</mFrameHeight>
     <mHasShadow>true</mHasShadow>
-    <mMotionRoot>4 4</mMotionRoot>
     <mAttachmentPoints>
       <Item>
         <mName>Ground</mName>

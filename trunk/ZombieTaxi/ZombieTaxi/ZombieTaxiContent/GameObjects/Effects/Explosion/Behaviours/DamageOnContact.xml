@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.DamageOnContactDefinition">
+    <mDamageCaused>100</mDamageCaused>
+    <mDamageAppliedTo>
+      <Item>PLAYER</Item>
+      <Item>ENEMY</Item>
+      <Item>ALLY</Item>
+    </mDamageAppliedTo>
+  </Asset>
+</XnaContent>
+

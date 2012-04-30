@@ -171,11 +171,6 @@ namespace MBHEngine.Behaviour
         private Boolean mHasShadow;
 
         /// <summary>
-        /// The offset from 0,0 that this sprite should be rendered at.
-        /// </summary>
-        private Vector2 mMotionRoot;
-
-        /// <summary>
         /// A list of position offsets (offset from the motion root) indexed by name.
         /// Used for attaching things to objects without having hard coded values.
         /// </summary>
@@ -214,7 +209,6 @@ namespace MBHEngine.Behaviour
             SpriteRenderDefinition def = GameObjectManager.pInstance.pContentManager.Load<SpriteRenderDefinition>(fileName);
 
             mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
-            mMotionRoot = def.mMotionRoot;
             mAttachmentPoints = new Dictionary<string, Vector2>();
             if (def.mAttachmentPoints != null)
             {
@@ -335,7 +329,7 @@ namespace MBHEngine.Behaviour
                            rect,
                            mColor,
                            mParentGOH.pOrientation.mRotation,
-                           mMotionRoot,
+                           mParentGOH.pMotionRoot,
                            mParentGOH.pOrientation.mScale,
                            mSpriteEffects,
                            0);
@@ -344,7 +338,7 @@ namespace MBHEngine.Behaviour
                 {
                     // By default, just flip from the motion root.  This works when we want the 
                     // shadow to line up with the button of the animation frame.  
-                    Vector2 shadowAttachmentPoint = new Vector2(0, (mFrameHeight - mMotionRoot.Y) * 2.0f);
+                    Vector2 shadowAttachmentPoint = new Vector2(0, (mFrameHeight - mParentGOH.pMotionRoot.Y) * 2.0f);
 
                     // Having the shadow line up to the buttom of the frame is great most of
                     // the time, but for cases where we want the shadow slightly embedded into the 
@@ -363,7 +357,7 @@ namespace MBHEngine.Behaviour
                                rect,
                                new Color(0, 0, 0, 128),
                                -mParentGOH.pOrientation.mRotation + MathHelper.ToRadians(180),
-                               mMotionRoot,
+                               mParentGOH.pMotionRoot,
                                mParentGOH.pOrientation.mScale,
                                mSpriteEffects ^ SpriteEffects.FlipHorizontally,
                                0);
@@ -376,7 +370,7 @@ namespace MBHEngine.Behaviour
                            null,
                            mColor,
                            mParentGOH.pOrientation.mRotation,
-                           mMotionRoot,
+                           mParentGOH.pMotionRoot,
                            mParentGOH.pOrientation.mScale,
                            mSpriteEffects,
                            0);
@@ -385,7 +379,7 @@ namespace MBHEngine.Behaviour
                 {
                     // By default, just flip from the motion root.  This works when we want the 
                     // shadow to line up with the button of the animation frame.  
-                    Vector2 shadowAttachmentPoint = new Vector2(0, (mTexture.Height - mMotionRoot.Y) * 2.0f);
+                    Vector2 shadowAttachmentPoint = new Vector2(0, (mTexture.Height - mParentGOH.pMotionRoot.Y) * 2.0f);
 
                     // Having the shadow line up to the buttom of the frame is great most of
                     // the time, but for cases where we want the shadow slightly embedded into the 
@@ -404,7 +398,7 @@ namespace MBHEngine.Behaviour
                                null,
                                new Color(0, 0, 0, 128),
                                -mParentGOH.pOrientation.mRotation + MathHelper.ToRadians(180),
-                               mMotionRoot,
+                               mParentGOH.pMotionRoot,
                                mParentGOH.pOrientation.mScale,
                                mSpriteEffects ^ SpriteEffects.FlipHorizontally,
                                0);
