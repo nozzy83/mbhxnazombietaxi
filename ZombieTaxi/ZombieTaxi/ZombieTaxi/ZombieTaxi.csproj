@@ -132,6 +132,7 @@
     <Compile Include="Code\Behaviours\Civilian.cs" />
     <Compile Include="Code\Behaviours\ClientBehaviourCreator.cs" />
     <Compile Include="Code\Behaviours\DamageFlash.cs" />
+    <Compile Include="Code\Behaviours\DamageOnContact.cs" />
     <Compile Include="Code\Behaviours\Explosive.cs" />
     <Compile Include="Code\Behaviours\ExtractionPoint.cs" />
     <Compile Include="Code\Behaviours\Health.cs" />

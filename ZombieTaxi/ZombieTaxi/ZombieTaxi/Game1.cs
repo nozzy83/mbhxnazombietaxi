@@ -26,13 +26,19 @@ namespace ZombieTaxi
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager mGraphics;
-        SpriteBatch mSpriteBatch;
+        private GraphicsDeviceManager mGraphics;
+        private SpriteBatch mSpriteBatch;
 
         /// <summary>
         /// Whether or not to draw debug information.
         /// </summary>
-        Boolean mDebugDrawEnabled;
+        private Boolean mDebugDrawEnabled;
+
+        /// <summary>
+        /// Debug controls for skipping updates calls to help debug in "slow motion".
+        /// </summary>
+        private Int32 mFrameSkip = 0;
+        private Int32 mFameSkipCount = 0;
         
         /// <summary>
         /// Constuctor
@@ -195,18 +201,40 @@ namespace ZombieTaxi
                 mDebugDrawEnabled ^= true;
             }
 
-            DebugMessageDisplay.pInstance.ClearDynamicMessages();
-            DebugShapeDisplay.pInstance.Update();
+#if DEBUG
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_RIGHT, true))
+            {
+                mFrameSkip = Math.Max(mFrameSkip - 1, 0);
+            }
+            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_LEFT, true))
+            {
+                mFrameSkip++;
+            }
+#endif
+
+            // If we are skipping frames, check if enough have passed before doing updates.
+            if (mFameSkipCount >= mFrameSkip)
+            {
+                DebugMessageDisplay.pInstance.ClearDynamicMessages();
+                DebugShapeDisplay.pInstance.Update();
 
 #if ALLOW_GARBAGE
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Game-Time Delta: " + gameTime.ElapsedGameTime.TotalSeconds);
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + PathFind.pNumUnusedNodes);
+                DebugMessageDisplay.pInstance.AddDynamicMessage("Game-Time Delta: " + gameTime.ElapsedGameTime.TotalSeconds);
+                DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + PathFind.pNumUnusedNodes);
 #endif
-            StopWatchManager.pInstance.Update();
-            GameObjectManager.pInstance.Update(gameTime);
-            PhysicsManager.pInstance.Update(gameTime);
+
+                mFameSkipCount = 0;
+                StopWatchManager.pInstance.Update();
+                GameObjectManager.pInstance.Update(gameTime);
+                PhysicsManager.pInstance.Update(gameTime);
+            }
+            else
+            {
+                mFameSkipCount++; 
+            }
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
+            DebugMessageDisplay.pInstance.AddDynamicMessage("Frame Skip: " + mFrameSkip);
 
             base.Update(gameTime);
         }

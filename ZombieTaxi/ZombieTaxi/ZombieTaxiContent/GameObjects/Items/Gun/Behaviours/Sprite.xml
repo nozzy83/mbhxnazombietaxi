@@ -3,7 +3,6 @@
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
     <mSpriteFileName>Sprites\Items\HandGun</mSpriteFileName>
     <mHasShadow>true</mHasShadow>
-    <mMotionRoot>3 1.5</mMotionRoot>
     <mAttachmentPoints>
       <Item>
         <mName>Shadow</mName>

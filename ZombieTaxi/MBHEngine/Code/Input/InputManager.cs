@@ -26,6 +26,7 @@ namespace MBHEngine.Input
         { 
             LA_LEFT = 0, LA_RIGHT, LA_UP, LA_DOWN,
             RA_LEFT, RA_RIGHT, RA_UP, RA_DOWN, 
+            DP_LEFT, DP_RIGHT, DP_UP, DP_DOWN,
             A, B, X, Y, 
             L1, L2, L3, R1, R2, 
             START, BACK 
@@ -67,8 +68,17 @@ namespace MBHEngine.Input
         private InputManager()
         {
             mIsControllerLocked = false;
+
+
+            //LA_LEFT = 0, LA_RIGHT, LA_UP, LA_DOWN,
+            //RA_LEFT, RA_RIGHT, RA_UP, RA_DOWN, 
+            //DP_LEFT, DP_RIGHT, DP_UP, DP_DOWN,
+            //A, B, X, Y, 
+            //L1, L2, L3, R1, R2, 
+            //START, BACK 
+
             mKeyboardActionMap = new Keys[] { 
-                                                Keys.Left, 
+                                                Keys.Left,
                                                 Keys.Right,
                                                 Keys.Up,
                                                 Keys.Down,
@@ -76,6 +86,10 @@ namespace MBHEngine.Input
                                                 Keys.OemQuestion,
                                                 Keys.OemSemicolon,
                                                 Keys.OemPeriod,
+                                                Keys.Left,
+                                                Keys.Right,
+                                                Keys.Up,
+                                                Keys.Down,
                                                 Keys.A,
                                                 Keys.B,
                                                 Keys.X,
@@ -277,7 +291,34 @@ namespace MBHEngine.Input
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
-
+                case InputActions.DP_LEFT:
+                    {
+                        return CheckButtonState(gamePadState.DPad.Left,
+                                                mPreviousGamePadState.DPad.Left,
+                                                ButtonState.Pressed,
+                                                buffer);
+                    }
+                case InputActions.DP_RIGHT:
+                    {
+                        return CheckButtonState(gamePadState.DPad.Right,
+                                                mPreviousGamePadState.DPad.Right,
+                                                ButtonState.Pressed,
+                                                buffer);
+                    }
+                case InputActions.DP_UP:
+                    {
+                        return CheckButtonState(gamePadState.DPad.Up,
+                                                mPreviousGamePadState.DPad.Up,
+                                                ButtonState.Pressed,
+                                                buffer);
+                    }
+                case InputActions.DP_DOWN:
+                    {
+                        return CheckButtonState(gamePadState.DPad.Down,
+                                                mPreviousGamePadState.DPad.Down,
+                                                ButtonState.Pressed,
+                                                buffer);
+                    }
                 case InputActions.LA_LEFT:
                     {
                         return CheckAnalogState(gamePadState.ThumbSticks.Left.X, 

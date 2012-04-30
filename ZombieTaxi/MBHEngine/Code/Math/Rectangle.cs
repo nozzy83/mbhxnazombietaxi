@@ -246,6 +246,10 @@ namespace MBHEngine.Math
         /// </summary>
         public Vector2 pTopLeft
         {
+            set
+            {
+                pCenterPoint = new Vector2(value.X + mHalfWidth, value.Y + mHalfHeight);
+            }
             get
             {
                 return new Vector2(pLeft, pTop);

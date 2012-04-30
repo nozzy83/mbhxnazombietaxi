@@ -45,6 +45,7 @@ namespace ZombieTaxi.Behaviours
         /// Preallocated messages to avoid GC.
         /// </summary>
         private SpriteRender.SetColorMessage mSetColorMsg;
+        private Health.GetHealthMessage mGetHealthMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -97,6 +98,7 @@ namespace ZombieTaxi.Behaviours
             mCurrentColor = 0;
 
             mSetColorMsg = new SpriteRender.SetColorMessage();
+            mGetHealthMsg = new Health.GetHealthMessage();
         }
 
         /// <summary>
@@ -160,12 +162,17 @@ namespace ZombieTaxi.Behaviours
             // Which type of message was sent to us?
             if (msg is Health.OnApplyDamage)
             {
-                // The only thing we need to do is set this to zero.
-                // If it was previous expired, this will trigger it to start again.
-                // If it was already running, than this will give us more time before we
-                // hit the mFramesToExpire.
-                mDamageCooldown.pIsPaused = false;
-                mDamageCooldown.Restart();
+                // We only want to flash if the object is still alive.
+                mParentGOH.OnMessage(mGetHealthMsg);
+                if (mGetHealthMsg.mCurrentHealth > 0)
+                {
+                    // The only thing we need to do is set this to zero.
+                    // If it was previous expired, this will trigger it to start again.
+                    // If it was already running, than this will give us more time before we
+                    // hit the mFramesToExpire.
+                    mDamageCooldown.pIsPaused = false;
+                    mDamageCooldown.Restart();
+                }
             }
         }
     }

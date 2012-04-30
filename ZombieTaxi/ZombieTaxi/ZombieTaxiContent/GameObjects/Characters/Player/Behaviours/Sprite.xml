@@ -4,7 +4,6 @@
     <mSpriteFileName>Sprites\Characters\Commando</mSpriteFileName>
     <mFrameHeight>16</mFrameHeight>
     <mHasShadow>true</mHasShadow>
-    <mMotionRoot>8 12</mMotionRoot>
     <mAnimationSets>
       <Item>
         <mTicksPerFrame>10</mTicksPerFrame>

@@ -4,7 +4,6 @@
     <mSpriteFileName>Sprites\Items\Flare</mSpriteFileName>
     <mFrameHeight>2</mFrameHeight>
     <mHasShadow>true</mHasShadow>
-    <mMotionRoot>2 1</mMotionRoot>
     <mAnimationSets>
       <Item>
         <mTicksPerFrame>60</mTicksPerFrame>

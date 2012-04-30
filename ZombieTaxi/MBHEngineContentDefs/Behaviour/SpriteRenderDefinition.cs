@@ -82,12 +82,6 @@ namespace MBHEngineContentDefs
         public Boolean mHasShadow;
 
         /// <summary>
-        /// The offset that the objects origin can be found.
-        /// </summary>
-        [ContentSerializer(Optional = true)]
-        public Vector2 mMotionRoot;
-
-        /// <summary>
         /// A list of attachment points, relative to the motion root.
         /// </summary>
         [ContentSerializer(Optional = true)]

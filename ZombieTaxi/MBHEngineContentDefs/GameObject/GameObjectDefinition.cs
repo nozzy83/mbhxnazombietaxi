@@ -59,6 +59,19 @@ namespace MBHEngineContentDefs
         public Vector2 mCollisionBoxDimensions;
 
         /// <summary>
+        /// Some objects do not want to use the same offset for collision as the motion root.  This is true
+        /// for sprites whhich do not go to the edge of the frame.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Vector2 mCollisionRoot;
+
+        /// <summary>
+        /// The offset that the objects origin can be found.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Vector2 mMotionRoot;
+
+        /// <summary>
         /// The calssifications for this game object.
         /// </summary>
         [ContentSerializer(Optional = true)]

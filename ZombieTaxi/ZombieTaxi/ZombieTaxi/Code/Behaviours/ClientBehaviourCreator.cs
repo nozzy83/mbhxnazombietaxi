@@ -68,6 +68,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new PlayerScore(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.DamageOnContact":
+                    {
+                        return new DamageOnContact(go, fileName);
+                    }
                 default:
                     {
                         return null;

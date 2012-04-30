@@ -562,7 +562,13 @@
       <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="GameObjects\Effects\Explosion\Behaviours\DamageOnContact.xml">
+      <Name>DamageOnContact</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="GameObjects\Interface\HUD\PlayerScore\Behaviours\PlayerScore.xml">
       <Name>PlayerScore</Name>
