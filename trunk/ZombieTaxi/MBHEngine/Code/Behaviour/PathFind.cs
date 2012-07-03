@@ -286,14 +286,14 @@ namespace MBHEngine.Behaviour
 
             // If there is no tile at the destination then there is no path finding to do.
             // If the destination is a solid tile then we will never be able to solve the path.
-            if( mDestinationTile == null || mDestinationTile.mType != 0)
+            if( mDestinationTile == null || mDestinationTile.mType != Level.Tile.TileTypes.Empty)
             {
                 return;
             }
 
             // If our source position is not on a tile, or that tile is solid we cannot ever solve
             // this path, so abort right away.
-            if (mSourceTile == null || mSourceTile.mType != 0)
+            if (mSourceTile == null || mSourceTile.mType != Level.Tile.TileTypes.Empty)
             {
                 return;
             }
@@ -323,7 +323,7 @@ namespace MBHEngine.Behaviour
             }
 
             // This path finding is very expensive over long distances.  To avoid slowing down the game,
-            // the solver is time slice; it will only execute a small chunk of the algorithm per frame.
+            // the solver is time sliced; it will only execute a small chunk of the algorithm per frame.
             Int32 timeSliceCount = 0;
             Int32 timeSliceCap = 10;
             
@@ -359,7 +359,7 @@ namespace MBHEngine.Behaviour
                 for (Int32 i = 0; i < mCurBest.mTile.mAdjecentTiles.Length; i++)
                 {
                     // 3-a. If it is not walkable or if it is on the closed list, ignore it. Otherwise...
-                    if (mCurBest.mTile.mAdjecentTiles[i] != null && mCurBest.mTile.mAdjecentTiles[i].mType == 0)
+                    if (mCurBest.mTile.mAdjecentTiles[i] != null && mCurBest.mTile.mAdjecentTiles[i].mType == Level.Tile.TileTypes.Empty)
                     {
                         // Avoid pathing that cut diagonally across solid tiles.  This is ok for the line of
                         // 0 width, but for actual GO, they should not be able to fit through that tight
@@ -636,7 +636,7 @@ namespace MBHEngine.Behaviour
         /// <returns>True if the adjecent tile exists and is solid.</returns>
         private Boolean IsTileInDirectionSolid(Level.Tile.AdjectTileDir dir, Level.Tile rootTile)
         {
-            return (rootTile.mAdjecentTiles[(Int32)dir] != null && rootTile.mAdjecentTiles[(Int32)dir].mType != 0);
+            return (rootTile.mAdjecentTiles[(Int32)dir] != null && rootTile.mAdjecentTiles[(Int32)dir].mType != Level.Tile.TileTypes.Empty);
         }
 
         /// <summary>

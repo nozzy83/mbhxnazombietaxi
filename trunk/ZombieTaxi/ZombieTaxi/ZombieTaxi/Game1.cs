@@ -234,7 +234,9 @@ namespace ZombieTaxi
             }
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
+#if DEBUG
             DebugMessageDisplay.pInstance.AddDynamicMessage("Frame Skip: " + mFrameSkip);
+#endif
 
             base.Update(gameTime);
         }
