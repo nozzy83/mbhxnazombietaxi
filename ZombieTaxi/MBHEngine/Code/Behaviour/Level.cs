@@ -358,7 +358,7 @@ namespace MBHEngine.Behaviour
                 for (Int32 x = 0; x < mMapWidth; x++)
                 {
                     // Is this tile solid?
-                    if (mCollisionGrid[x, y].mType != 0)
+                    if (mCollisionGrid[x, y].mType != Level.Tile.TileTypes.Empty)
                     {
                         // By default render it black.
                         Color c = Color.Black;
@@ -515,7 +515,7 @@ namespace MBHEngine.Behaviour
 
                     // Is this tile solid and does it have any active walls?
                     // It may be solid with no walls in the case of one completly surrounded.
-                    if (mCollisionGrid[x, y].mType != 0 && mCollisionGrid[x,y].mActiveWalls != Tile.WallTypes.None)
+                    if (mCollisionGrid[x, y].mType != Level.Tile.TileTypes.Empty && mCollisionGrid[x, y].mActiveWalls != Tile.WallTypes.None)
                     {
                         // This tile has been considered for a collision.  It will be changed to type 2 if there is a
                         // collision.

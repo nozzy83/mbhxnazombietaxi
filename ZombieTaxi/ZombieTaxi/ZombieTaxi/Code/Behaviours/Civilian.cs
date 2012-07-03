@@ -504,8 +504,8 @@ namespace ZombieTaxi.Behaviours
                 }
                 else
                 {
-                    // We had an invalid target, try again later.
-                    return "WaitInSafeHouse";
+                    // We had an invalid target, try again.
+                    return "WanderInSafeHouse";
                 }
 
                 return null;
