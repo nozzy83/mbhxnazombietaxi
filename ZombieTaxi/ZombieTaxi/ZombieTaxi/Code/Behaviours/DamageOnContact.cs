@@ -28,6 +28,12 @@ namespace ZombieTaxi.Behaviours
         private List<GameObject> mObjectsInRange;
 
         /// <summary>
+        /// Keeps track of all the game objects which have already been damaged by this
+        /// behaviour, to avoid to from continually damaging the same object.
+        /// </summary>
+        private List<GameObject> mObjectsDamaged;
+
+        /// <summary>
         /// A list of the types of objects that this does damage to when exploding.
         /// </summary>
         private List<GameObjectDefinition.Classifications> mDamageAppliedTo;
@@ -68,8 +74,11 @@ namespace ZombieTaxi.Behaviours
             }
 
             mObjectsInRange = new List<GameObject>(16);
+            mObjectsDamaged = new List<GameObject>(64);
 
             mOnApplyDamageMsg = new Health.OnApplyDamage(mDamagedCaused);
+
+            Reset();
         }
 
         /// <summary>
@@ -83,19 +92,31 @@ namespace ZombieTaxi.Behaviours
             GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH, ref mObjectsInRange, mDamageAppliedTo);
             for (Int32 i = 0; i < mObjectsInRange.Count; i++)
             {
-                mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);
+                if( !mObjectsDamaged.Contains( mObjectsInRange[i] ) )
+                {
+                    mObjectsDamaged.Add(mObjectsInRange[i]);
+                    mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);
+                }
             }
         }
 
         /// <summary>
         /// The main interface for communicating between behaviours.  Using polymorphism, we
         /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
-        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// can then check for particular upcasted message types, and either grab some data 
         /// from it (set message) or store some data in it (get message).
         /// </summary>
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
+        }
+
+        /// <summary>
+        /// Resets a behaviour to its initial state.
+        /// </summary>
+        public override void Reset()
+        {
+            mObjectsDamaged.Clear();
         }
     }
 }
