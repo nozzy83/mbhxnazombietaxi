@@ -136,7 +136,7 @@ namespace MBHEngine.Behaviour
                     }
                 default:
                     {
-                        throw new Exception("Unahndled FSM Flow State.");
+                        throw new Exception("Unhandled FSM Flow State.");
                     }
             }
 
