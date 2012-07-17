@@ -530,5 +530,17 @@ namespace MBHEngine.GameObject
                 return mBlendMode;
             }
         }
+
+        /// <summary>
+        /// A unique id assigned to this game object. Will possibly change each time 
+        /// the game is run. Meant more for debugging than anything.
+        /// </summary>
+        public Int32 pID
+        {
+            get
+            {
+                return mID;
+            }
+        }
     }
 }
