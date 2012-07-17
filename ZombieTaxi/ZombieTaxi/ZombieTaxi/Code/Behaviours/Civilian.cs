@@ -449,7 +449,7 @@ namespace ZombieTaxi.Behaviours
                 Level.Tile newTarget = mGetTileAtPositionMsg.mTile.mAdjecentTiles[dir];
 
                 // Only try to move to a tile if it is empty.
-                if (newTarget.mType == Level.Tile.TileTypes.Empty)
+                if ((newTarget.mType & Level.Tile.TileTypes.Solid) != Level.Tile.TileTypes.Solid)
                 {
                     pParentGOH.OnMessage(mGetSafeHouseMsg);
 
