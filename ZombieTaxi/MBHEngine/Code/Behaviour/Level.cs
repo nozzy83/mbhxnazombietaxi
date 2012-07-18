@@ -401,6 +401,8 @@ namespace MBHEngine.Behaviour
                         // If a collision was even checked for, render it Orange.
                         else if ((mCollisionGrid[x, y].mType & Level.Tile.TileTypes.CollisionChecked) == Tile.TileTypes.CollisionChecked)
                             DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.OrangeRed);
+                        else
+                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Black);
 
                         // Clear the temp bits used for rendering collision info.
                         // TODO: This is not being cleared for tiles not on screen. Does that matter?
