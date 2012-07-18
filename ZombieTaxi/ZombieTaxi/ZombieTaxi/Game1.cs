@@ -120,7 +120,7 @@ namespace ZombieTaxi
             GameObject bg = new GameObject();
             MBHEngine.Behaviour.Behaviour t = new InfiniteBG(bg, null);
             bg.AttachBehaviour(t);
-            bg.pRenderPriority = 25;
+            bg.pRenderPriority = 20;
             GameObjectManager.pInstance.Add(bg);
 
             // The place where the player must bring back recused characters to.

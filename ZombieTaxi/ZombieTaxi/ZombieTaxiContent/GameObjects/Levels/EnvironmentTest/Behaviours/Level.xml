@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.LevelDefinition">
+    <mMapDimensions>200 200</mMapDimensions>
+    <mTileDimensions>8 8</mTileDimensions>
+    <mTileMapImageName>Sprites\\Environments\\grass_tilemap</mTileMapImageName>
   </Asset>
 </XnaContent>
 

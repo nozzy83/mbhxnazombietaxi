@@ -182,6 +182,10 @@ namespace MBHEngine.Render
             }
         }
 
+        /// <summary>
+        /// Where the camera is trying to get to. We quickly blend between the current position
+        /// to this position.
+        /// </summary>
         public Vector2 pTargetPosition
         {
             get
@@ -203,6 +207,9 @@ namespace MBHEngine.Render
             }
         }
 
+        /// <summary>
+        /// The position in the world that is currently at the center of the screen.
+        /// </summary>
         public Vector2 pScreenCenter
         {
             get
@@ -211,6 +218,10 @@ namespace MBHEngine.Render
             }
         }
 
+        /// <summary>
+        /// The amount that the camera is currently zoomed in by. This is a scalar, so 1.0 
+        /// means no zoom.
+        /// </summary>
         public Single pZoomScale
         {
             get
@@ -220,6 +231,17 @@ namespace MBHEngine.Render
             set
             {
                 mZoomAmount = value;
+            }
+        }
+
+        /// <summary>
+        /// A rectangle defining the viewable area of the world.
+        /// </summary>
+        public MBHEngine.Math.Rectangle pViewRect
+        {
+            get
+            {
+                return mViewRectangle;
             }
         }
     }
