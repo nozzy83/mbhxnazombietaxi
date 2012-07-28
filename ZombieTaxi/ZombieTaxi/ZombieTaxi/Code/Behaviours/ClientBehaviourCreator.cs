@@ -72,6 +72,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new DamageOnContact(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.Inventory":
+                    {
+                        return new Inventory(go, fileName);
+                    }
                 default:
                     {
                         return null;
