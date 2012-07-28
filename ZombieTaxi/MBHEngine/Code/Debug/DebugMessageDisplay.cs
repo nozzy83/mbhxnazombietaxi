@@ -37,7 +37,7 @@ namespace MBHEngine.Debug
         /// <summary>
         /// This is how many constant strings we are going to store.
         /// </summary>
-        private int mMaxConstMsgs = 20;
+        private int mMaxConstMsgs = 10;
 
 #if ALLOW_GARBAGE
         /// <summary>
