@@ -305,6 +305,50 @@ namespace MBHEngine.Math
         }
 
         /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pCenterBottom
+        {
+            get
+            {
+                return new Vector2(pCenterPoint.X, pBottom);
+            }
+        }
+
+        /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pCenterTop
+        {
+            get
+            {
+                return new Vector2(pCenterPoint.X, pTop);
+            }
+        }
+
+        /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pCenterLeft
+        {
+            get
+            {
+                return new Vector2(pLeft, pCenterPoint.Y);
+            }
+        }
+
+        /// <summary>
+        /// The point in world space.
+        /// </summary>
+        public Vector2 pCenterRight
+        {
+            get
+            {
+                return new Vector2(pRight, pCenterPoint.Y);
+            }
+        }
+
+        /// <summary>
         /// The width and height of the rectangle.
         /// </summary>
         public Vector2 pDimensions

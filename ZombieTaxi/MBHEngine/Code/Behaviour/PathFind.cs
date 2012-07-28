@@ -261,7 +261,7 @@ namespace MBHEngine.Behaviour
             if (mUpdateSourceAutomatically)
             {
                 // Update the source incase the GO has moved since the last update.
-                mSource = mParentGOH.pOrientation.mPosition;
+                mSource = mParentGOH.pOrientation.mPosition + mParentGOH.pCollisionRoot;
 
                 // Grab the tile at the source position.
                 mGetTileAtPositionMsg.mPosition = mSource;
