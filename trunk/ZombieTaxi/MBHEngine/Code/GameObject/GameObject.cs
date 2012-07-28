@@ -186,8 +186,15 @@ namespace MBHEngine.GameObject
                 mOrientation.mScale = def.mScale;
                 mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
                 mCollisionRectangle.pCenterPoint = mOrientation.mPosition;
-                mCollisionRoot = def.mCollisionRoot;
                 mMotionRoot = def.mMotionRoot;
+                if (def.mCollisionRoot == null)
+                {
+                    mCollisionRoot = mMotionRoot;
+                }
+                else
+                {
+                    mCollisionRoot = def.mCollisionRoot;
+                }
 
                 for (Int32 i = 0; def.mClassifications != null && i < def.mClassifications.Count; i++)
                 {

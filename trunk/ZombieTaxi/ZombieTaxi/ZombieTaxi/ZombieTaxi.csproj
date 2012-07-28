@@ -138,6 +138,7 @@
     <Compile Include="Code\Behaviours\Health.cs" />
     <Compile Include="Code\Behaviours\HUD\PlayerScore.cs" />
     <Compile Include="Code\Behaviours\InfiniteBG.cs" />
+    <Compile Include="Code\Behaviours\Inventory.cs" />
     <Compile Include="Code\Behaviours\Kamikaze.cs" />
     <Compile Include="Code\Behaviours\PlayerHealthBar.cs" />
     <Compile Include="Code\Behaviours\Projectile.cs" />
