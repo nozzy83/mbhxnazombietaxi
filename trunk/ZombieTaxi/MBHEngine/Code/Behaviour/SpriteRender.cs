@@ -489,7 +489,21 @@ namespace MBHEngine.Behaviour
 
                 if (mAttachmentPoints.ContainsKey(temp.mName))
                 {
-                    temp.mPoisitionInWorld = mAttachmentPoints[temp.mName] + mParentGOH.pOrientation.mPosition;
+                    Single attachX = mAttachmentPoints[temp.mName].X;
+                    Single attachY = mAttachmentPoints[temp.mName].Y;
+
+                    if ((mSpriteEffects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally)
+                    {
+                        attachX *= -1;
+                    }
+
+                    if ((mSpriteEffects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically)
+                    {
+                        attachY *= -1;
+                    }
+
+                    temp.mPoisitionInWorld.X = attachX + mParentGOH.pOrientation.mPosition.X;
+                    temp.mPoisitionInWorld.Y = attachY + mParentGOH.pOrientation.mPosition.Y;
                 }
             }
             else if (msg is SetColorMessage)

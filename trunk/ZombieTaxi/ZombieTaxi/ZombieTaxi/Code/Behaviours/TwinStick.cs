@@ -49,6 +49,7 @@ namespace ZombieTaxi.Behaviours
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
         private Timer.ToggleTimerMessage mToggleTimerMsg;
         private ExtractionPoint.SetExtractionPointActivateMessage mSetExtractionPointActivateMsg;
+        private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -99,6 +100,7 @@ namespace ZombieTaxi.Behaviours
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
             mToggleTimerMsg = new Timer.ToggleTimerMessage();
             mSetExtractionPointActivateMsg = new ExtractionPoint.SetExtractionPointActivateMessage();
+            mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
         }
 
         /// <summary>
@@ -118,13 +120,14 @@ namespace ZombieTaxi.Behaviours
             dir1 *= g.ThumbSticks.Left;
             mParentGOH.pOrientation.mPosition += dir1;
 
-            // If the player has moved at all this frame, start with the gun right behind him.  We don't do this if he didn't
-            // move so that we don't need to figure out where to position it; we just use what was already there.
-            if (dir1.X != 0.0f)
-            {
-                mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
-                //mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
-            }
+            // The position the Gun gets attached to is configured via an AttachPoint in the 
+            // Player template.
+            mGetAttachmentPointMsg.mName = "Gun";
+            mParentGOH.OnMessage(mGetAttachmentPointMsg);
+            Vector2 mGunAttachPos = mGetAttachmentPointMsg.mPoisitionInWorld;
+
+            // Position the gun at the attachment point.
+            mGun.pOrientation.mPosition = mGunAttachPos;
 
             // Flip the sprite to face the direction that we are moving.
             if (g.ThumbSticks.Left.X > 0)
@@ -139,7 +142,6 @@ namespace ZombieTaxi.Behaviours
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
                 mGun.OnMessage(mSpriteFxMsg);
                 mGun.pOrientation.mRotation = 0.0f;
-                mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
             }
             else if (g.ThumbSticks.Left.X < 0)
             {
@@ -151,7 +153,6 @@ namespace ZombieTaxi.Behaviours
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
                 mGun.OnMessage(mSpriteFxMsg);
                 mGun.pOrientation.mRotation = MathHelper.ToRadians(180.0f);
-                mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X - 1.0f;
             }
             else
             {
@@ -193,7 +194,6 @@ namespace ZombieTaxi.Behaviours
                     // the player is shooting, so the gun needs to be updated as well.
                     mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
                     mGun.OnMessage(mSpriteFxMsg);
-                    mGun.pOrientation.mPosition.X = mParentGOH.pOrientation.mPosition.X + 1.0f;
                 }
                 else if (dir.X < 0)
                 {
@@ -202,7 +202,6 @@ namespace ZombieTaxi.Behaviours
 
                     mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
                     mGun.OnMessage(mSpriteFxMsg);
-                    mGun.pOrientation.mPosition.X = mParentGOH.pOrientation.mPosition.X - 1.0f;
                 }
 
                 // We want some slight randomness to the bullets fired.  This is the randomness in radians.

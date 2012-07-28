@@ -8,6 +8,7 @@
         <mName>Shadow</mName>
         <mOffset>0 5</mOffset>
       </Item>
-    </mAttachmentPoints>  </Asset>
+    </mAttachmentPoints>  
+  </Asset>
 </XnaContent>
 

@@ -217,7 +217,7 @@ namespace ZombieTaxi.Behaviours
                     Single minDist = pParentGOH.pDirection.mSpeed * 2.0f;
 
                     // Once we are within one unit of the target consider it reached.
-                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterPoint, pParentGOH.pOrientation.mPosition) <= minDist)
+                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterBottom, pParentGOH.pOrientation.mPosition) <= minDist)
                     {
                         // This node has been reached, so next update it will start moving towards the next node.
                         p.mReached = true;
@@ -226,16 +226,16 @@ namespace ZombieTaxi.Behaviours
                         // the target moving.
                         //DebugMessageDisplay.pInstance.AddConstantMessage("Reached target.  Setting new destination.");
 
-                        mSetSourceMsg.mSource = pParentGOH.pOrientation.mPosition;
+                        mSetSourceMsg.mSource = pParentGOH.pOrientation.mPosition + pParentGOH.pCollisionRoot;
                         pParentGOH.OnMessage(mSetSourceMsg);
-                        mSetDestinationMsg.mDestination = player.pOrientation.mPosition;
+                        mSetDestinationMsg.mDestination = player.pOrientation.mPosition + pParentGOH.pCollisionRoot;
                         pParentGOH.OnMessage(mSetDestinationMsg);
                     }
 
                     //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
 
                     // Move towards the nodes center point.
-                    Vector2 d = p.mTile.mCollisionRect.pCenterPoint - pParentGOH.pOrientation.mPosition;
+                    Vector2 d = p.mTile.mCollisionRect.pCenterBottom - pParentGOH.pOrientation.mPosition;
                     if (d.Length() != 0.0f)
                     {
                         d = Vector2.Normalize(d);
@@ -247,9 +247,9 @@ namespace ZombieTaxi.Behaviours
                     //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
 
                     // If we don't have a destination set yet, set it up now.
-                    mSetSourceMsg.mSource = pParentGOH.pOrientation.mPosition;
+                    mSetSourceMsg.mSource = pParentGOH.pOrientation.mPosition + pParentGOH.pCollisionRoot;
                     pParentGOH.OnMessage(mSetSourceMsg);
-                    mSetDestinationMsg.mDestination = player.pOrientation.mPosition;
+                    mSetDestinationMsg.mDestination = player.pOrientation.mPosition + pParentGOH.pCollisionRoot;
                     pParentGOH.OnMessage(mSetDestinationMsg);
                 }
             }
@@ -474,7 +474,7 @@ namespace ZombieTaxi.Behaviours
                 mTarget = target;
 
                 // Move towards the nodes center point.
-                Vector2 d = mTarget.mCollisionRect.pCenterPoint - pParentGOH.pOrientation.mPosition;
+                Vector2 d = mTarget.mCollisionRect.pCenterBottom - pParentGOH.pOrientation.mPosition;
                 if (d.Length() != 0.0f)
                 {
                     d = Vector2.Normalize(d);
@@ -496,7 +496,7 @@ namespace ZombieTaxi.Behaviours
                     // The min distance is based on the speed of this Game Object to avoid overhsooting the
                     // target over and over again.
                     Single minDist = pParentGOH.pDirection.mSpeed * pParentGOH.pDirection.mSpeed;
-                    if (Vector2.DistanceSquared(mTarget.mCollisionRect.pCenterPoint, pParentGOH.pOrientation.mPosition) < minDist)
+                    if (Vector2.DistanceSquared(mTarget.mCollisionRect.pCenterBottom, pParentGOH.pOrientation.mPosition) < minDist)
                     {
                         // Target reached.  Sit around for a bit.
                         return "WaitInSafeHouse";
@@ -590,9 +590,9 @@ namespace ZombieTaxi.Behaviours
 
                 pParentGOH.OnMessage(mGetExtractionPointMsg);
 
-                mSetSourceMsg.mSource = pParentGOH.pOrientation.mPosition;
+                mSetSourceMsg.mSource = pParentGOH.pOrientation.mPosition + pParentGOH.pCollisionRoot;
                 pParentGOH.OnMessage(mSetSourceMsg);
-                mSetDestinationMsg.mDestination = mGetExtractionPointMsg.mExtractionPoint.pOrientation.mPosition;
+                mSetDestinationMsg.mDestination = mGetExtractionPointMsg.mExtractionPoint.pOrientation.mPosition + pParentGOH.pCollisionRoot;
                 pParentGOH.OnMessage(mSetDestinationMsg);
 
             }
@@ -663,7 +663,7 @@ namespace ZombieTaxi.Behaviours
                     Single minDist = pParentGOH.pDirection.mSpeed * 2.0f;
 
                     // Once we are within one unit of the target consider it reached.
-                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterPoint, pParentGOH.pOrientation.mPosition) <= minDist)
+                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterBottom, pParentGOH.pOrientation.mPosition) <= minDist)
                     {
                         // This node has been reached, so next update it will start moving towards the next node.
                         p.mReached = true;
@@ -677,7 +677,7 @@ namespace ZombieTaxi.Behaviours
                     //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
 
                     // Move towards the nodes center point.
-                    Vector2 d = p.mTile.mCollisionRect.pCenterPoint - pParentGOH.pOrientation.mPosition;
+                    Vector2 d = p.mTile.mCollisionRect.pCenterBottom - pParentGOH.pOrientation.mPosition;
                     if (d.Length() != 0.0f)
                     {
                         d = Vector2.Normalize(d);

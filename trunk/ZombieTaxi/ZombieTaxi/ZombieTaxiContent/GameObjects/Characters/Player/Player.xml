@@ -8,8 +8,8 @@
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
     <mCollisionBoxDimensions>8.0 8.0</mCollisionBoxDimensions>
-    <mCollisionRoot>4 4</mCollisionRoot>
-    <mMotionRoot>8 12</mMotionRoot>
+    <mCollisionRoot>0 -4</mCollisionRoot>
+    <mMotionRoot>8 16</mMotionRoot>
     <mClassifications>
       <Item>PLAYER</Item>
     </mClassifications>
@@ -20,6 +20,7 @@
       <Item>TwinStick</Item>
       <Item>PathFind</Item>
       <Item>DamageFlash</Item>
+      <Item>Inventory</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
@@ -28,6 +29,7 @@
       <Item>ZombieTaxi.Behaviours.TwinStick</Item>
       <Item>MBHEngine.Code.Behaviour.PathFind</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>ZombieTaxi.Behaviours.Inventory</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

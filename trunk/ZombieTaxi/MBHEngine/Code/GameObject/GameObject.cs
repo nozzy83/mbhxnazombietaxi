@@ -189,7 +189,7 @@ namespace MBHEngine.GameObject
                 mMotionRoot = def.mMotionRoot;
                 if (def.mCollisionRoot == null)
                 {
-                    mCollisionRoot = mMotionRoot;
+                    mCollisionRoot = Vector2.Zero;
                 }
                 else
                 {
@@ -260,14 +260,8 @@ namespace MBHEngine.GameObject
 
             // With all behaviours done updating, it should be safe to
             // now update and draw the collision volume for this object.
-            //pCollisionRect.pCenterPoint = pOrientation.mPosition;
-            Vector2 offset = mCollisionRoot;
-            if (mCollisionRoot == Vector2.Zero)
-            {
-                offset = mMotionRoot;
-            }
+            pCollisionRect.pCenterPoint = pOrientation.mPosition + mCollisionRoot;
 
-            pCollisionRect.pTopLeft = pOrientation.mPosition - offset;
             DebugShapeDisplay.pInstance.AddAABB(pCollisionRect, Color.Green);
         }
 
@@ -502,6 +496,17 @@ namespace MBHEngine.GameObject
             get
             {
                 return mCollisionRectangle;
+            }
+        }
+
+        /// <summary>
+        /// Access to the collision root offset.
+        /// </summary>
+        public Vector2 pCollisionRoot
+        {
+            get
+            {
+                return mCollisionRoot;
             }
         }
 

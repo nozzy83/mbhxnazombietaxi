@@ -4,6 +4,12 @@
     <mSpriteFileName>Sprites\Characters\Commando</mSpriteFileName>
     <mFrameHeight>16</mFrameHeight>
     <mHasShadow>true</mHasShadow>
+    <mAttachmentPoints>
+      <Item>
+        <mName>Gun</mName>
+        <mOffset>1 -4</mOffset>
+      </Item>
+    </mAttachmentPoints>
     <mAnimationSets>
       <Item>
         <mTicksPerFrame>10</mTicksPerFrame>

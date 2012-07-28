@@ -7,7 +7,7 @@
     <mAttachmentPoints>
       <Item>
         <mName>Ground</mName>
-        <mOffset>0 4</mOffset>
+        <mOffset>0 0</mOffset>
       </Item>
     </mAttachmentPoints>
     <mAnimationSets>
