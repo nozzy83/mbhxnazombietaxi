@@ -5,30 +5,20 @@ using System.Text;
 using MBHEngine.Behaviour;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
+using MBHEngine.Debug;
 using ZombieTaxiContentDefs;
 
 namespace ZombieTaxi.Behaviours
 {
     /// <summary>
-    /// Allows on GameObject to store a collection of items.
+    /// Allows a GameObject to be picked up and added to an inventory.
     /// </summary>
-    class Inventory : MBHEngine.Behaviour.Behaviour
+    class Pickup : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
-        /// Message used for adding objects to this inventory.
+        /// Preallocated messages to avoid GC.
         /// </summary>
-        public class AddObjectMessage : MBHEngine.Behaviour.BehaviourMessage
-        {
-            /// <summary>
-            /// The GameObject that should be added to this inventory.
-            /// </summary>
-            public GameObject mObj;
-        };
-
-        /// <summary>
-        /// The collection of objects this Inventory is storing.
-        /// </summary>
-        private List<GameObject> mObjects;
+        private Inventory.AddObjectMessage mAddObjectMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -36,7 +26,7 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         /// <param name="parentGOH">The game object that this behaviour is attached to.</param>
         /// <param name="fileName">The file defining this behaviour.</param>
-        public Inventory(GameObject parentGOH, String fileName)
+        public Pickup(GameObject parentGOH, String fileName)
             : base(parentGOH, fileName)
         {
         }
@@ -49,9 +39,9 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
-            InventoryDefinition def = GameObjectManager.pInstance.pContentManager.Load<InventoryDefinition>(fileName);
+            PickupDefinition def = GameObjectManager.pInstance.pContentManager.Load<PickupDefinition>(fileName);
 
-            mObjects = new List<GameObject>(16);
+            mAddObjectMsg = new Inventory.AddObjectMessage();
         }
 
         /// <summary>
@@ -60,6 +50,21 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
+            GameObject player = GameObjectManager.pInstance.pPlayer;
+
+            // For now just check if we are colliding with the player.
+            // TODO: Object should be able to specify what types of objects can pick it up.
+            if (mParentGOH.pCollisionRect.Intersects(player.pCollisionRect))
+            {
+                DebugMessageDisplay.pInstance.AddConstantMessage("Pickup grabbed");
+
+                // Add the object to the player's inventory.
+                mAddObjectMsg.mObj = mParentGOH;
+                player.OnMessage(mAddObjectMsg);
+
+                // Stop updating and rendering the object.
+                GameObjectManager.pInstance.Remove(mParentGOH);
+            }
         }
 
         /// <summary>
@@ -71,13 +76,6 @@ namespace ZombieTaxi.Behaviours
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
-            if (msg is AddObjectMessage)
-            {
-                AddObjectMessage temp = (AddObjectMessage)msg;
-
-                mObjects.Add(temp.mObj);
-            }
         }
-
     }
 }

@@ -88,7 +88,7 @@ namespace ZombieTaxi
 
 #if DEBUG
             // By default, in DEBUG the debug drawing is enabled.
-            mDebugDrawEnabled = true;
+            mDebugDrawEnabled = false;
 #else
             // In release it is not.
             mDebugDrawEnabled = false;
@@ -113,6 +113,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\BulletSpark\\BulletSpark", 32);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\Explosion\\Explosion", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Flare\\Flare", 10);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\StonePickup\\StonePickup", 10);
             
 
             // The tiled background image that travels will the player creating the illusion of
@@ -144,6 +145,10 @@ namespace ZombieTaxi
             // Store the player for easy access.
             GameObjectManager.pInstance.pPlayer = player;
 
+            GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\StonePickup\\StonePickup");
+            go.pOrientation.mPosition = new Vector2(50, 50);
+            GameObjectManager.pInstance.Add(go);
+
             GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
             GameObjectManager.pInstance.Add(chef);
             
@@ -152,7 +157,6 @@ namespace ZombieTaxi
             //enemy.pOrientation.mPosition.Y = 50;
             //GameObjectManager.pInstance.Add(enemy);
             
-
             // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager.
             new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
             new GameObject("GameObjects\\Utils\\RandCivilianGenerator\\RandCivilianGenerator");

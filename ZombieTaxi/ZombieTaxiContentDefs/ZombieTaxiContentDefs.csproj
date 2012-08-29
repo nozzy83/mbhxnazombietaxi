@@ -101,6 +101,7 @@
     <Compile Include="Behaviour\HUD\PlayerScoreDefinition.cs" />
     <Compile Include="Behaviour\InventoryDefinition.cs" />
     <Compile Include="Behaviour\KamikazeDefinition.cs" />
+    <Compile Include="Behaviour\PickupDefinition.cs" />
     <Compile Include="Behaviour\PlayerHealthBarDefinition.cs" />
     <Compile Include="Behaviour\ProjectileDefinition.cs" />
     <Compile Include="Behaviour\RandomEnemyGeneratorDefinition.cs" />

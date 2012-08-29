@@ -8,13 +8,15 @@
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
     <mCollisionBoxDimensions>4.0 8.0</mCollisionBoxDimensions>
-    <mCollisionRoot>2 8</mCollisionRoot>
+    <mCollisionRoot>0 -4</mCollisionRoot>
     <mMotionRoot>4 8</mMotionRoot>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
+      <Item>Pickup</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>ZombieTaxi.Behaviours.Pickup</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
