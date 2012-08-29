@@ -56,7 +56,9 @@ namespace ZombieTaxi.Behaviours
             // TODO: Object should be able to specify what types of objects can pick it up.
             if (mParentGOH.pCollisionRect.Intersects(player.pCollisionRect))
             {
+#if ALLOW_GARBAGE
                 DebugMessageDisplay.pInstance.AddConstantMessage("Pickup grabbed");
+#endif
 
                 // Add the object to the player's inventory.
                 mAddObjectMsg.mObj = mParentGOH;
