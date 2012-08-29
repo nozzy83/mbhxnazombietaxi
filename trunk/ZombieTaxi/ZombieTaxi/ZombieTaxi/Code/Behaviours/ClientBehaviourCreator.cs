@@ -76,6 +76,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new Inventory(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.Pickup":
+                    {
+                        return new Pickup(go, fileName);
+                    }
                 default:
                     {
                         return null;
