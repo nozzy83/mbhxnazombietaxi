@@ -368,7 +368,7 @@ namespace MBHEngine.Behaviour
                         //  [+]/
                         //    /[+]
                         //   /
-                        if (IsAttemptingInvalidDiagonalMove((Level.Tile.AdjectTileDir)i, mCurBest.mTile))
+                        if (IsAttemptingInvalidDiagonalMove((Level.Tile.AdjacentTileDir)i, mCurBest.mTile))
                         {
                             continue;
                         }
@@ -409,10 +409,10 @@ namespace MBHEngine.Behaviour
                         // Diagonal movement cost more than lateral movement, so figure out where this node is
                         // in relation to the current node.
                         Boolean isDiag = 
-                            ( i == (Int32)Level.Tile.AdjectTileDir.LEFT_DOWN ) ||
-                            ( i == (Int32)Level.Tile.AdjectTileDir.LEFT_UP ) ||
-                            ( i == (Int32)Level.Tile.AdjectTileDir.RIGHT_DOWN ) ||
-                            ( i == (Int32)Level.Tile.AdjectTileDir.RIGHT_UP );
+                            ( i == (Int32)Level.Tile.AdjacentTileDir.LEFT_DOWN ) ||
+                            ( i == (Int32)Level.Tile.AdjacentTileDir.LEFT_UP ) ||
+                            ( i == (Int32)Level.Tile.AdjacentTileDir.RIGHT_DOWN ) ||
+                            ( i == (Int32)Level.Tile.AdjacentTileDir.RIGHT_UP );
 
                         // Calculate the cost of moving to this node.  This is the distance between the two nodes.
                         // This will be needed in both the case where the node is in the open list already,
@@ -634,7 +634,7 @@ namespace MBHEngine.Behaviour
         /// <param name="dir">The direction to check in.</param>
         /// <param name="rootTile">The tile to move from.</param>
         /// <returns>True if the adjecent tile exists and is solid.</returns>
-        private Boolean IsTileInDirectionSolid(Level.Tile.AdjectTileDir dir, Level.Tile rootTile)
+        private Boolean IsTileInDirectionSolid(Level.Tile.AdjacentTileDir dir, Level.Tile rootTile)
         {
             return (rootTile.mAdjecentTiles[(Int32)dir] != null && rootTile.mAdjecentTiles[(Int32)dir].mType != Level.Tile.TileTypes.Empty);
         }
@@ -648,44 +648,44 @@ namespace MBHEngine.Behaviour
         /// <param name="dir">The direction we want to move.</param>
         /// <param name="rootTile">The tile we are moving from.</param>
         /// <returns>True if this is an invalid move.</returns>
-        private Boolean IsAttemptingInvalidDiagonalMove(Level.Tile.AdjectTileDir dir, Level.Tile rootTile)
+        private Boolean IsAttemptingInvalidDiagonalMove(Level.Tile.AdjacentTileDir dir, Level.Tile rootTile)
         {
             switch( (Int32)dir )
             {
                 // The path wants to move down and to the left...
-                case (Int32)Level.Tile.AdjectTileDir.LEFT_DOWN:
+                case (Int32)Level.Tile.AdjacentTileDir.LEFT_DOWN:
                     {
                         // But it should only do so if their are no solid tiles to the left and
                         // no solid tiles below.  If there are, it needs to find another way round.
-                        if( IsTileInDirectionSolid( Level.Tile.AdjectTileDir.LEFT, rootTile ) ||
-                            IsTileInDirectionSolid( Level.Tile.AdjectTileDir.DOWN, rootTile ) )
+                        if( IsTileInDirectionSolid( Level.Tile.AdjacentTileDir.LEFT, rootTile ) ||
+                            IsTileInDirectionSolid( Level.Tile.AdjacentTileDir.DOWN, rootTile ) )
                         {
                             return true;
                         }
                         break;
                     }
-                case (Int32)Level.Tile.AdjectTileDir.LEFT_UP:
+                case (Int32)Level.Tile.AdjacentTileDir.LEFT_UP:
                     {
-                        if (IsTileInDirectionSolid(Level.Tile.AdjectTileDir.LEFT, rootTile) ||
-                            IsTileInDirectionSolid(Level.Tile.AdjectTileDir.UP, rootTile))
+                        if (IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.LEFT, rootTile) ||
+                            IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.UP, rootTile))
                         {
                             return true;
                         }
                         break;
                     }
-                case (Int32)Level.Tile.AdjectTileDir.RIGHT_DOWN:
+                case (Int32)Level.Tile.AdjacentTileDir.RIGHT_DOWN:
                     {
-                        if (IsTileInDirectionSolid(Level.Tile.AdjectTileDir.RIGHT, rootTile) ||
-                            IsTileInDirectionSolid(Level.Tile.AdjectTileDir.DOWN, rootTile))
+                        if (IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.RIGHT, rootTile) ||
+                            IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.DOWN, rootTile))
                         {
                             return true;
                         }
                         break;
                     }
-                case (Int32)Level.Tile.AdjectTileDir.RIGHT_UP:
+                case (Int32)Level.Tile.AdjacentTileDir.RIGHT_UP:
                     {
-                        if (IsTileInDirectionSolid(Level.Tile.AdjectTileDir.RIGHT, rootTile) ||
-                            IsTileInDirectionSolid(Level.Tile.AdjectTileDir.UP, rootTile))
+                        if (IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.RIGHT, rootTile) ||
+                            IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.UP, rootTile))
                         {
                             return true;
                         }
