@@ -415,22 +415,22 @@ namespace ZombieTaxi.Behaviours
                 {
                     case 0:
                         {
-                            dir = (Int32)Level.Tile.AdjectTileDir.LEFT;
+                            dir = (Int32)Level.Tile.AdjacentTileDir.LEFT;
                             break;
                         }
                     case 1:
                         {
-                            dir = (Int32)Level.Tile.AdjectTileDir.UP;
+                            dir = (Int32)Level.Tile.AdjacentTileDir.UP;
                             break;
                         }
                     case 2:
                         {
-                            dir = (Int32)Level.Tile.AdjectTileDir.RIGHT;
+                            dir = (Int32)Level.Tile.AdjacentTileDir.RIGHT;
                             break;
                         }
                     case 3:
                         {
-                            dir = (Int32)Level.Tile.AdjectTileDir.DOWN;
+                            dir = (Int32)Level.Tile.AdjacentTileDir.DOWN;
                             break;
                         }
 

@@ -76,6 +76,23 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Set the type of a tile at a specific location. Updates surround tiles to make sure
+        /// collision continues to work properly.
+        /// </summary>
+        public class SetTileTypeAtPosition : BehaviourMessage
+        {
+            /// <summary>
+            /// A position in world space to check against.
+            /// </summary>
+            public Vector2 mPosition;
+
+            /// <summary>
+            /// The type of tile to place here.
+            /// </summary>
+            public Tile.TileTypes mType;
+        }
+
+        /// <summary>
         /// Data about a single tile.
         /// </summary>
         public class Tile
@@ -128,7 +145,7 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// Uses these enums to look up the adjecent tiles in mAdjecentTiles.
             /// </summary>
-            public enum AdjectTileDir
+            public enum AdjacentTileDir
             {
                 LEFT = 0,
                 LEFT_UP,
@@ -222,25 +239,25 @@ namespace MBHEngine.Behaviour
                     //
 
                     // Allocate space for the Array itself.
-                    mCollisionGrid[x, y].mAdjecentTiles = new Tile[(Int32)Tile.AdjectTileDir.NUM_DIRECTIONS];
+                    mCollisionGrid[x, y].mAdjecentTiles = new Tile[(Int32)Tile.AdjacentTileDir.NUM_DIRECTIONS];
 
                     // Start with the tiles left of this one, but avoid looking outside the map.
                     if (x > 0)
                     {
                         // Store a reference to the tile to the left.
-                        mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.LEFT] = mCollisionGrid[x - 1, y];
+                        mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.LEFT] = mCollisionGrid[x - 1, y];
 
                         // Since the tile to the left was created before this one, it needs to be updated to point to this
                         // once as the tile on it right.
-                        mCollisionGrid[x - 1, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.RIGHT] = mCollisionGrid[x, y];
+                        mCollisionGrid[x - 1, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.RIGHT] = mCollisionGrid[x, y];
 
                         // Check up and to the left if that is not outside the map.
                         if (y > 0)
                         {
                             // Again, set ourselves and then the adjecent one which was created prior to us being
                             // created.
-                            mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.LEFT_UP] = mCollisionGrid[x - 1, y - 1];
-                            mCollisionGrid[x - 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjectTileDir.RIGHT_DOWN] = mCollisionGrid[x, y];
+                            mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.LEFT_UP] = mCollisionGrid[x - 1, y - 1];
+                            mCollisionGrid[x - 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.RIGHT_DOWN] = mCollisionGrid[x, y];
                         }
                     }
 
@@ -248,14 +265,14 @@ namespace MBHEngine.Behaviour
                     if (y > 0)
                     {
                         // Set our up, their down.
-                        mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.UP] = mCollisionGrid[x, y - 1];
-                        mCollisionGrid[x, y - 1].mAdjecentTiles[(Int32)Tile.AdjectTileDir.DOWN] = mCollisionGrid[x, y];
+                        mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.UP] = mCollisionGrid[x, y - 1];
+                        mCollisionGrid[x, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.DOWN] = mCollisionGrid[x, y];
 
                         // All that is left is the RIGHT_UP/LEFT_DOWN relationship.
                         if (x < mMapWidth - 1)
                         {
-                            mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjectTileDir.RIGHT_UP] = mCollisionGrid[x + 1, y - 1];
-                            mCollisionGrid[x + 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjectTileDir.LEFT_DOWN] = mCollisionGrid[x, y];
+                            mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.RIGHT_UP] = mCollisionGrid[x + 1, y - 1];
+                            mCollisionGrid[x + 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.LEFT_DOWN] = mCollisionGrid[x, y];
                         }
                     }
 
@@ -269,23 +286,9 @@ namespace MBHEngine.Behaviour
                     if (RandomManager.pInstance.RandomPercent() <= 0.05f)
                     {
                         mCollisionGrid[x, y].mType = Level.Tile.TileTypes.Solid;
-                        
-                        // Solid tiles all use the same image.
-                        mCollisionGrid[x, y].mImageIndex = 0;
                     }
-                    else
-                    {
-                        // We want empty tiles to mostly be one image with a low chance of being one of the
-                        // other tiles.
-                        if (RandomManager.pInstance.RandomPercent() > 0.9f)
-                        {
-                            mCollisionGrid[x, y].mImageIndex = (RandomManager.pInstance.RandomNumber() % 2) + 3;
-                        }
-                        else
-                        {
-                            mCollisionGrid[x, y].mImageIndex = 2; // Most will use this.
-                        }
-                    }
+
+                    DetermineAndSetImage(mCollisionGrid[x, y]);
                 }
             }
 
@@ -352,6 +355,92 @@ namespace MBHEngine.Behaviour
                 (def.mTileMapImageName);
 
             base.LoadContent(fileName);
+        }
+
+        /// <summary>
+        /// Centralized place for logic in mapping a Tile state to a Tile image.
+        /// </summary>
+        /// <param name="tile">The tile to update.</param>
+        private void DetermineAndSetImage(Tile tile)
+        {
+            // Give it a random chance to be solid.
+            if (tile.mType == Tile.TileTypes.Solid)
+            {
+                // Solid tiles all use the same image.
+                tile.mImageIndex = 0;
+            }
+            else
+            {
+                // We want empty tiles to mostly be one image with a low chance of being one of the
+                // other tiles.
+                if (RandomManager.pInstance.RandomPercent() > 0.9f)
+                {
+                    tile.mImageIndex = (RandomManager.pInstance.RandomNumber() % 2) + 3;
+                }
+                else
+                {
+                    tile.mImageIndex = 2; // Most will use this.
+                }
+            }
+        }
+
+        /// <summary>
+        /// Helper function for UpdateEdgeCollisionData.
+        /// </summary>
+        /// <param name="t">The tile being updated.</param>
+        /// <param name="dir">The direction to update the edge of.</param>
+        /// <param name="type">The edge side (should match dir).</param>
+        /// <returns>The tile that was adjacent which we checked.</returns>
+        private Tile UpdateSingleEdge(Tile t, Tile.AdjacentTileDir dir, Tile.WallTypes type)
+        {
+            Tile adjTile = t.mAdjecentTiles[(Int32)dir];
+            if (adjTile != null)
+            {
+                if (t.mType == Tile.TileTypes.Solid)
+                {
+                    if (adjTile.mType != Tile.TileTypes.Solid)
+                    {
+                        t.mActiveWalls |= type;
+                    }
+                }
+            }
+
+            return adjTile;
+        }
+
+        /// <summary>
+        /// When a tile changes collision states, the edges need to be recalculated.
+        /// </summary>
+        /// <param name="t">The tile to update.</param>
+        /// <param name="updateAdjacent">True if the adjacent tiles should be updated as well.</param>
+        private void UpdateEdgeCollisionData(Tile t, Boolean updateAdjacent = true)
+        {
+            // Fail said to make recursive calls a little cleaner (don't need to check for a bunch 
+            // of nulls).
+            if (t == null)
+            {
+                return;
+            }
+
+            // Start with no edges,
+            t.mActiveWalls = 0;
+
+            // Update each edge based on the surrounding tiles.
+            Tile left = UpdateSingleEdge(t, Tile.AdjacentTileDir.LEFT, Tile.WallTypes.Left);
+            Tile up = UpdateSingleEdge(t, Tile.AdjacentTileDir.UP, Tile.WallTypes.Top);
+            Tile down = UpdateSingleEdge(t, Tile.AdjacentTileDir.DOWN, Tile.WallTypes.Bottom);
+            Tile right = UpdateSingleEdge(t, Tile.AdjacentTileDir.RIGHT, Tile.WallTypes.Right);
+
+            if (true == updateAdjacent)
+            {
+                // If this was the tile that changed, the surrounding tiles likely need to
+                // be updated because the edge touching this tile has changed. However,
+                // the tiles adjacent to THEM do not need to be updated.
+                UpdateEdgeCollisionData(left, false);
+                UpdateEdgeCollisionData(up, false);
+                UpdateEdgeCollisionData(down, false);
+                UpdateEdgeCollisionData(right, false);
+            }
         }
 
         /// <summary>
@@ -487,6 +576,21 @@ namespace MBHEngine.Behaviour
                 temp.mTile = GetTileAtPosition(temp.mPosition.X, temp.mPosition.Y);
 
                 msg = temp;
+            }
+            else if (msg is SetTileTypeAtPosition)
+            {
+                SetTileTypeAtPosition temp = (SetTileTypeAtPosition)msg;
+
+                Tile t = GetTileAtPosition(temp.mPosition.X, temp.mPosition.Y);
+
+                if (t.mType != temp.mType)
+                {
+                    t.mType = temp.mType;
+
+                    DetermineAndSetImage(t);
+
+                    UpdateEdgeCollisionData(t);
+                }
             }
         }
 
