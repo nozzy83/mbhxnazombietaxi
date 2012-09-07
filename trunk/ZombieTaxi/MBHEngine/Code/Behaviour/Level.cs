@@ -79,7 +79,7 @@ namespace MBHEngine.Behaviour
         /// Set the type of a tile at a specific location. Updates surround tiles to make sure
         /// collision continues to work properly.
         /// </summary>
-        public class SetTileTypeAtPosition : BehaviourMessage
+        public class SetTileTypeAtPositionMessage : BehaviourMessage
         {
             /// <summary>
             /// A position in world space to check against.
@@ -90,6 +90,17 @@ namespace MBHEngine.Behaviour
             /// The type of tile to place here.
             /// </summary>
             public Tile.TileTypes mType;
+        }
+
+        /// <summary>
+        /// Retrives the struct containing a bunch of information about this level.
+        /// </summary>
+        public class GetMapInfoMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// Contains various pieces of information about this map.
+            /// </summary>
+            public MapInfo mInfo;
         }
 
         /// <summary>
@@ -166,34 +177,46 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Stores a bunch of constant information about the level making it easier
+        /// to send this information to other objects.
+        /// </summary>
+        public class MapInfo
+        {
+            /// <summary>
+            /// The size of the map in tiles.
+            /// </summary>
+            public Int32 mMapWidth;
+
+            /// <summary>
+            /// The size of the map in tiles.
+            /// </summary>
+            public Int32 mMapHeight;
+
+            /// <summary>
+            /// The width of a single tile.
+            /// </summary>
+            public Int32 mTileWidth;
+
+            /// <summary>
+            /// The height of a single tile.
+            /// </summary>
+            public Int32 mTileHeight;
+
+            /// <summary>
+            /// Texture used for rendering the tile map.
+            /// </summary>        
+            public Texture2D mTileMap;
+        }
+
+        /// <summary>
         /// Collision information for this level.
         /// </summary>
         private Tile[,] mCollisionGrid;
 
         /// <summary>
-        /// The size of the map in tiles.
+        /// The defininition of this map.
         /// </summary>
-        private Int32 mMapWidth;
-
-        /// <summary>
-        /// The size of the map in tiles.
-        /// </summary>
-        private Int32 mMapHeight;
-
-        /// <summary>
-        /// The width of a single tile.
-        /// </summary>
-        private Int32 mTileWidth;
-
-        /// <summary>
-        /// The height of a single tile.
-        /// </summary>
-        private Int32 mTileHeight;
-
-        /// <summary>
-        /// Texture used for rendering the tile map.
-        /// </summary>        
-        private Texture2D mTileMap;
+        private MapInfo mMapInfo;
 
         /// <summary>
         /// These are needed to do our wall collision and we want to avoid allocating them over and
@@ -221,17 +244,19 @@ namespace MBHEngine.Behaviour
         {
             LevelDefinition def = GameObjectManager.pInstance.pContentManager.Load<LevelDefinition>(fileName);
 
+            mMapInfo = new MapInfo();
+
             // TODO: This should be loaded in from the def.
-            mMapWidth = (Int32)def.mMapDimensions.X;
-            mMapHeight = (Int32)def.mMapDimensions.Y;
-            mTileWidth = (Int32)def.mTileDimensions.X;
-            mTileHeight = (Int32)def.mTileDimensions.Y;
+            mMapInfo.mMapWidth = (Int32)def.mMapDimensions.X;
+            mMapInfo.mMapHeight = (Int32)def.mMapDimensions.Y;
+            mMapInfo.mTileWidth = (Int32)def.mTileDimensions.X;
+            mMapInfo.mTileHeight = (Int32)def.mTileDimensions.Y;
 
             // Start by creating all the tiles for this level.
-            mCollisionGrid = new Tile[mMapWidth, mMapHeight];
-            for (Int32 y = 0; y < mMapHeight; y++)
+            mCollisionGrid = new Tile[mMapInfo.mMapWidth, mMapInfo.mMapHeight];
+            for (Int32 y = 0; y < mMapInfo.mMapHeight; y++)
             {
-                for (Int32 x = 0; x < mMapWidth; x++)
+                for (Int32 x = 0; x < mMapInfo.mMapWidth; x++)
                 {
                     mCollisionGrid[x,y] = new Tile();
 
@@ -269,7 +294,7 @@ namespace MBHEngine.Behaviour
                         mCollisionGrid[x, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.DOWN] = mCollisionGrid[x, y];
 
                         // All that is left is the RIGHT_UP/LEFT_DOWN relationship.
-                        if (x < mMapWidth - 1)
+                        if (x < mMapInfo.mMapWidth - 1)
                         {
                             mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.RIGHT_UP] = mCollisionGrid[x + 1, y - 1];
                             mCollisionGrid[x + 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.LEFT_DOWN] = mCollisionGrid[x, y];
@@ -277,10 +302,10 @@ namespace MBHEngine.Behaviour
                     }
 
                     // Calculate the center point of the tile.
-                    Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));
+                    Vector2 cent = new Vector2((x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f), (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f));
 
                     // Create a rectangle to represent the tile.
-                    mCollisionGrid[x,y].mCollisionRect = new MBHEngine.Math.Rectangle(mTileWidth, mTileHeight, cent);
+                    mCollisionGrid[x, y].mCollisionRect = new MBHEngine.Math.Rectangle(mMapInfo.mTileWidth, mMapInfo.mTileHeight, cent);
 
                     // Give it a random chance to be solid.
                     if (RandomManager.pInstance.RandomPercent() <= 0.05f)
@@ -328,17 +353,17 @@ namespace MBHEngine.Behaviour
             // Loop through all the tiles and calculate which sides need to have collision checks done on it.
             // For example if a tile has another tile directly above it, it does not need to check collision 
             // on the top side, because it is not reachable.
-            for (Int32 y = 0; y < mMapHeight; y++)
+            for (Int32 y = 0; y < mMapInfo.mMapHeight; y++)
             {
-                for (Int32 x = 0; x < mMapWidth; x++)
+                for (Int32 x = 0; x < mMapInfo.mMapWidth; x++)
                 {
                     if ((mCollisionGrid[x, y].mType & Level.Tile.TileTypes.Solid) == Tile.TileTypes.Solid)
                     {
                         if (y == 0 || (mCollisionGrid[x, y - 1].mType & Level.Tile.TileTypes.Solid) != Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Top;
-                        if (x == mMapWidth - 1 || (mCollisionGrid[x + 1, y].mType & Level.Tile.TileTypes.Solid) != Tile.TileTypes.Solid)
+                        if (x == mMapInfo.mMapWidth - 1 || (mCollisionGrid[x + 1, y].mType & Level.Tile.TileTypes.Solid) != Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Right;
-                        if (y == mMapHeight - 1 || (mCollisionGrid[x, y + 1].mType & Level.Tile.TileTypes.Solid) != Tile.TileTypes.Solid)
+                        if (y == mMapInfo.mMapHeight - 1 || (mCollisionGrid[x, y + 1].mType & Level.Tile.TileTypes.Solid) != Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Bottom;
                         if (x == 0 || (mCollisionGrid[x - 1, y].mType & Level.Tile.TileTypes.Solid) != Tile.TileTypes.Solid)
                             mCollisionGrid[x, y].mActiveWalls |= Tile.WallTypes.Left;
@@ -351,7 +376,7 @@ namespace MBHEngine.Behaviour
             mCollisionRectMovement = new LineSegment();
 
             // Load an image to use for rendering the level.
-            mTileMap = GameObjectManager.pInstance.pContentManager.Load<Texture2D>
+            mMapInfo.mTileMap = GameObjectManager.pInstance.pContentManager.Load<Texture2D>
                 (def.mTileMapImageName);
 
             base.LoadContent(fileName);
@@ -471,10 +496,10 @@ namespace MBHEngine.Behaviour
             // of the tile.
             //
             MBHEngine.Math.Rectangle view = CameraManager.pInstance.pViewRect;
-            Int32 startX = (Int32)MathHelper.Max((Int32)view.pLeft / mTileWidth, 0);
-            Int32 endX = (Int32)MathHelper.Min((Int32)view.pRight / mTileWidth + 1, mMapWidth); 
-            Int32 startY = (Int32)MathHelper.Max((Int32)view.pTop / mTileHeight, 0);
-            Int32 endY = (Int32)MathHelper.Min((Int32)view.pBottom / mTileHeight + 1, mMapHeight);
+            Int32 startX = (Int32)MathHelper.Max((Int32)view.pLeft / mMapInfo.mTileWidth, 0);
+            Int32 endX = (Int32)MathHelper.Min((Int32)view.pRight / mMapInfo.mTileWidth + 1, mMapInfo.mMapWidth);
+            Int32 startY = (Int32)MathHelper.Max((Int32)view.pTop / mMapInfo.mTileHeight, 0);
+            Int32 endY = (Int32)MathHelper.Min((Int32)view.pBottom / mMapInfo.mTileHeight + 1, mMapInfo.mMapHeight);
 
             // Loop through every tile on screen.
             for (Int32 y = startY; y < endY; y++)
@@ -499,37 +524,37 @@ namespace MBHEngine.Behaviour
 
                         // Render the tile image.
                         batch.Draw(
-                            mTileMap,
+                            mMapInfo.mTileMap,
                             new Microsoft.Xna.Framework.Rectangle(
-                                x * mTileWidth, y * mTileHeight, mTileWidth, mTileHeight),
+                                x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
                             new Microsoft.Xna.Framework.Rectangle(
-                                mCollisionGrid[x, y].mImageIndex * mTileWidth, 0, mTileWidth, mTileHeight),
+                                mCollisionGrid[x, y].mImageIndex * mMapInfo.mTileWidth, 0, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
                             Color.White);
 
                         // Draw the walls that have been determined to require collision checks.
                         //
                         if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Top) != Tile.WallTypes.None)
                         {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mTileWidth, y * mTileHeight),
-                                                                   new Vector2(x * mTileWidth + mTileWidth, y * mTileHeight),
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
                                                                    Color.Red);
                         }
                         if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Right) != Tile.WallTypes.None)
                         {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mTileWidth + mTileWidth, y * mTileHeight),
-                                                                   new Vector2(x * mTileWidth + mTileWidth, y * mTileHeight + mTileHeight),
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
                                                                    Color.Red);
                         }
                         if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Bottom) != Tile.WallTypes.None)
                         {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mTileWidth, y * mTileHeight + mTileHeight),
-                                                                   new Vector2(x * mTileWidth + mTileWidth, y * mTileHeight + mTileHeight),
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
                                                                    Color.Red);
                         }
                         if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Left) != Tile.WallTypes.None)
                         {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mTileWidth, y * mTileHeight),
-                                                                   new Vector2(x * mTileWidth, y * mTileHeight + mTileHeight),
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
                                                                    Color.Red);
                         }
                     }
@@ -537,11 +562,11 @@ namespace MBHEngine.Behaviour
                     {
                         // Render the empty tile.
                         batch.Draw(
-                            mTileMap,
+                            mMapInfo.mTileMap,
                             new Microsoft.Xna.Framework.Rectangle(
-                                x * mTileWidth, y * mTileHeight, mTileWidth, mTileHeight),
+                                x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
                             new Microsoft.Xna.Framework.Rectangle(
-                                mCollisionGrid[x, y].mImageIndex * mTileWidth, 0, mTileWidth, mTileHeight),
+                                mCollisionGrid[x, y].mImageIndex * mMapInfo.mTileWidth, 0, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
                             Color.White);
                     }
                 }
@@ -577,9 +602,9 @@ namespace MBHEngine.Behaviour
 
                 msg = temp;
             }
-            else if (msg is SetTileTypeAtPosition)
+            else if (msg is SetTileTypeAtPositionMessage)
             {
-                SetTileTypeAtPosition temp = (SetTileTypeAtPosition)msg;
+                SetTileTypeAtPositionMessage temp = (SetTileTypeAtPositionMessage)msg;
 
                 Tile t = GetTileAtPosition(temp.mPosition.X, temp.mPosition.Y);
 
@@ -591,6 +616,14 @@ namespace MBHEngine.Behaviour
 
                     UpdateEdgeCollisionData(t);
                 }
+            }
+            else if (msg is GetMapInfoMessage)
+            {
+                GetMapInfoMessage temp = (GetMapInfoMessage)msg;
+
+                temp.mInfo = mMapInfo;
+
+                msg = temp;
             }
         }
 
@@ -604,10 +637,10 @@ namespace MBHEngine.Behaviour
         {
             // We assume that the x and y are at the center point of the object so don't round these numbers
             // just truncate them down.
-            Int32 xIndex = (Int32)(x / mTileWidth);
-            Int32 yIndex = (Int32)(y / mTileHeight);
+            Int32 xIndex = (Int32)(x / mMapInfo.mTileWidth);
+            Int32 yIndex = (Int32)(y / mMapInfo.mTileHeight);
 
-            if (xIndex < 0 || xIndex >= mMapWidth || yIndex < 0 || yIndex >= mMapHeight)
+            if (xIndex < 0 || xIndex >= mMapInfo.mMapWidth || yIndex < 0 || yIndex >= mMapInfo.mMapHeight)
             {
                 return null;
             }
@@ -651,16 +684,16 @@ namespace MBHEngine.Behaviour
             // based on the fact that the tiles can be mapped from their x,y position to their index
             // into the array.
             Int32 checkRange = 5;
-            Single x2 = (endRect.pCenterPoint.X / mTileWidth) - ((Single)checkRange * 0.5f);
+            Single x2 = (endRect.pCenterPoint.X / mMapInfo.mTileWidth) - ((Single)checkRange * 0.5f);
             Int32 startX = System.Math.Max((Int32)System.Math.Round(x2), 0);
 
-            Single y2 = (endRect.pCenterPoint.Y / mTileHeight) - ((Single)checkRange * 0.5f);
+            Single y2 = (endRect.pCenterPoint.Y / mMapInfo.mTileHeight) - ((Single)checkRange * 0.5f);
             Int32 startY = System.Math.Max((Int32)System.Math.Round(y2), 0);
 
             // Loop through every time checking for collisions.
-            for (Int32 y = startY; y < mMapHeight && y < startY + checkRange; y++)
+            for (Int32 y = startY; y < mMapInfo.mMapHeight && y < startY + checkRange; y++)
             {
-                for (Int32 x = startX; x < mMapWidth && x < startX + checkRange; x++)
+                for (Int32 x = startX; x < mMapInfo.mMapWidth && x < startX + checkRange; x++)
                 {
 
                     // Is this tile solid and does it have any active walls?
@@ -672,7 +705,7 @@ namespace MBHEngine.Behaviour
                         mCollisionGrid[x, y].mType |= Level.Tile.TileTypes.CollisionChecked;
 
                         // Calculate the center point of the tile.
-                        Vector2 cent = new Vector2((x * mTileWidth) + (mTileWidth * 0.5f), (y * mTileHeight) + (mTileHeight * 0.5f));
+                        Vector2 cent = new Vector2((x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f), (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f));
 
                         // Create a rectangle to represent the tile.
                         //MBHEngine.Math.Rectangle tileRect = new MBHEngine.Math.Rectangle(mTileWidth, mTileHeight, cent);
@@ -702,7 +735,7 @@ namespace MBHEngine.Behaviour
                                     DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
                                     // We have collide along the x axis.
                                     collideX = true;
-                                    collidePointX = x * mTileWidth;
+                                    collidePointX = x * mMapInfo.mTileWidth;
                                 }
                             }
                             // If we are moving left, and we hit a tile with a right wall...
@@ -722,7 +755,7 @@ namespace MBHEngine.Behaviour
                                     DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
                                     // We have collide along the x axis.
                                     collideX = true;
-                                    collidePointX = x * mTileWidth + mTileWidth;
+                                    collidePointX = x * mMapInfo.mTileWidth + mMapInfo.mTileWidth;
                                 }
                             }
                             if (dir.Y > 0 &&
@@ -741,7 +774,7 @@ namespace MBHEngine.Behaviour
                                     DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
                                     // We have collide along the y axis.
                                     collideY = true;
-                                    collidePointY = y * mTileHeight;
+                                    collidePointY = y * mMapInfo.mTileHeight;
                                 }
                             }
                             else if (dir.Y < 0 &&
@@ -760,7 +793,7 @@ namespace MBHEngine.Behaviour
                                     DebugShapeDisplay.pInstance.AddPoint(intersect, 1, Color.Orange);
                                     // We have collide along the y axis.
                                     collideY = true;
-                                    collidePointY = y * mTileHeight + mTileHeight;
+                                    collidePointY = y * mMapInfo.mTileHeight + mMapInfo.mTileHeight;
                                 }
                             }
 

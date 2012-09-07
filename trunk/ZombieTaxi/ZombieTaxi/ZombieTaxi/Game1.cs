@@ -205,7 +205,7 @@ namespace ZombieTaxi
                 mDebugDrawEnabled ^= true;
             }
 
-#if DEBUG
+#if DEBUG && false // Temporarily disable this feature while working on tile placement mode.
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_RIGHT, true))
             {
                 mFrameSkip = Math.Max(mFrameSkip - 1, 0);

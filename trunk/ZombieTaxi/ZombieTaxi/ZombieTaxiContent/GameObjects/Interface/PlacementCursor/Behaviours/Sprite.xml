@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\Interface\PlacementCursor</mSpriteFileName>
+    <mFrameHeight>16</mFrameHeight>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>15</mTicksPerFrame>
+        <mName>Idle</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+

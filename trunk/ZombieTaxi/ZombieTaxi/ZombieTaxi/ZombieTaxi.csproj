@@ -140,6 +140,7 @@
     <Compile Include="Code\Behaviours\InfiniteBG.cs" />
     <Compile Include="Code\Behaviours\Inventory.cs" />
     <Compile Include="Code\Behaviours\Kamikaze.cs" />
+    <Compile Include="Code\Behaviours\ObjectPlacement.cs" />
     <Compile Include="Code\Behaviours\Pickup.cs" />
     <Compile Include="Code\Behaviours\PlayerHealthBar.cs" />
     <Compile Include="Code\Behaviours\Projectile.cs" />

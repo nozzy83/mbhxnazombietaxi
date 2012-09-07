@@ -21,6 +21,7 @@
       <Item>PathFind</Item>
       <Item>DamageFlash</Item>
       <Item>Inventory</Item>
+      <Item>ObjectPlacement</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
@@ -30,6 +31,7 @@
       <Item>MBHEngine.Code.Behaviour.PathFind</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>ZombieTaxi.Behaviours.Inventory</Item>
+      <Item>ZombieTaxi.Behaviours.ObjectPlacement</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
