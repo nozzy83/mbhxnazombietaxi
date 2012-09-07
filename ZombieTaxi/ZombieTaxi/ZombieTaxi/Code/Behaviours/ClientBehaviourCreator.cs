@@ -80,6 +80,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new Pickup(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.ObjectPlacement":
+                    {
+                        return new ObjectPlacement(go, fileName);
+                    }
                 default:
                     {
                         return null;

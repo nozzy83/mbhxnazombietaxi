@@ -292,31 +292,9 @@ namespace ZombieTaxi.Behaviours
                 go.OnMessage(mSetExtractionPointActivateMsg);
             }
 
-            if (InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
-            {
-                Level.SetTileTypeAtPosition mSetTileTypeAtPositionMsg = new Level.SetTileTypeAtPosition();
-                mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Solid;
-                mSetTileTypeAtPositionMsg.mPosition = mParentGOH.pOrientation.mPosition;
-                MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
-            }
-            if (InputManager.pInstance.CheckAction(InputManager.InputActions.Y, true))
-            {
-                Level.SetTileTypeAtPosition mSetTileTypeAtPositionMsg = new Level.SetTileTypeAtPosition();
-                mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Empty;
-                mSetTileTypeAtPositionMsg.mPosition = mParentGOH.pOrientation.mPosition;
-                mSetTileTypeAtPositionMsg.mPosition.Y += 4;
-                MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
-            }
-
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pOrientation.mPosition);
 #endif
-            // DEBUG TESTING
-            //
-            if (InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
-            {
-                mParentGOH.OnMessage(new Health.OnApplyDamage(113));
-            }
             
             CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
         }
