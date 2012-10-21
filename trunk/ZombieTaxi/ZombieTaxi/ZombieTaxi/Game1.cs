@@ -203,6 +203,10 @@ namespace ZombieTaxi
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.L3, true))
             {
                 mDebugDrawEnabled ^= true;
+
+                // When debug draw is enabled, turn on the hardware mouse so that things like the
+                // GameObjectPicker work better.
+                IsMouseVisible = mDebugDrawEnabled;
             }
 
 #if DEBUG && false // Temporarily disable this feature while working on tile placement mode.
@@ -236,6 +240,7 @@ namespace ZombieTaxi
             {
                 mFameSkipCount++; 
             }
+            GameObjectPicker.pInstance.Update(gameTime);
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
 #if DEBUG

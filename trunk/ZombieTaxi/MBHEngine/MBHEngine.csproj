@@ -131,6 +131,7 @@
     <Compile Include="Code\GameObject\GameObject.cs" />
     <Compile Include="Code\GameObject\GameObjectFactory.cs" />
     <Compile Include="Code\GameObject\GameObjectManager.cs" />
+    <Compile Include="Code\GameObject\GameObjectPicker.cs" />
     <Compile Include="Code\Input\InputManager.cs" />
     <Compile Include="Code\IO\CommandLineManager.cs" />
     <Compile Include="Code\IO\DatabaseManager.cs" />

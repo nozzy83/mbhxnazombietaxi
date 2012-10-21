@@ -169,10 +169,10 @@ namespace ZombieTaxi.Behaviours
             }
 
 #if ALLOW_GARBAGE
-            Single deg = MathHelper.ToDegrees((Single)angle);
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Angle: " + deg);
-            DebugMessageDisplay.pInstance.AddDynamicMessage("X: " + g.ThumbSticks.Right.X);
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Y: " + g.ThumbSticks.Right.Y);
+            //Single deg = MathHelper.ToDegrees((Single)angle);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("Angle: " + deg);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("X: " + g.ThumbSticks.Right.X);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("Y: " + g.ThumbSticks.Right.Y);
 #endif // ALLOW_GARBAGE
 
             // Determine the direction that right analog stick is pointing (if any).

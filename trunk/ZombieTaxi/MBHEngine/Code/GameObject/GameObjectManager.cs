@@ -475,6 +475,22 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// Populates a list of all the objects within a certain range of a position.
+        /// </summary>
+        /// <param name="rect">A collision rectangle to check against.</param>
+        /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.</param>
+        public void GetGameObjectsInRange(Math.Rectangle rect, ref List<GameObject> refObjects)
+        {
+            for (int i = 0; i < mGameObjects.Count; i++)
+            {
+                if (rect.Intersects(mGameObjects[i].pCollisionRect))
+                {
+                    refObjects.Add(mGameObjects[i]);
+                }
+            }
+        }
+
+        /// <summary>
         /// Populates a list of all the objects that overlap the source gameobject.
         /// </summary>
         /// <param name="source">The object to test all other game objects against.</param>
