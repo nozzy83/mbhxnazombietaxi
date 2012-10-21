@@ -144,6 +144,11 @@ namespace MBHEngine.GameObject
         private Vector2 mMotionRoot;
 
         /// <summary>
+        /// The name of the template file defining this object.
+        /// </summary>
+        private String mTemplateFileName;
+
+        /// <summary>
         /// Default Constructor.  Does nothing but needed to be overwritten so that
         /// we can create an OPTIONAL version which takes a parameter.
         /// </summary>
@@ -173,6 +178,8 @@ namespace MBHEngine.GameObject
             mFactoryInfo = new GameObjectFactory.FactoryInfo();
             mClassifications = new List<GameObjectDefinition.Classifications>();
             mCollisionRectangle = new Math.Rectangle();
+
+            mTemplateFileName = fileName;
 
             if (null != fileName)
             {
@@ -401,6 +408,29 @@ namespace MBHEngine.GameObject
             }
         }
 
+#if ALLOW_GARBAGE
+        /// <summary>
+        /// Returns a bunch of information about the GameObject which can be dumped to
+        /// a debug display for debugging at runtime.
+        /// </summary>
+        /// <returns>A formatted string of debug information.</returns>
+        public virtual String GetDebugInfo()
+        {
+            String info = "";
+
+            info += "Template: " + mTemplateFileName;
+            info += "\n";
+
+            info += "ID: " + mID;
+            info += "\n";
+
+            info += "Managed: " + pFactoryInfo.pIsManaged;
+            //info += "\n";
+
+            return info;
+        }
+#endif // ALLOW_GARBAGE
+
         /// <summary>
         /// The game object factory will call this for each Game Object it creates so that it can
         /// later be return to the factory.
@@ -552,6 +582,17 @@ namespace MBHEngine.GameObject
             get
             {
                 return mID;
+            }
+        }
+
+        /// <summary>
+        /// A list of all behaviours attached to this GameObject.
+        /// </summary>
+        public List<Behaviour.Behaviour> pBehaviours
+        {
+            get
+            {
+                return mBehaviours;
             }
         }
     }

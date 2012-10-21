@@ -131,6 +131,11 @@ namespace MBHEngine.Behaviour
         private Texture2D mTexture;
 
         /// <summary>
+        /// The name of the texture file used by this sprite.
+        /// </summary>
+        private String mSpriteFileName;
+
+        /// <summary>
         /// Describes some simple effects that can be applied to the sprite, such as flipping.
         /// </summary>
         private SpriteEffects mSpriteEffects;
@@ -208,7 +213,8 @@ namespace MBHEngine.Behaviour
 
             SpriteRenderDefinition def = GameObjectManager.pInstance.pContentManager.Load<SpriteRenderDefinition>(fileName);
 
-            mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
+            mSpriteFileName = def.mSpriteFileName;
+            mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(mSpriteFileName);
             mAttachmentPoints = new Dictionary<string, Vector2>();
             if (def.mAttachmentPoints != null)
             {
@@ -512,6 +518,18 @@ namespace MBHEngine.Behaviour
                 mColor = temp.mColor;
             }
         }
+
+#if ALLOW_GARBAGE
+        /// <summary>
+        /// Returns a bunch of information about the behaviour which can be dumped to
+        /// a debug display for debugging at runtime.
+        /// </summary>
+        /// <returns>A formatted string of debug information.</returns>
+        public override String GetDebugInfo()
+        {
+            return "File: " + mSpriteFileName + "\nAnimated: " + mIsAnimated;
+        }
+#endif // ALLOW_GARBAGE
 
         /// <summary>
         /// The currently playing animation.  See XML for this sprite for corisponding names.
