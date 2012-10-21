@@ -148,7 +148,7 @@ namespace MBHEngine.Debug
         /// <param name="spriteBatch">The sprite batch to render to.</param>
         public void Render(SpriteBatch spriteBatch)
         {
-#if DEBUG
+#if ALLOW_GARBAGE
             RenderDynamicMsgs(spriteBatch);
 
             // Draw the constant messages

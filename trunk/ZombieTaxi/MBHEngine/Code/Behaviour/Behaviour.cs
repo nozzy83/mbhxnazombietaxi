@@ -90,6 +90,18 @@ namespace MBHEngine.Behaviour
         {
         }
 
+#if ALLOW_GARBAGE
+        /// <summary>
+        /// Returns a bunch of information about the behaviour which can be dumped to
+        /// a debug display for debugging at runtime.
+        /// </summary>
+        /// <returns>A formatted string of debug information.</returns>
+        public virtual String GetDebugInfo()
+        {
+            return null;
+        }
+#endif // ALLOW_GARBAGE
+
         /// <summary>
         /// Resets a behaviour to its initial state.
         /// </summary>

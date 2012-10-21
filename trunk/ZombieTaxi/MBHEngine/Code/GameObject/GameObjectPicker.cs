@@ -32,7 +32,14 @@ namespace MBHEngine.GameObject
         /// Preallocated list used for getting a list of all the objects we are pointing
         /// at in a givent frame.
         /// </summary>
-        List<GameObject> refObjects = new List<GameObject>();
+        private List<GameObject> mCollidedObjects = new List<GameObject>();
+
+        /// <summary>
+        /// We need to track the previous mouse state so that we don't get repeating
+        /// press events.
+        /// </summary>
+        /// <remarks>This should be moved into InputManager.</remarks>
+        private MouseState mPreviousMouseState = Mouse.GetState();
 
         /// <summary>
         /// Must be called once every update to check which objects are being picked.
@@ -51,31 +58,51 @@ namespace MBHEngine.GameObject
             rect.pCenterPoint = proj;
 
             // Clear any objects that might still be stored from the previous frame.
-            refObjects.Clear();
+            mCollidedObjects.Clear();
 
             // Check if any objects are colliding with the mouse.
-            GameObjectManager.pInstance.GetGameObjectsInRange(rect, ref refObjects);
+            GameObjectManager.pInstance.GetGameObjectsInRange(rect, ref mCollidedObjects);
 
             // Temp storing which object the mouse is currently over top of (if any).
             GameObject mousedObject = null;
 
+            // Only count mouse clicks that happen after the button was previously released.
+            Boolean clickChanged = (mPreviousMouseState.LeftButton != ms.LeftButton);
+
             // Did the mouse actually collide with any objects?
-            if (refObjects.Count > 0)
+            if (mCollidedObjects.Count > 0)
             {
                 // We just use index 0 for now. Eventually we might need to determine some sort
                 // of sorting order, perhaps based on rect size, or render order.
-                mousedObject = refObjects[0];
+                mousedObject = mCollidedObjects[0];
 
                 // If while hovering over an object, the user presses the mouse button, that object
                 // not becomes the new "selected" object.
-                if (ms.LeftButton == ButtonState.Pressed)
+                if (ms.LeftButton == ButtonState.Pressed && clickChanged)
                 {
-                    mSelectedGameObject = mousedObject;
-                }            
+                    if (mousedObject != mSelectedGameObject)
+                    {
+                        mSelectedGameObject = mousedObject;
+                    }
+                    else
+                    {
+                        // If they click the same object which is already selected, consider that an
+                        // attempt to unselect the GameObject.
+                        mSelectedGameObject = null;
+                    }
+                }
+            }
+            else
+            {
+                // If the user clicks while not over any GameObject, unselect the currently selected.
+                if (ms.LeftButton == ButtonState.Pressed && clickChanged)
+                {
+                    mSelectedGameObject = null;
+                }
             }
 
 #if ALLOW_GARBAGE
-            // Display some information about the selected object and the object we are hovering over.
+            // Display some information about the object we are hovering over.
             //
             if (null != mousedObject)
             {
@@ -86,16 +113,43 @@ namespace MBHEngine.GameObject
             {
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Picked GO (over): --");
             }
+
+            // The Behaviour and GameObject classes expose a bunch of debug information through the GetDebugInfo
+            // functions. If there is an object currently selected, we want to get that info about the selected
+            // object and print it on screen for real-time debugging.
             if (null != mSelectedGameObject)
             {
-                DebugMessageDisplay.pInstance.AddDynamicMessage("Picked GO (selected): " + mSelectedGameObject.pID);
+                // So the user knows what is going on, highlight the object.
                 DebugShapeDisplay.pInstance.AddAABB(mSelectedGameObject.pCollisionRect, Color.Red);
+
+                // The the GameObject debug info. Every GameObject has this.
+                String goInfo = mSelectedGameObject.GetDebugInfo();
+
+                // Print the class name and the info.
+                DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + mSelectedGameObject.GetType().ToString() + "::.");
+                DebugMessageDisplay.pInstance.AddDynamicMessage(goInfo);
+
+                // Loop through every Behaviour attached to this GameObject and call the corisponding 
+                // GetDebugInfo functions.
+                for (int i = 0; i < mSelectedGameObject.pBehaviours.Count; i++)
+                {
+                    Behaviour.Behaviour b = mSelectedGameObject.pBehaviours[i];
+
+                    String dbgInfo = b.GetDebugInfo();
+
+                    // Not every Behaviour overrides the GetDebugInfo function. In those cases the 
+                    // default implementation will return null.
+                    if (null != dbgInfo)
+                    {
+                        DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + b.GetType().ToString() + "::.");
+                        DebugMessageDisplay.pInstance.AddDynamicMessage(dbgInfo);
+                    }
+                }
             }
-            else
-            {
-                DebugMessageDisplay.pInstance.AddDynamicMessage("Picked GO (selected): --");
-            }
-#endif // ALLOW_GARBAGE    
+#endif // ALLOW_GARBAGE
+
+            // Update the previous state with the current state.
+            mPreviousMouseState = Mouse.GetState();
         }
 
         /// <summary>
