@@ -143,6 +143,22 @@ namespace MBHEngine.Render
         }
 
         /// <summary>
+        /// Takes a 2D mouse position and transforms it into a 2D world position.
+        /// </summary>
+        /// <param name="mouse">The x, y of the mouse in screen space.</param>
+        /// <returns>The mouse position converted into 2D world space.</returns>
+        public Vector2 ProjectMouseToWorldSpace(Vector2 mouse)
+        {
+            // http://gamedev.stackexchange.com/questions/25692/picking-2d-objects-after-transforming-camera-in-xna
+            //
+
+            Matrix inverseViewMatrix = Matrix.Invert(pFinalTransform);
+            Vector2 worldMousePosition = Vector2.Transform(mouse, inverseViewMatrix);
+
+            return worldMousePosition;
+        }
+
+        /// <summary>
         /// Access to the single instance of the class.
         /// </summary>
         public static CameraManager pInstance
