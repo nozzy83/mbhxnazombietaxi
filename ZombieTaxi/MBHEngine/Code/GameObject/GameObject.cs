@@ -414,18 +414,20 @@ namespace MBHEngine.GameObject
         /// a debug display for debugging at runtime.
         /// </summary>
         /// <returns>A formatted string of debug information.</returns>
-        public virtual String GetDebugInfo()
+        public virtual String [] GetDebugInfo()
         {
-            String info = "";
+            String [] info = new String[3];
 
-            info += "Template: " + mTemplateFileName;
-            info += "\n";
+            Int32 i = 0;
 
-            info += "ID: " + mID;
-            info += "\n";
+            info[i] = "Template: " + mTemplateFileName;
+            i++;
 
-            info += "Managed: " + pFactoryInfo.pIsManaged;
-            //info += "\n";
+            info[i] = "ID: " + mID;
+            i++;
+
+            info[i] = "Managed: " + pFactoryInfo.pIsManaged;
+            i++;
 
             return info;
         }

@@ -525,9 +525,13 @@ namespace MBHEngine.Behaviour
         /// a debug display for debugging at runtime.
         /// </summary>
         /// <returns>A formatted string of debug information.</returns>
-        public override String GetDebugInfo()
+        public override String [] GetDebugInfo()
         {
-            return "File: " + mSpriteFileName + "\nAnimated: " + mIsAnimated;
+            String [] temp = new String[2];
+
+            temp[0] = "File: " + mSpriteFileName;
+            temp[1] = "Animated: " + mIsAnimated;
+            return temp;
         }
 #endif // ALLOW_GARBAGE
 
