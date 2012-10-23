@@ -96,7 +96,7 @@ namespace MBHEngine.Behaviour
         /// a debug display for debugging at runtime.
         /// </summary>
         /// <returns>A formatted string of debug information.</returns>
-        public virtual String GetDebugInfo()
+        public virtual String [] GetDebugInfo()
         {
             return null;
         }

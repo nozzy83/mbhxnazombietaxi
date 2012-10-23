@@ -84,13 +84,13 @@ namespace MBHEngine.GameObject
                 {
                     if (mousedObject != mSelectedGameObject)
                     {
-                        DebugMessageDisplay.pInstance.pCurrentLayer = dbgLayer;
+                        DebugMessageDisplay.pInstance.pCurrentTag = dbgLayer;
 
                         mSelectedGameObject = mousedObject;
                     }
                     else
                     {
-                        DebugMessageDisplay.pInstance.pCurrentLayer = null;
+                        DebugMessageDisplay.pInstance.pCurrentTag = null;
 
                         // If they click the same object which is already selected, consider that an
                         // attempt to unselect the GameObject.
@@ -103,7 +103,7 @@ namespace MBHEngine.GameObject
                 // If the user clicks while not over any GameObject, unselect the currently selected.
                 if (ms.LeftButton == ButtonState.Pressed && clickChanged)
                 {
-                    DebugMessageDisplay.pInstance.pCurrentLayer = null;
+                    DebugMessageDisplay.pInstance.pCurrentTag = null;
 
                     mSelectedGameObject = null;
                 }
@@ -131,26 +131,34 @@ namespace MBHEngine.GameObject
                 DebugShapeDisplay.pInstance.AddAABB(mSelectedGameObject.pCollisionRect, Color.Red);
 
                 // The the GameObject debug info. Every GameObject has this.
-                String goInfo = mSelectedGameObject.GetDebugInfo();
+                String [] goInfo = mSelectedGameObject.GetDebugInfo();
 
                 // Print the class name and the info.
-                DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + mSelectedGameObject.GetType().ToString() + "::.", dbgLayer);
-                DebugMessageDisplay.pInstance.AddDynamicMessage(goInfo, dbgLayer);
+                DebugMessageDisplay.pInstance.AddDynamicMessage(mSelectedGameObject.GetType().ToString(), dbgLayer);
+
+                for (Int32 i = 0; i < goInfo.Length; i++)
+                {
+                    DebugMessageDisplay.pInstance.AddDynamicMessage(" - " + goInfo[i], dbgLayer);
+                }
 
                 // Loop through every Behaviour attached to this GameObject and call the corisponding 
                 // GetDebugInfo functions.
-                for (int i = 0; i < mSelectedGameObject.pBehaviours.Count; i++)
+                for (Int32 i = 0; i < mSelectedGameObject.pBehaviours.Count; i++)
                 {
                     Behaviour.Behaviour b = mSelectedGameObject.pBehaviours[i];
 
-                    String dbgInfo = b.GetDebugInfo();
+                    String [] dbgInfo = b.GetDebugInfo();
 
                     // Not every Behaviour overrides the GetDebugInfo function. In those cases the 
                     // default implementation will return null.
                     if (null != dbgInfo)
                     {
-                        DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + b.GetType().ToString() + "::.", dbgLayer);
-                        DebugMessageDisplay.pInstance.AddDynamicMessage(dbgInfo, dbgLayer);
+                        DebugMessageDisplay.pInstance.AddDynamicMessage(b.GetType().ToString(), dbgLayer);
+
+                        for (Int32 j = 0; j < dbgInfo.Length; j++)
+                        {
+                            DebugMessageDisplay.pInstance.AddDynamicMessage(" - " + dbgInfo[j], dbgLayer);
+                        }
                     }
                 }
             }

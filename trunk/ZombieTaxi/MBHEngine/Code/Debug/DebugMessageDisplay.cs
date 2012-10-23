@@ -20,19 +20,35 @@ namespace MBHEngine.Debug
     public class DebugMessageDisplay
     {
         /// <summary>
+        /// Class used to wrap a single debug message and its associated information.
+        /// </summary>
+        private class DebugMessage
+        {
+            /// <summary>
+            /// The message to display.
+            /// </summary>
+            public String mMessage = null;
+
+            /// <summary>
+            /// The tag used to filter this message.
+            /// </summary>
+            public String mTag = null;
+        };
+
+        /// <summary>
         /// The static instance of this class, making this a singleton.
         /// </summary>
         static private DebugMessageDisplay mInstance = null;
 
         /// <summary>
-        /// This string will store our messages that are only shown for one frame.
+        /// This array will store our messages that are only shown for one frame.
         /// </summary>
-        private String mDynamicMsgs;
+        private List<DebugMessage> mDynamicMsgs;
 
         /// <summary>
         /// This array will store the constant strings.
         /// </summary>
-        private String[] mConstantMsgs;
+        private DebugMessage[] mConstantMsgs;
 
         /// <summary>
         /// This is how many constant strings we are going to store.
@@ -70,7 +86,12 @@ namespace MBHEngine.Debug
         /// <summary>
         /// The name of the layer currently being shown.
         /// </summary>
-        private String mCurrentLayer;
+        private String mCurrentTag;
+
+        /// <summary>
+        /// The message that appears at the top of the debug display.
+        /// </summary>
+        private DebugMessage mDefaultHeader;
 
         /// <summary>
         /// Constructor.
@@ -80,22 +101,27 @@ namespace MBHEngine.Debug
             // Create the font
             mFont = GameObjectManager.pInstance.pContentManager.Load<SpriteFont>("Fonts\\DebugDisplay");
 
-            // Start with an empty string
-            mDynamicMsgs = "Debug Information:";
+            mDynamicMsgs = new List<DebugMessage>(32);
+
+            mDefaultHeader = new DebugMessage();
+            mDefaultHeader.mMessage = "Debug Information:";
+            mDynamicMsgs.Add(mDefaultHeader);
 
             // Allocate our constant string
-            mConstantMsgs = new String[mMaxConstMsgs];
+            mConstantMsgs = new DebugMessage[mMaxConstMsgs];
 
             // Clear all the messages.
             for (int i = 0; i < mMaxConstMsgs; i++)
             {
-                mConstantMsgs[i] = "";
+                DebugMessage temp = new DebugMessage();
+                temp.mMessage = "";
+                mConstantMsgs[i] = temp;
             }
 
             mTextShadowColor = Color.Black;
             mTextColor = Color.White;
 
-            mCurrentLayer = null;
+            mCurrentTag = null;
         }
 
         /// <summary>
@@ -104,10 +130,23 @@ namespace MBHEngine.Debug
         /// <param name="spriteBatch">Sprite batch used for rendering.</param>
         private void RenderDynamicMsgs(SpriteBatch spriteBatch)
         {
-            // The dynamic message is just stored as a long single string, so we only need one
-            // draw call (as well as a copy for the drop shadow).
-            spriteBatch.DrawString(mFont, mDynamicMsgs, new Vector2(1 + safeZoneOffsetX, 1 + safeZoneOffsetY), mTextShadowColor);
-            spriteBatch.DrawString(mFont, mDynamicMsgs, new Vector2(0 + safeZoneOffsetX, 0 + safeZoneOffsetY), mTextColor);
+            Int32 spacing = mFont.LineSpacing;
+
+            Int32 count = 0;
+
+            for (Int16 i = 0; i < mDynamicMsgs.Count; i++)
+            {
+                if (null != mDynamicMsgs[i].mMessage && mCurrentTag == mDynamicMsgs[i].mTag)
+                {
+                    Single Y = (spacing * count) + safeZoneOffsetY;
+                    count++;
+
+                    // The dynamic message is just stored as a long single string, so we only need one
+                    // draw call (as well as a copy for the drop shadow).
+                    spriteBatch.DrawString(mFont, mDynamicMsgs[i].mMessage, new Vector2(1 + safeZoneOffsetX, 1 + Y), mTextShadowColor);
+                    spriteBatch.DrawString(mFont, mDynamicMsgs[i].mMessage, new Vector2(0 + safeZoneOffsetX, 0 + Y), mTextColor);
+                }
+            }
         }
 
         /// <summary>
@@ -123,7 +162,7 @@ namespace MBHEngine.Debug
             // Loop through all the messages
             for (int i = 0; i < mMaxConstMsgs; i++)
             {
-                if (mConstantMsgs[i] != "")
+                if (mConstantMsgs[i].mMessage != null)
                 {
                     // Get the bottom of the window.
                     int bottom = GameObjectManager.pInstance.pGraphicsDevice.Viewport.Height;
@@ -137,8 +176,8 @@ namespace MBHEngine.Debug
                     bottom -= i * 15;
 
                     // Draw the message at the bottom of the screen.
-                    spriteBatch.DrawString(mFont, mConstantMsgs[i], new Vector2(1 + safeZoneOffsetX, bottom + 1 - safeZoneOffsetY), mTextShadowColor * alphaCur);
-                    spriteBatch.DrawString(mFont, mConstantMsgs[i], new Vector2(0 + safeZoneOffsetX, bottom - safeZoneOffsetY), mTextColor * alphaCur);
+                    spriteBatch.DrawString(mFont, mConstantMsgs[i].mMessage, new Vector2(1 + safeZoneOffsetX, bottom + 1 - safeZoneOffsetY), mTextShadowColor * alphaCur);
+                    spriteBatch.DrawString(mFont, mConstantMsgs[i].mMessage, new Vector2(0 + safeZoneOffsetX, bottom - safeZoneOffsetY), mTextColor * alphaCur);
 
                     // Make it so the next message is a little less visable
                     alphaCur -= alphaDec;
@@ -171,7 +210,10 @@ namespace MBHEngine.Debug
         public void ClearDynamicMessages()
         {
             // When we finish rendering we want to clear the dynamic messages
-            mDynamicMsgs = "Debug Information:";
+            mDynamicMsgs.Clear();
+
+            // Add the default header back to the top.
+            mDynamicMsgs.Add(mDefaultHeader);
         }
 
         
@@ -182,13 +224,15 @@ namespace MBHEngine.Debug
         /// such as a frame rate counter.
         /// </summary>
         /// <param name="newMsg">The message to display.</param>
-        public void AddDynamicMessage(String newMsg, String layer = null)
+        public void AddDynamicMessage(String newMsg, String tag = null)
         {
-            if (layer == mCurrentLayer)
-            {
-                // Add the new message to the current one
-                mDynamicMsgs += "\n" + newMsg;
-            }
+            // TODO: This should probably just keep reusing the same entries rather than reallocating
+            //       every time. Not too worries since this is all wrapped in ALLOW_GARBAGE.
+            DebugMessage d = new DebugMessage();
+            d.mMessage = newMsg;
+            d.mTag = tag;
+
+            mDynamicMsgs.Add(d);
         }
 #endif
 
@@ -205,12 +249,15 @@ namespace MBHEngine.Debug
             for (int i = mMaxConstMsgs - 1; i > 0; i--)
             {
                 // Copy the message below into the message above
-                mConstantMsgs[i] = mConstantMsgs[i - 1];
+                mConstantMsgs[i].mMessage = mConstantMsgs[i - 1].mMessage;
+                mConstantMsgs[i].mTag = mConstantMsgs[i - 1].mTag;
             }
 
             // And finally copy in the new message
             mCurMsgNum++;
-            mConstantMsgs[0] = mCurMsgNum + ": " + newMsg;
+
+            mConstantMsgs[0].mMessage = mCurMsgNum + ": " + newMsg;
+            mConstantMsgs[0].mTag = null;
         }
 #endif
 
@@ -238,16 +285,16 @@ namespace MBHEngine.Debug
         /// Sets the current layer of debug being rendered.
         /// Set to null to return to default.
         /// </summary>
-        public String pCurrentLayer
+        public String pCurrentTag
         {
             get
             {
-                return mCurrentLayer;
+                return mCurrentTag;
             }
 
             set
             {
-                mCurrentLayer = value;
+                mCurrentTag = value;
             }
         }
     }
