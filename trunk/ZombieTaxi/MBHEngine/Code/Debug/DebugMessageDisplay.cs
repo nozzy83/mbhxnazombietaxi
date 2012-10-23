@@ -68,6 +68,11 @@ namespace MBHEngine.Debug
         private Color mTextColor;
 
         /// <summary>
+        /// The name of the layer currently being shown.
+        /// </summary>
+        private String mCurrentLayer;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         private DebugMessageDisplay()
@@ -89,6 +94,8 @@ namespace MBHEngine.Debug
 
             mTextShadowColor = Color.Black;
             mTextColor = Color.White;
+
+            mCurrentLayer = null;
         }
 
         /// <summary>
@@ -175,10 +182,13 @@ namespace MBHEngine.Debug
         /// such as a frame rate counter.
         /// </summary>
         /// <param name="newMsg">The message to display.</param>
-        public void AddDynamicMessage(String newMsg)
+        public void AddDynamicMessage(String newMsg, String layer = null)
         {
-            // Add the new message to the current one
-            mDynamicMsgs += "\n" + newMsg;
+            if (layer == mCurrentLayer)
+            {
+                // Add the new message to the current one
+                mDynamicMsgs += "\n" + newMsg;
+            }
         }
 #endif
 
@@ -221,6 +231,23 @@ namespace MBHEngine.Debug
                 // Either way, at this point we should have an instantiated version
                 // if the class.
                 return mInstance;
+            }
+        }
+
+        /// <summary>
+        /// Sets the current layer of debug being rendered.
+        /// Set to null to return to default.
+        /// </summary>
+        public String pCurrentLayer
+        {
+            get
+            {
+                return mCurrentLayer;
+            }
+
+            set
+            {
+                mCurrentLayer = value;
             }
         }
     }
