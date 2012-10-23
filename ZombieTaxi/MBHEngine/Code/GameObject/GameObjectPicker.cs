@@ -69,6 +69,8 @@ namespace MBHEngine.GameObject
             // Only count mouse clicks that happen after the button was previously released.
             Boolean clickChanged = (mPreviousMouseState.LeftButton != ms.LeftButton);
 
+            const String dbgLayer = "GameObjectPicker";
+
             // Did the mouse actually collide with any objects?
             if (mCollidedObjects.Count > 0)
             {
@@ -82,10 +84,14 @@ namespace MBHEngine.GameObject
                 {
                     if (mousedObject != mSelectedGameObject)
                     {
+                        DebugMessageDisplay.pInstance.pCurrentLayer = dbgLayer;
+
                         mSelectedGameObject = mousedObject;
                     }
                     else
                     {
+                        DebugMessageDisplay.pInstance.pCurrentLayer = null;
+
                         // If they click the same object which is already selected, consider that an
                         // attempt to unselect the GameObject.
                         mSelectedGameObject = null;
@@ -97,6 +103,8 @@ namespace MBHEngine.GameObject
                 // If the user clicks while not over any GameObject, unselect the currently selected.
                 if (ms.LeftButton == ButtonState.Pressed && clickChanged)
                 {
+                    DebugMessageDisplay.pInstance.pCurrentLayer = null;
+
                     mSelectedGameObject = null;
                 }
             }
@@ -126,8 +134,8 @@ namespace MBHEngine.GameObject
                 String goInfo = mSelectedGameObject.GetDebugInfo();
 
                 // Print the class name and the info.
-                DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + mSelectedGameObject.GetType().ToString() + "::.");
-                DebugMessageDisplay.pInstance.AddDynamicMessage(goInfo);
+                DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + mSelectedGameObject.GetType().ToString() + "::.", dbgLayer);
+                DebugMessageDisplay.pInstance.AddDynamicMessage(goInfo, dbgLayer);
 
                 // Loop through every Behaviour attached to this GameObject and call the corisponding 
                 // GetDebugInfo functions.
@@ -141,8 +149,8 @@ namespace MBHEngine.GameObject
                     // default implementation will return null.
                     if (null != dbgInfo)
                     {
-                        DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + b.GetType().ToString() + "::.");
-                        DebugMessageDisplay.pInstance.AddDynamicMessage(dbgInfo);
+                        DebugMessageDisplay.pInstance.AddDynamicMessage(".::" + b.GetType().ToString() + "::.", dbgLayer);
+                        DebugMessageDisplay.pInstance.AddDynamicMessage(dbgInfo, dbgLayer);
                     }
                 }
             }
