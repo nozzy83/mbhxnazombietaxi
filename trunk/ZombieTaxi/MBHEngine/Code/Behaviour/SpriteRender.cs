@@ -234,12 +234,12 @@ namespace MBHEngine.Behaviour
             {
                 mIsAnimated = true;
 
-#if DEBUG
                 if (def.mFrameHeight == 0)
                 {
-                    throw new Exception("Sprite has animations but a frame height of 0.  FrameHeight must be > 0.");
+                    System.Diagnostics.Debug.Assert(false, "Sprite has animations but a frame height of 0.  FrameHeight must be > 0.");
+
+                    def.mFrameHeight = 1;
                 }
-#endif
 
                 mFrameHeight = def.mFrameHeight;
 
@@ -471,10 +471,7 @@ namespace MBHEngine.Behaviour
                         }
                     }
 #if DEBUG
-                    if(!animationFound)
-                    {
-                        throw new Exception("Attempting to set unknown Animation: " + temp.mAnimationSetName);
-                    }
+                    System.Diagnostics.Debug.Assert(animationFound, "Attempting to set unknown Animation: " + temp.mAnimationSetName);
 #endif
                 }
                 // In the case where it is a non-looping animation which has completed, we need to reset the 

@@ -53,10 +53,7 @@ namespace MBHEngine.StateMachine
         {
             get
             {
-                if (mParentGOH == null)
-                {
-                    throw new Exception("Attempting to Get parent GOH before it has been set.");
-                }
+                System.Diagnostics.Debug.Assert((mParentGOH != null), "Attempting to Get parent GOH before it has been set.");
 
                 return mParentGOH;
             }

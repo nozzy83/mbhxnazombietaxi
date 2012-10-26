@@ -8,6 +8,7 @@ using MBHEngine.GameObject;
 using MBHEngine.Debug;
 using ZombieTaxiContentDefs;
 using MBHEngine.Math;
+using System.Diagnostics;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -87,12 +88,12 @@ namespace ZombieTaxi.Behaviours
             // We don't want the damage effect to play until they start taking damage.
             mDamageCooldown.pIsPaused = true;
 
-#if DEBUG
             if (def.mFramesToReset < def.mFramesBetweenColorChange)
             {
-                throw new Exception("mFramesBetweenColorChange must be less than mFramesToReset.");
+                Debug.Assert(false, "mFramesBetweenColorChange must be less than mFramesToReset.");
+				
+                def.mFramesBetweenColorChange = def.mFramesToReset;
             }
-#endif
 
             mColors = def.mColors;
             mCurrentColor = 0;

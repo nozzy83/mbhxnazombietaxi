@@ -87,9 +87,8 @@ namespace MBHEngine.Math
             // Make sure we didn't go over the limit.
             if (mExpiredWatches.Count == 0)
             {
-#if DEBUG
-                throw new Exception("Ran out of stop watches.  Increase amount.");
-#else
+                System.Diagnostics.Debug.Assert(false, "Ran out of stop watches.  Increase amount.");
+
                 // Hopefully all cases get caught in Debug, but incase one was missed, have a fallback
                 // where we allocate additional StopWatch objects to avoid crashes.
                 //
@@ -99,7 +98,6 @@ namespace MBHEngine.Math
                     StopWatch temp = new StopWatch();
                     mExpiredWatches.Push(temp);
                 }
-#endif
             }
 
             // Pop another StopWatch off the expired stack, and add it to the active list.

@@ -102,11 +102,9 @@ namespace MBHEngine.Behaviour
 
             if( def.mMaxHealth < def.mCurrentHealth )
             {
-#if DEBUG
-                throw new Exception("Max health must not be less than current health.");
-#else
+                System.Diagnostics.Debug.Assert(false, "Max health must not be less than current health.");
+
                 def.mMaxHealth = def.mCurrentHealth;
-#endif
             }
 
             mMaxHealth = def.mMaxHealth;
@@ -176,7 +174,8 @@ namespace MBHEngine.Behaviour
         {
             if (amount < 0)
             {
-                throw new Exception("Attempting to apply negative damage");
+                System.Diagnostics.Debug.Assert(false, "Attempting to apply negative damage");
+                amount = 0;
             }
 
             // Don't reduce the health if we are already dead.
