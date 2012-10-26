@@ -115,8 +115,8 @@ namespace MBHEngine.Behaviour
         public override void Update(GameTime gameTime)
         {
             mGround.SetTransform(PhysicsManager.pInstance.ScreenToPhysicalWorld(
-                mParentGOH.pOrientation.mPosition.X + (mSourceWidth / 2 * 5) - (mSourceWidth / 2),
-                mParentGOH.pOrientation.mPosition.Y + (mSourceHeight / 2 * 2) - (mSourceHeight / 2)), 
+                mParentGOH.pPosition.X + (mSourceWidth / 2 * 5) - (mSourceWidth / 2),
+                mParentGOH.pPosition.Y + (mSourceHeight / 2 * 2) - (mSourceHeight / 2)), 
                 0.0f);
         }
 
@@ -126,13 +126,13 @@ namespace MBHEngine.Behaviour
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
-            Vector2 pos = mParentGOH.pOrientation.mPosition;
+            Vector2 pos = mParentGOH.pPosition;
 
             for (Int32 i = 0; i < mMapData.Count; i++)
             {
                 if (i == mMapData.Count / 2)
                 {
-                    pos.X = mParentGOH.pOrientation.mPosition.X;
+                    pos.X = mParentGOH.pPosition.X;
                     pos.Y += mSourceHeight;
                 }
 
@@ -144,9 +144,9 @@ namespace MBHEngine.Behaviour
                            pos,
                            new Microsoft.Xna.Framework.Rectangle(x * mSourceWidth, y * mSourceHeight, mSourceWidth, mSourceHeight),
                            Color.White,
-                           mParentGOH.pOrientation.mRotation,
+                           mParentGOH.pRotation,
                            new Vector2(mSourceWidth * 0.5f, mSourceHeight * 0.5f),
-                           mParentGOH.pOrientation.mScale,
+                           mParentGOH.pScale,
                            SpriteEffects.None,
                            0);
 

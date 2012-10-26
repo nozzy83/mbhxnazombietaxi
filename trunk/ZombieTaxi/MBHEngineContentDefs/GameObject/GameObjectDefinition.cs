@@ -19,6 +19,7 @@ namespace MBHEngineContentDefs
             ENEMY,
             ALLY,
             SAFE_HOUSE,
+            WALL,
         }
 
         /// <summary>

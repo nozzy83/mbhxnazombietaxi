@@ -24,27 +24,6 @@ namespace MBHEngine.GameObject
     public class GameObject
     {
         /// <summary>
-        /// Wrapper class for all the orientation data: position, rotation and scale.
-        /// </summary>
-        public class Orientation
-        {
-            /// <summary>
-            /// The position of the object in space.
-            /// </summary>
-            public Vector2 mPosition = new Vector2(0, 0);
-
-            /// <summary>
-            /// The rotation of the object around the Z axis.
-            /// </summary>
-            public Single mRotation = 0.0f;
-
-            /// <summary>
-            /// The scale of the object in both the x and y axis independently.
-            /// </summary>
-            public Vector2 mScale = new Vector2(1, 1);
-        };
-
-        /// <summary>
         /// Wrapper class used for storing the objects direction, used to control movement.
         /// </summary>
         public class Direction
@@ -90,9 +69,24 @@ namespace MBHEngine.GameObject
         protected Boolean mDoRender;
 
         /// <summary>
-        /// Every Game Object tracks its own transforms.
+        /// The position of the object in space.
         /// </summary>
-        protected Orientation mOrientation;
+        protected Vector2 mPosition = new Vector2(0, 0);
+
+        /// <summary>
+        /// The position the object was, at the end of the previous frame.
+        /// </summary>
+        protected Vector2 mPrevPosition = new Vector2(0, 0);
+
+        /// <summary>
+        /// The rotation of the object around the Z axis.
+        /// </summary>
+        protected Single mRotation = 0.0f;
+
+        /// <summary>
+        /// The scale of the object in both the x and y axis independently.
+        /// </summary>
+        protected Vector2 mScale = new Vector2(1, 1);
 
         /// <summary>
         /// Every Game Object tracks its own direction for movement.
@@ -104,6 +98,11 @@ namespace MBHEngine.GameObject
 		/// detection routines.
         /// </summary>
         private MBHEngine.Math.Rectangle mCollisionRectangle;
+
+        /// <summary>
+        /// The area on screen where this object is visible. Used for culling checks.
+        /// </summary>
+        private MBHEngine.Math.Rectangle mRenderRectangle;
 
         /// <summary>
         /// A list of classifications which this game objects fits into.  This can be used to filter
@@ -174,10 +173,10 @@ namespace MBHEngine.GameObject
             mID = mUniqueIDCounter++;
 
             mDirection = new Direction();
-            mOrientation = new Orientation();
             mFactoryInfo = new GameObjectFactory.FactoryInfo();
             mClassifications = new List<GameObjectDefinition.Classifications>();
             mCollisionRectangle = new Math.Rectangle();
+            mRenderRectangle = new Math.Rectangle();
 
             mTemplateFileName = fileName;
 
@@ -188,11 +187,14 @@ namespace MBHEngine.GameObject
                 mRenderPriority = def.mRenderPriority;
                 mDoUpdate = def.mDoUpdate;
                 mDoRender = def.mDoRender;
-                mOrientation.mPosition = def.mPosition;
-                mOrientation.mRotation = def.mRotation;
-                mOrientation.mScale = def.mScale;
+                mPosition = def.mPosition;
+                mRotation = def.mRotation;
+                mScale = def.mScale;
                 mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
-                mCollisionRectangle.pCenterPoint = mOrientation.mPosition;
+                mCollisionRectangle.pCenterPoint = mPosition;
+                // Being lazy for now. Just assume that a scaler of collision box is big enough to always show character.
+                mRenderRectangle = new Math.Rectangle(def.mCollisionBoxDimensions * 4f); 
+                mRenderRectangle.pCenterPoint = mPosition;
                 mMotionRoot = def.mMotionRoot;
                 if (def.mCollisionRoot == null)
                 {
@@ -250,7 +252,7 @@ namespace MBHEngine.GameObject
                 mBehaviours[i].Update(gameTime);
             }
 
-            mOrientation.mPosition += mDirection.mForward * mDirection.mSpeed;
+            mPosition += mDirection.mForward * mDirection.mSpeed;
         }
 
         /// <summary>
@@ -267,9 +269,11 @@ namespace MBHEngine.GameObject
 
             // With all behaviours done updating, it should be safe to
             // now update and draw the collision volume for this object.
-            pCollisionRect.pCenterPoint = pOrientation.mPosition + mCollisionRoot;
+            UpdateBounds();
 
             DebugShapeDisplay.pInstance.AddAABB(pCollisionRect, Color.Green);
+
+            mPrevPosition = mPosition;
         }
 
         /// <summary>
@@ -444,6 +448,15 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// Updates the different bounding volumes based on the current position.
+        /// </summary>
+        private void UpdateBounds()
+        {
+            mCollisionRectangle.pCenterPoint = pPosition + mCollisionRoot;
+            mRenderRectangle.pCenterPoint = pPosition + mCollisionRoot;
+        }
+
+        /// <summary>
         /// The factory information for this game object.
         /// </summary>
         public GameObjectFactory.FactoryInfo pFactoryInfo
@@ -492,18 +505,70 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
-        /// The position, scale and rotation of the object.
+        /// The position of the object right now.
         /// </summary>
-        public Orientation pOrientation
+        public Vector2 pPosition
         {
-            get { return mOrientation; }
+            get { return mPosition; }
             set 
-            {
-                // Do a deep copy to avoid holding a reference to another game objects orientation.
-                mOrientation.mPosition = value.mPosition;
-                mOrientation.mRotation = value.mRotation;
-                mOrientation.mScale = value.mScale;
+            { 
+                mPosition = value;
+                UpdateBounds();
             }
+        }
+
+        /// <summary>
+        /// The position of the object at the end of the previous frame.
+        /// </summary>
+        public Vector2 pPrevPos
+        {
+            get { return mPrevPosition; }
+        }
+
+        /// <summary>
+        /// The position's X value.
+        /// </summary>
+        public Single pPosX
+        {
+            get { return mPosition.X; }
+            set 
+            { 
+                mPosition.X = value;
+
+                UpdateBounds();
+            }
+        }
+
+        /// <summary>
+        /// The position's Y value.
+        /// </summary>
+        public Single pPosY
+        {
+            get { return mPosition.Y; }
+            set 
+            { 
+                mPosition.Y = value;
+
+                UpdateBounds();
+            }
+        }
+
+        /// <summary>
+        /// The rotation of the object around the Z axis.
+        /// </summary>
+        public Single pRotation
+        {
+            get { return mRotation; }
+            set { mRotation = value; }
+        }
+
+        /// <summary>
+        /// The scale of the object.
+        /// </summary>
+        public Vector2 pScale
+        {
+            get { return mScale; }
+            set { mScale = value; }
         }
 
         /// <summary>
@@ -528,6 +593,17 @@ namespace MBHEngine.GameObject
             get
             {
                 return mCollisionRectangle;
+            }
+        }
+
+        /// <summary>
+        /// A rectangle defining the area in the world where this object is visible.
+        /// </summary>
+        public Math.Rectangle pRenderRect
+        {
+            get
+            {
+                return mRenderRectangle;
             }
         }
 

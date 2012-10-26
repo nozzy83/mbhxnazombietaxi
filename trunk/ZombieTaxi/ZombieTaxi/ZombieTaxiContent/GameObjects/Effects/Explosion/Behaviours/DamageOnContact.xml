@@ -6,6 +6,7 @@
       <Item>PLAYER</Item>
       <Item>ENEMY</Item>
       <Item>ALLY</Item>
+      <Item>WALL</Item>
     </mDamageAppliedTo>
   </Asset>
 </XnaContent>

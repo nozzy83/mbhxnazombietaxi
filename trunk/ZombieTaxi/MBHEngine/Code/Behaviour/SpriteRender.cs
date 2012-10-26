@@ -331,12 +331,12 @@ namespace MBHEngine.Behaviour
                 Int32 baseIndex = (mAnimations[mActiveAnimation].mStartingFrame + mCurrentFrame) * mFrameHeight;
                 Rectangle rect = new Rectangle(0, baseIndex, mTexture.Width, mFrameHeight);
                 batch.Draw(mTexture,
-                           mParentGOH.pOrientation.mPosition,
+                           mParentGOH.pPosition,
                            rect,
                            mColor,
-                           mParentGOH.pOrientation.mRotation,
+                           mParentGOH.pRotation,
                            mParentGOH.pMotionRoot,
-                           mParentGOH.pOrientation.mScale,
+                           mParentGOH.pScale,
                            mSpriteEffects,
                            0);
 
@@ -359,12 +359,12 @@ namespace MBHEngine.Behaviour
                     }
 
                     batch.Draw(mTexture,
-                               mParentGOH.pOrientation.mPosition + shadowAttachmentPoint,
+                               mParentGOH.pPosition + shadowAttachmentPoint,
                                rect,
                                new Color(0, 0, 0, 128),
-                               -mParentGOH.pOrientation.mRotation + MathHelper.ToRadians(180),
+                               -mParentGOH.pRotation + MathHelper.ToRadians(180),
                                mParentGOH.pMotionRoot,
-                               mParentGOH.pOrientation.mScale,
+                               mParentGOH.pScale,
                                mSpriteEffects ^ SpriteEffects.FlipHorizontally,
                                0);
                 }
@@ -372,12 +372,12 @@ namespace MBHEngine.Behaviour
             else
             {
                 batch.Draw(mTexture,
-                           mParentGOH.pOrientation.mPosition,
+                           mParentGOH.pPosition,
                            null,
                            mColor,
-                           mParentGOH.pOrientation.mRotation,
+                           mParentGOH.pRotation,
                            mParentGOH.pMotionRoot,
-                           mParentGOH.pOrientation.mScale,
+                           mParentGOH.pScale,
                            mSpriteEffects,
                            0);
 
@@ -400,12 +400,12 @@ namespace MBHEngine.Behaviour
                     }
 
                     batch.Draw(mTexture,
-                               mParentGOH.pOrientation.mPosition + shadowAttachmentPoint,
+                               mParentGOH.pPosition + shadowAttachmentPoint,
                                null,
                                new Color(0, 0, 0, 128),
-                               -mParentGOH.pOrientation.mRotation + MathHelper.ToRadians(180),
+                               -mParentGOH.pRotation + MathHelper.ToRadians(180),
                                mParentGOH.pMotionRoot,
-                               mParentGOH.pOrientation.mScale,
+                               mParentGOH.pScale,
                                mSpriteEffects ^ SpriteEffects.FlipHorizontally,
                                0);
                 }
@@ -414,8 +414,8 @@ namespace MBHEngine.Behaviour
 #if ALLOW_GARBAGE
             foreach (KeyValuePair<String, Vector2> pair in mAttachmentPoints)
             {
-                //DebugShapeDisplay.pInstance.AddTransform(mParentGOH.pOrientation.mPosition + pair.Value);
-                DebugShapeDisplay.pInstance.AddPoint(mParentGOH.pOrientation.mPosition + pair.Value, 1.0f, Color.Purple);
+                //DebugShapeDisplay.pInstance.AddTransform(mParentGOH.pPosition + pair.Value);
+                DebugShapeDisplay.pInstance.AddPoint(mParentGOH.pPosition + pair.Value, 1.0f, Color.Purple);
             }
 #endif
         }
@@ -508,8 +508,8 @@ namespace MBHEngine.Behaviour
                         attachY *= -1;
                     }
 
-                    temp.mPoisitionInWorld.X = attachX + mParentGOH.pOrientation.mPosition.X;
-                    temp.mPoisitionInWorld.Y = attachY + mParentGOH.pOrientation.mPosition.Y;
+                    temp.mPoisitionInWorld.X = attachX + mParentGOH.pPosition.X;
+                    temp.mPoisitionInWorld.Y = attachY + mParentGOH.pPosition.Y;
                 }
             }
             else if (msg is SetColorMessage)

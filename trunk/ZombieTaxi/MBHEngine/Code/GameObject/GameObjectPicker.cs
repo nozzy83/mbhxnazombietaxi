@@ -147,14 +147,16 @@ namespace MBHEngine.GameObject
                 {
                     Behaviour.Behaviour b = mSelectedGameObject.pBehaviours[i];
 
+                    // Show the behaviour even if the GetDebugInfo isn't implmented for it since we 
+                    // may just want to know which behaviours it has.5
+                    DebugMessageDisplay.pInstance.AddDynamicMessage(b.GetType().ToString(), dbgLayer);
+
                     String [] dbgInfo = b.GetDebugInfo();
 
                     // Not every Behaviour overrides the GetDebugInfo function. In those cases the 
                     // default implementation will return null.
                     if (null != dbgInfo)
                     {
-                        DebugMessageDisplay.pInstance.AddDynamicMessage(b.GetType().ToString(), dbgLayer);
-
                         for (Int32 j = 0; j < dbgInfo.Length; j++)
                         {
                             DebugMessageDisplay.pInstance.AddDynamicMessage(" - " + dbgInfo[j], dbgLayer);

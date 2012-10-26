@@ -85,9 +85,9 @@ namespace ZombieTaxi.Behaviours
 
             mGun = new GameObject("GameObjects\\Items\\Gun\\Gun");
             GameObjectManager.pInstance.Add(mGun);
-            mGun.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
-            mGun.pOrientation.mPosition.X = mGun.pOrientation.mPosition.X + 1.0f;
-            //mGun.pOrientation.mPosition.Y = mGun.pOrientation.mPosition.Y + 4.5f;
+            mGun.pPosition = mParentGOH.pPosition;
+            mGun.pPosX = mGun.pPosX + 1.0f;
+            //mGun.pPosition.Y = mGun.pPosition.Y + 4.5f;
 
             mGunCooldown = StopWatchManager.pInstance.GetNewStopWatch();
             mGunCooldown.pLifeTime = 5; // 1 bullet fired every 5 frames.
@@ -113,12 +113,12 @@ namespace ZombieTaxi.Behaviours
             GamePadState g = InputManager.pInstance.pActiveGamePadState;
 
             // Store the original position prior to polling any input for use with collision reactions.
-            Vector2 origPos = mParentGOH.pOrientation.mPosition;
+            Vector2 origPos = mParentGOH.pPosition;
 
             // The character will move at this rate in the direction of the Left Analog Stick.
             Vector2 dir1 = new Vector2(mMoveSpeed, -mMoveSpeed);
             dir1 *= g.ThumbSticks.Left;
-            mParentGOH.pOrientation.mPosition += dir1;
+            mParentGOH.pPosition += dir1;
 
             // The position the Gun gets attached to is configured via an AttachPoint in the 
             // Player template.
@@ -127,7 +127,7 @@ namespace ZombieTaxi.Behaviours
             Vector2 mGunAttachPos = mGetAttachmentPointMsg.mPoisitionInWorld;
 
             // Position the gun at the attachment point.
-            mGun.pOrientation.mPosition = mGunAttachPos;
+            mGun.pPosition = mGunAttachPos;
 
             // Flip the sprite to face the direction that we are moving.
             if (g.ThumbSticks.Left.X > 0)
@@ -141,7 +141,7 @@ namespace ZombieTaxi.Behaviours
                 // in the direction the player is walking.
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
                 mGun.OnMessage(mSpriteFxMsg);
-                mGun.pOrientation.mRotation = 0.0f;
+                mGun.pRotation = 0.0f;
             }
             else if (g.ThumbSticks.Left.X < 0)
             {
@@ -152,7 +152,7 @@ namespace ZombieTaxi.Behaviours
 
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
                 mGun.OnMessage(mSpriteFxMsg);
-                mGun.pOrientation.mRotation = MathHelper.ToRadians(180.0f);
+                mGun.pRotation = MathHelper.ToRadians(180.0f);
             }
             else
             {
@@ -181,8 +181,8 @@ namespace ZombieTaxi.Behaviours
             // If the user is pressing the right analog stick, then they need to fire a bullet.
             if (!Single.IsNaN(dir.X) && !Single.IsNaN(dir.Y))
             {
-                //mGun.pOrientation.mPosition += dir;
-                mGun.pOrientation.mRotation = (Single)angle;
+                //mGun.pPosition += dir;
+                mGun.pRotation = (Single)angle;
 
                 // Use dir, not finalDir, so that the direction does not include the spread randomization.
                 if (dir.X > 0)
@@ -243,13 +243,13 @@ namespace ZombieTaxi.Behaviours
                         bullet.pDirection.mSpeed = 1.75f;
 
                         // Update the game object with all the new data.
-                        bullet.pOrientation.mPosition = mGun.pOrientation.mPosition;
-                        bullet.pOrientation.mRotation = (Single)angle;
+                        bullet.pPosition = mGun.pPosition;
+                        bullet.pRotation = (Single)angle;
                         bullet.pDirection.mForward = bulletDir;
 
                         bulletDir.Y *= -1;
-                        bullet.pOrientation.mPosition += finalUp * 1.0f;
-                        bullet.pOrientation.mPosition += bulletDir * 3.5f;
+                        bullet.pPosition += finalUp * 1.0f;
+                        bullet.pPosition += bulletDir * 3.5f;
 
                         // The screen's y direction is opposite the controller.
                         bullet.pDirection.mForward.Y *= -1;
@@ -268,11 +268,11 @@ namespace ZombieTaxi.Behaviours
                         GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Grenade\\Grenade");
                         Vector2 grenadeDir = finalDir;
                         grenadeDir.Y *= -1;
-                        go.pOrientation.mPosition = mGun.pOrientation.mPosition;
-                        go.pOrientation.mPosition += finalUp * 1.0f;
-                        go.pOrientation.mPosition += grenadeDir * 3.5f;
-                        go.pOrientation.mPosition = go.pOrientation.mPosition;
-                        go.pOrientation.mRotation = (Single)angle;
+                        go.pPosition = mGun.pPosition;
+                        go.pPosition += finalUp * 1.0f;
+                        go.pPosition += grenadeDir * 3.5f;
+                        go.pPosition = go.pPosition;
+                        go.pRotation = (Single)angle;
                         go.pDirection.mForward = grenadeDir;
                         go.pDirection.mSpeed = 0.25f;
                         GameObjectManager.pInstance.Add(go);
@@ -286,17 +286,17 @@ namespace ZombieTaxi.Behaviours
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.L1, true))
             {
                 GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Flare\\Flare");
-                go.pOrientation.mPosition = mGun.pOrientation.mPosition;
+                go.pPosition = mGun.pPosition;
                 GameObjectManager.pInstance.Add(go);
 
                 go.OnMessage(mSetExtractionPointActivateMsg);
             }
 
 #if ALLOW_GARBAGE
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pOrientation.mPosition);
+            DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pPosition);
 #endif
             
-            CameraManager.pInstance.pTargetPosition = mParentGOH.pOrientation.mPosition;
+            CameraManager.pInstance.pTargetPosition = mParentGOH.pPosition;
         }
 
         /// <summary>
