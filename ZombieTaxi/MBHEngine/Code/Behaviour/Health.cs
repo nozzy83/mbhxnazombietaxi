@@ -70,6 +70,11 @@ namespace MBHEngine.Behaviour
         private Single mMaxHealth;
 
         /// <summary>
+        /// True if this object should be deleted when it reaches Zero Health.
+        /// </summary>
+        private Boolean mRemoveOnDeath;
+
+        /// <summary>
         /// Preallocated messages so that we don't trigger garbage collection during gameplay.
         /// </summary>
         private OnZeroHealth mOnZeroHealthMsg;
@@ -106,6 +111,7 @@ namespace MBHEngine.Behaviour
 
             mMaxHealth = def.mMaxHealth;
             mCurrentHealth = def.mCurrentHealth;
+            mRemoveOnDeath = def.mRemoveOnDeath;
 
             mOnZeroHealthMsg = new OnZeroHealth();
         }
@@ -184,6 +190,11 @@ namespace MBHEngine.Behaviour
 
                     // Let anyone interested know that we have died.
                     mParentGOH.OnMessage(mOnZeroHealthMsg);
+
+                    if (mRemoveOnDeath)
+                    {
+                        GameObjectManager.pInstance.Remove(mParentGOH);
+                    }
                 }
             }
         }

@@ -3,6 +3,7 @@
   <Asset Type="MBHEngineContentDefs.HealthDefinition">
     <mCurrentHealth>50</mCurrentHealth>
     <mMaxHealth>50</mMaxHealth>
+    <mRemoveOnDeath>true</mRemoveOnDeath>
   </Asset>
 </XnaContent>
 

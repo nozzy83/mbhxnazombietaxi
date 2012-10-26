@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MBHEngine.GameObject;
 using Microsoft.Xna.Framework;
+using MBHEngineContentDefs;
 
 namespace MBHEngine.Behaviour
 {
@@ -12,6 +13,20 @@ namespace MBHEngine.Behaviour
     /// </summary>
     public class SpawnOnDeath : Behaviour
     {
+        /// <summary>
+        /// The name of Template which will be spawned.
+        /// </summary>
+        private String mTemplateFileName;
+
+        /// <summary>
+        /// An attachment point on this object at which to spawn the new object at.
+        /// </summary>
+        private String mAttachmentPoint;
+
+        /// <summary>
+        /// Preallocated messages to avoid triggering GC.
+        /// </summary>
+        private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -31,6 +46,13 @@ namespace MBHEngine.Behaviour
         public override void LoadContent(String fileName)
         {
             base.LoadContent(fileName);
+
+            SpawnOnDeathDefinition def = GameObjectManager.pInstance.pContentManager.Load<SpawnOnDeathDefinition>(fileName);
+
+            mTemplateFileName = def.mTemplateFileName;
+            mAttachmentPoint = def.mAttachmentPoint;
+
+            mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
         }
 
         /// <summary>
@@ -44,8 +66,21 @@ namespace MBHEngine.Behaviour
         {
             if (msg is Health.OnZeroHealth)
             {
-                GameObject.GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\StonePickup\\StonePickup");
-                go.pPosition = mParentGOH.pPosition;
+                // By default just spawn the object where this object is.
+                GameObject.GameObject go = GameObjectFactory.pInstance.GetTemplate(mTemplateFileName);
+                Vector2 spawnPos = mParentGOH.pPosition;
+
+                // Optionally, there could be an attachment point specified.
+                if (null != mAttachmentPoint)
+                {
+                    // Grab that attachment point and position the new object there.
+                    mGetAttachmentPointMsg.mName = mAttachmentPoint;
+                    mParentGOH.OnMessage(mGetAttachmentPointMsg);
+                    spawnPos = mGetAttachmentPointMsg.mPoisitionInWorld;
+                }
+
+                go.pPosition = spawnPos;
+
                 GameObjectManager.pInstance.Add(go);
             }
         }
