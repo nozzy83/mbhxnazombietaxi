@@ -15,6 +15,7 @@
     <mBehaviourFileNames>
       <Item>Sprite</Item>
       <Item>RemoveTileOnDeath</Item>
+      <Item>SpawnOnDeath</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
       <Item>Explosive</Item>
@@ -22,6 +23,7 @@
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>MBHEngine.Behaviour.RemoveTileOnDeath</Item>
+      <Item>MBHEngine.Behaviour.SpawnOnDeath</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>ZombieTaxi.Behaviours.Explosive</Item>

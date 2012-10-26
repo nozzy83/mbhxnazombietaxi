@@ -413,6 +413,10 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.Health(this, fileName);
                     }
+                case "MBHEngine.Behaviour.SpawnOnDeath":
+                    {
+                        return new MBHEngine.Behaviour.SpawnOnDeath(this, fileName);
+                    }
                 default:
                     {
                         throw new Exception("Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
