@@ -90,6 +90,11 @@ namespace MBHEngine.Behaviour
             /// The type of tile to place here.
             /// </summary>
             public Tile.TileTypes mType;
+
+            /// <summary>
+            /// Upon return, this member will store the previous type of tile that was stored here.
+            /// </summary>
+            public Tile.TileTypes mOutPreviousType;
         }
 
         /// <summary>
@@ -612,6 +617,8 @@ namespace MBHEngine.Behaviour
                 SetTileTypeAtPositionMessage temp = (SetTileTypeAtPositionMessage)msg;
 
                 Tile t = GetTileAtPosition(temp.mPosition.X, temp.mPosition.Y);
+
+                temp.mOutPreviousType = t.mType;
 
                 if (t.mType != temp.mType)
                 {

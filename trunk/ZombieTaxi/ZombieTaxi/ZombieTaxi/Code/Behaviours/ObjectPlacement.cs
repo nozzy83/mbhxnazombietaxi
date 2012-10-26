@@ -27,6 +27,17 @@ namespace ZombieTaxi.Behaviours
         private Vector2 mCursorOffset;
 
         /// <summary>
+        /// Preallocated list used for getting a list Wall objects at a given location.
+        /// </summary>
+        private List<GameObject> mCollidedObjects = new List<GameObject>();
+
+        /// <summary>
+        /// List of the classification of objects which will be removed if they collide with the
+        /// cursor when the user presses the "Remove" button.
+        /// </summary>
+        private List<MBHEngineContentDefs.GameObjectDefinition.Classifications> mRemoveClassifications;
+
+        /// <summary>
         /// Preallocated messages to avoid garbage collection.
         /// </summary>
         private Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
@@ -59,6 +70,9 @@ namespace ZombieTaxi.Behaviours
             GameObjectManager.pInstance.Add(mCursor);
 
             mCursorOffset = Vector2.Zero;
+
+            mRemoveClassifications = new List<MBHEngineContentDefs.GameObjectDefinition.Classifications>(1);
+            mRemoveClassifications.Add(MBHEngineContentDefs.GameObjectDefinition.Classifications.WALL);
 
             mGetTileAtPositionMsg = new Level.GetTileAtPositionMessage();
             mGetMapInfoMsg = new Level.GetMapInfoMessage();
@@ -101,12 +115,33 @@ namespace ZombieTaxi.Behaviours
                 mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Solid;
                 mSetTileTypeAtPositionMsg.mPosition = mCursor.pPosition;
                 MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
+
+                // Only spawn a tile if we actually changed the tile type.
+                // TODO: This logic should probably live in another behaviour so that different objects
+                //       can do different things when placed.
+                if (mSetTileTypeAtPositionMsg.mType != mSetTileTypeAtPositionMsg.mOutPreviousType)
+                {
+                    GameObject g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\Wall\\Wall");
+                    g.pPosition = mCursor.pPosition;
+                    GameObjectManager.pInstance.Add(g);
+                }
             }
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
             {
                 mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Empty;
                 mSetTileTypeAtPositionMsg.mPosition = mCursor.pPosition;
                 MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
+
+                // Clear any objects that might still be stored from the previous frame.
+                mCollidedObjects.Clear();
+
+                // Check if any objects are colliding with the mouse.
+                GameObjectManager.pInstance.GetGameObjectsInRange(mCursor, ref mCollidedObjects, mRemoveClassifications);
+
+                for (Int32 i = 0; i < mCollidedObjects.Count; i++)
+                {
+                    GameObjectManager.pInstance.Remove(mCollidedObjects[i]);
+                }
             }
         }
 
