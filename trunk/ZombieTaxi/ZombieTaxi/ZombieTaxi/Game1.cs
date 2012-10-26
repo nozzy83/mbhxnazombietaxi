@@ -18,6 +18,7 @@ using ZombieTaxi.Behaviours;
 using OgmoXNA4;
 using MBHEngine.Behaviour;
 using MBHEngine.World;
+using MBHEngineContentDefs;
 
 namespace ZombieTaxi
 {
@@ -197,6 +198,8 @@ namespace ZombieTaxi
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            InputManager.pInstance.UpdateBegin();
+
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
@@ -209,6 +212,15 @@ namespace ZombieTaxi
                 // When debug draw is enabled, turn on the hardware mouse so that things like the
                 // GameObjectPicker work better.
                 IsMouseVisible = mDebugDrawEnabled;
+            }
+
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2))
+            {
+                GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.PLACEMENT;
+            }
+            else
+            {
+                GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.DEFAULT;
             }
 
 #if DEBUG && false // Temporarily disable this feature while working on tile placement mode.
