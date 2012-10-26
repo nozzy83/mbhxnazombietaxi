@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using MBHEngine.IO;
+using MBHEngine.Debug;
 
 namespace MBHEngine.Input
 {
@@ -51,6 +52,13 @@ namespace MBHEngine.Input
         /// The state of the gamepad last update.
         /// </summary>
         private GamePadState mPreviousGamePadState;
+
+        /// <summary>
+        /// The state of the gamepad at the start of this frame. It seems
+        /// to be able to change mid update, so it is inportant to only
+        /// retrive it once to avoid mismatched state info.
+        /// </summary>
+        private GamePadState mCurrentGamePadState;
 
         /// <summary>
         /// Has the user been locked to a controller yet?
@@ -114,8 +122,18 @@ namespace MBHEngine.Input
             {
                 mIsControllerLocked = true;
                 mActiveControllerIndex = PlayerIndex.One;
-                mPreviousGamePadState = GamePad.GetState(mActiveControllerIndex);
+                mPreviousGamePadState = mCurrentGamePadState = GamePad.GetState(mActiveControllerIndex);
             }
+        }
+
+        /// <summary>
+        /// This needs to be called at the start of each update.  It gives the InputManager a chance
+        /// to store the current state of the controller so that we have a consistant
+        /// state for the entire frame.
+        /// </summary>
+        public void UpdateBegin()
+        {
+            mCurrentGamePadState = GamePad.GetState(mActiveControllerIndex);
         }
 
         /// <summary>
@@ -127,7 +145,7 @@ namespace MBHEngine.Input
             mPreviousKeyboardState = Keyboard.GetState();
             if (mIsControllerLocked == true)
             {
-                mPreviousGamePadState = GamePad.GetState(mActiveControllerIndex);
+                mPreviousGamePadState = mCurrentGamePadState;
             }
         }
 
@@ -188,15 +206,13 @@ namespace MBHEngine.Input
                     {
                         mIsControllerLocked = true;
                         mActiveControllerIndex = (PlayerIndex)i;
-                        mPreviousGamePadState = GamePad.GetState(mActiveControllerIndex);
+                        mPreviousGamePadState = mCurrentGamePadState = GamePad.GetState(mActiveControllerIndex);
                         return true;
                     }
                 }
                 return false;
             }
-
-            GamePadState gamePadState = GamePad.GetState(mActiveControllerIndex);
-
+            
             // Dump brute force checks.  Not as simple as keyboard because we
             // need to handle buttons, dpad, and thumbstick.
             //
@@ -204,63 +220,63 @@ namespace MBHEngine.Input
             {
                 case InputActions.A:
                     {
-                        return CheckButtonState(gamePadState.Buttons.A, 
+                        return CheckButtonState(mCurrentGamePadState.Buttons.A, 
                                                 mPreviousGamePadState.Buttons.A, 
                                                 ButtonState.Pressed, 
                                                 buffer);
                     }
                 case InputActions.B:
                     {
-                        return CheckButtonState(gamePadState.Buttons.B,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.B,
                                                 mPreviousGamePadState.Buttons.B,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.X:
                     {
-                        return CheckButtonState(gamePadState.Buttons.X,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.X,
                                                 mPreviousGamePadState.Buttons.X,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.Y:
                     {
-                        return CheckButtonState(gamePadState.Buttons.Y,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.Y,
                                                 mPreviousGamePadState.Buttons.Y,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.START:
                     {
-                        return CheckButtonState(gamePadState.Buttons.Start,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.Start,
                                                 mPreviousGamePadState.Buttons.Start,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.BACK:
                     {
-                        return CheckButtonState(gamePadState.Buttons.Back,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.Back,
                                                 mPreviousGamePadState.Buttons.Back,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.R1:
                     {
-                        return CheckButtonState(gamePadState.Buttons.RightShoulder,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.RightShoulder,
                                                 mPreviousGamePadState.Buttons.RightShoulder,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.L1:
                     {
-                        return CheckButtonState(gamePadState.Buttons.LeftShoulder,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.LeftShoulder,
                                                 mPreviousGamePadState.Buttons.LeftShoulder,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.R2:
                     {
-                        if (gamePadState.Triggers.Right >= 0.1f)
+                        if (mCurrentGamePadState.Triggers.Right >= 0.1f)
                         {
                             if (!buffer || mPreviousGamePadState.Triggers.Right < 0.1f)
                             {
@@ -272,7 +288,7 @@ namespace MBHEngine.Input
                     }
                 case InputActions.L2:
                     {
-                        if (gamePadState.Triggers.Left >= 0.1f)
+                        if (mCurrentGamePadState.Triggers.Left >= 0.1f)
                         {
                             if (!buffer || mPreviousGamePadState.Triggers.Left < 0.1f)
                             {
@@ -284,107 +300,107 @@ namespace MBHEngine.Input
                     }
                 case InputActions.L3:
                     {
-                        return CheckButtonState(gamePadState.Buttons.LeftStick,
+                        return CheckButtonState(mCurrentGamePadState.Buttons.LeftStick,
                                                 mPreviousGamePadState.Buttons.LeftStick,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.DP_LEFT:
                     {
-                        return CheckButtonState(gamePadState.DPad.Left,
+                        return CheckButtonState(mCurrentGamePadState.DPad.Left,
                                                 mPreviousGamePadState.DPad.Left,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.DP_RIGHT:
                     {
-                        return CheckButtonState(gamePadState.DPad.Right,
+                        return CheckButtonState(mCurrentGamePadState.DPad.Right,
                                                 mPreviousGamePadState.DPad.Right,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.DP_UP:
                     {
-                        return CheckButtonState(gamePadState.DPad.Up,
+                        return CheckButtonState(mCurrentGamePadState.DPad.Up,
                                                 mPreviousGamePadState.DPad.Up,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.DP_DOWN:
                     {
-                        return CheckButtonState(gamePadState.DPad.Down,
+                        return CheckButtonState(mCurrentGamePadState.DPad.Down,
                                                 mPreviousGamePadState.DPad.Down,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.LA_LEFT:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Left.X, 
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Left.X, 
                                                 mPreviousGamePadState.ThumbSticks.Left.X,
                                                 -0.1f,
                                                 buffer) ||
-                               CheckButtonState(gamePadState.DPad.Left,
+                               CheckButtonState(mCurrentGamePadState.DPad.Left,
                                                 mPreviousGamePadState.DPad.Left,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.LA_RIGHT:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Left.X,
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Left.X,
                                                 mPreviousGamePadState.ThumbSticks.Left.X,
                                                 0.1f,
                                                 buffer) ||
-                               CheckButtonState(gamePadState.DPad.Right,
+                               CheckButtonState(mCurrentGamePadState.DPad.Right,
                                                 mPreviousGamePadState.DPad.Right,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.LA_UP:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Left.Y,
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Left.Y,
                                                 mPreviousGamePadState.ThumbSticks.Left.Y,
                                                 0.1f,
                                                 buffer) ||
-                               CheckButtonState(gamePadState.DPad.Up,
+                               CheckButtonState(mCurrentGamePadState.DPad.Up,
                                                 mPreviousGamePadState.DPad.Up,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.LA_DOWN:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Left.Y,
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Left.Y,
                                                 mPreviousGamePadState.ThumbSticks.Left.Y,
                                                 -0.1f,
                                                 buffer) ||
-                               CheckButtonState(gamePadState.DPad.Down,
+                               CheckButtonState(mCurrentGamePadState.DPad.Down,
                                                 mPreviousGamePadState.DPad.Down,
                                                 ButtonState.Pressed,
                                                 buffer);
                     }
                 case InputActions.RA_LEFT:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Right.X,
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Right.X,
                                                 mPreviousGamePadState.ThumbSticks.Right.X,
                                                 -0.1f,
                                                 buffer);
                     }
                 case InputActions.RA_RIGHT:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Right.X,
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Right.X,
                                                 mPreviousGamePadState.ThumbSticks.Right.X,
                                                 0.1f,
                                                 buffer);
                     }
                 case InputActions.RA_UP:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Right.Y,
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Right.Y,
                                                 mPreviousGamePadState.ThumbSticks.Right.Y,
                                                 0.1f,
                                                 buffer);
                     }
                 case InputActions.RA_DOWN:
                     {
-                        return CheckAnalogState(gamePadState.ThumbSticks.Right.Y,
+                        return CheckAnalogState(mCurrentGamePadState.ThumbSticks.Right.Y,
                                                 mPreviousGamePadState.ThumbSticks.Right.Y,
                                                 -0.1f,
                                                 buffer);
