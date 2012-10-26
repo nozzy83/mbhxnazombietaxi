@@ -26,7 +26,7 @@ namespace MBHEngine.GameObject
         /// A rectangle roughly defining the area the mouse takes up. This should probably 
         /// be scaled by the camera's current scale.
         /// </summary>
-        private Math.Rectangle rect = new Math.Rectangle(4.0f, 8.0f);
+        private Math.Rectangle mMouseRect = new Math.Rectangle(4.0f, 8.0f);
 
         /// <summary>
         /// Preallocated list used for getting a list of all the objects we are pointing
@@ -55,13 +55,13 @@ namespace MBHEngine.GameObject
 
             // Reposition the collision rect of the mouse pointer to the position of the actual 
             // mouse in world space.
-            rect.pCenterPoint = proj;
+            mMouseRect.pCenterPoint = proj;
 
             // Clear any objects that might still be stored from the previous frame.
             mCollidedObjects.Clear();
 
             // Check if any objects are colliding with the mouse.
-            GameObjectManager.pInstance.GetGameObjectsInRange(rect, ref mCollidedObjects);
+            GameObjectManager.pInstance.GetGameObjectsInRange(mMouseRect, ref mCollidedObjects);
 
             // Temp storing which object the mouse is currently over top of (if any).
             GameObject mousedObject = null;

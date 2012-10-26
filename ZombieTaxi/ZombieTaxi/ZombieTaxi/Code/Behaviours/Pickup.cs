@@ -64,7 +64,7 @@ namespace ZombieTaxi.Behaviours
                 mAddObjectMsg.mObj = mParentGOH;
                 player.OnMessage(mAddObjectMsg);
 
-                // Stop updating and rendering the object.
+                // Stop updating and rendering the object. Also prevent things like collision checks finding it.
                 GameObjectManager.pInstance.Remove(mParentGOH);
             }
         }
@@ -72,7 +72,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// The main interface for communicating between behaviours.  Using polymorphism, we
         /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
-        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// can then check for particular upcasted message types, and either grab some data 
         /// from it (set message) or store some data in it (get message).
         /// </summary>
         /// <param name="msg">The message being communicated to the behaviour.</param>
