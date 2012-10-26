@@ -97,7 +97,6 @@
     <Compile Include="Behaviour\DamageOnContactDefinition.cs" />
     <Compile Include="Behaviour\ExplosiveDefinition.cs" />
     <Compile Include="Behaviour\ExtractionPointDefinition.cs" />
-    <Compile Include="Behaviour\HealthDefinition.cs" />
     <Compile Include="Behaviour\HUD\PlayerScoreDefinition.cs" />
     <Compile Include="Behaviour\InventoryDefinition.cs" />
     <Compile Include="Behaviour\KamikazeDefinition.cs" />

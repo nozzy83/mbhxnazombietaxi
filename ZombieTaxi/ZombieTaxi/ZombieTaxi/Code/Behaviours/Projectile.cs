@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.GameObject;
 using MBHEngineContentDefs;
 using ZombieTaxiContentDefs;
+using MBHEngine.Behaviour;
 
 namespace ZombieTaxi.Behaviours
 {

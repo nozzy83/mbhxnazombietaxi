@@ -15,8 +15,8 @@
       <Item>Explosive</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
-      <Item>MBHEngine.Code.Behaviour.Timer</Item>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Behaviour.Timer</Item>
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
     </mBehaviourClassNames>
   </Asset>

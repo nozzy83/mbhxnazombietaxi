@@ -32,10 +32,6 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new Kamikaze(go, fileName);
                     }
-                case "ZombieTaxi.Behaviours.Health":
-                    {
-                        return new Health(go, fileName);
-                    }
                 case "ZombieTaxi.Behaviours.Explosive":
                     {
                         return new Explosive(go, fileName);

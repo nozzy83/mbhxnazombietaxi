@@ -7,15 +7,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.Debug;
 using MBHEngine.Behaviour;
-using ZombieTaxi.Behaviours;
-using ZombieTaxiContentDefs;
+using MBHEngineContentDefs;
 
-namespace ZombieTaxi.Behaviours
+namespace MBHEngine.Behaviour
 {
     /// <summary>
     /// Manages health for an object.
     /// </summary>
-    class Health : MBHEngine.Behaviour.Behaviour
+    public class Health : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
         /// Applies a specified amount of damage to the current health.
@@ -81,7 +80,7 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         /// <param name="parentGOH">The game object that this behaviour is attached to.</param>
         /// <param name="fileName">The file defining this behaviour.</param>
-        public Health(GameObject parentGOH, String fileName)
+        public Health(GameObject.GameObject parentGOH, String fileName)
             : base(parentGOH, fileName)
         {
         }

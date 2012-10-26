@@ -106,7 +106,7 @@ namespace MBHEngineContentDefs
         /// This should be an index to index mapping with mBehaviorFileNames, where instead
         /// of defining the file names, we are defining the class names of the behaviour.
         /// This needs to be the full class and names space.  For example:
-        /// MBHEngine.Code.Behaviour.Behaviour
+        /// MBHEngine.Behaviour.Behaviour
         /// </summary>
         public List<String> mBehaviourClassNames;
     }

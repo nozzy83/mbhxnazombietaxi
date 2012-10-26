@@ -135,7 +135,6 @@
     <Compile Include="Code\Behaviours\DamageOnContact.cs" />
     <Compile Include="Code\Behaviours\Explosive.cs" />
     <Compile Include="Code\Behaviours\ExtractionPoint.cs" />
-    <Compile Include="Code\Behaviours\Health.cs" />
     <Compile Include="Code\Behaviours\HUD\PlayerScore.cs" />
     <Compile Include="Code\Behaviours\InfiniteBG.cs" />
     <Compile Include="Code\Behaviours\Inventory.cs" />

@@ -15,9 +15,9 @@
       <Item>Timer</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
-      <Item>MBHEngine.Code.Behaviour.Timer</Item>
+      <Item>MBHEngine.Behaviour.Timer</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

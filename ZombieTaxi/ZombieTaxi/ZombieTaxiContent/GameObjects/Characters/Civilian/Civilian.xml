@@ -21,10 +21,10 @@
       <Item>DamageFlash</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>ZombieTaxi.Behaviours.Civilian</Item>
-      <Item>MBHEngine.Code.Behaviour.PathFind</Item>
-      <Item>ZombieTaxi.Behaviours.Health</Item>
+      <Item>MBHEngine.Behaviour.PathFind</Item>
+      <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
     </mBehaviourClassNames>
   </Asset>

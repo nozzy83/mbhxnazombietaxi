@@ -14,13 +14,17 @@
     </mClassifications>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
+      <Item>RemoveTileOnDeath</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
+      <Item>Explosive</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
-      <Item>ZombieTaxi.Behaviours.Health</Item>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Behaviour.RemoveTileOnDeath</Item>
+      <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>ZombieTaxi.Behaviours.Explosive</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

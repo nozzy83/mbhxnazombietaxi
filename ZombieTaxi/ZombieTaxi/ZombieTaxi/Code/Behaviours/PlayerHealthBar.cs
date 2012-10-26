@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
+using MBHEngine.Behaviour;
 
 namespace ZombieTaxi.Behaviours
 {
