@@ -138,9 +138,13 @@ namespace MBHEngine.GameObject
                 }
             }
 
+#if ALLOW_GARBAGE
             // There are no GameObjects of the requested type available.  For now throw and exception,
             // but at some point we may want to change this to an assert and then allocate some additional ones.
-            throw new Exception( "Ran out of templates of type: " + fileName );
+            System.Diagnostics.Debug.Assert(false, "Ran out of templates of type: " + fileName);
+#endif // ALLOW_GARBAGE
+
+            return null;
         }
 
         /// <summary>
@@ -153,7 +157,9 @@ namespace MBHEngine.GameObject
             // Make sure the Object being recycled is actually managed by this Factory.
             if (!go.pFactoryInfo.pIsManaged)
             {
-                throw new Exception("Attempting to Recycle non-managed Game Object.");
+                System.Diagnostics.Debug.Assert(false, "Attempting to Recycle non-managed Game Object.");
+
+                return;
             }
 
             // Reset all Behaviours so that the next client gets a "fresh" GameObject.

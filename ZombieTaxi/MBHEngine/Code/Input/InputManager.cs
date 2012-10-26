@@ -103,10 +103,8 @@ namespace MBHEngine.Input
                                                 Keys.Escape
                                             };
 
-            if (mKeyboardActionMap.Length != Enum.GetValues(typeof(InputActions)).Length)
-            {
-                throw new Exception("Keyboard mapping does not match InputActions.  Have you added new InputActions but not updated the keyboard mapping?");
-            }
+
+            System.Diagnostics.Debug.Assert(mKeyboardActionMap.Length == Enum.GetValues(typeof(InputActions)).Length, "Keyboard mapping does not match InputActions.  Have you added new InputActions but not updated the keyboard mapping?");
 
             mPreviousKeyboardState = Keyboard.GetState();
 
@@ -458,7 +456,9 @@ namespace MBHEngine.Input
                 return (currentState > 0 );
             }
 
-            throw new ArgumentException("Direction must be a non-zero number.", "direction");
+            System.Diagnostics.Debug.Assert(false, "Direction must be a non-zero number.");
+
+            return false;
         }
 
         /// <summary>
@@ -486,10 +486,8 @@ namespace MBHEngine.Input
         {
             get
             {
-                if (mIsControllerLocked == false)
-                {
-                    throw new Exception("Controller is not locked");
-                }
+                System.Diagnostics.Debug.Assert((true == mIsControllerLocked), "Controller is not locked");
+
                 return mActiveControllerIndex;
             }
             set

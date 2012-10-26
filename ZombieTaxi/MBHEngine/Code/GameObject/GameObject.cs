@@ -419,7 +419,10 @@ namespace MBHEngine.GameObject
                     }
                 default:
                     {
-                        throw new Exception("Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
+#if ALLOW_GARBAGE
+                        System.Diagnostics.Debug.Assert(false, "Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
+#endif // ALLOW_GARBAGE
+                        return null;
                     }
             }
         }

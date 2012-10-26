@@ -255,7 +255,7 @@ namespace MBHEngine.GameObject
                 {
                     if (mGameObjectsToAdd.Remove(mGameObjectsToRemove[i]) == false)
                     {
-                        //throw new Exception("Attempting to remove a game object which isn't in any of the managed lists.");
+                        //System.Diagnostics.Debug.Assert(false, "Attempting to remove a game object which isn't in any of the managed lists.");
                     }
                 }
             }
@@ -344,7 +344,7 @@ namespace MBHEngine.GameObject
                         {
                             if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.UNDEFINED)
                             {
-                                throw new Exception("Attempting to rendering Game Object with UNDEFINED blend mode.");
+                                System.Diagnostics.Debug.Assert(false, "Attempting to rendering Game Object with UNDEFINED blend mode.");
                             }
 
                             // Did the last game object set the blend mode, meaning we have to end it?
@@ -397,7 +397,7 @@ namespace MBHEngine.GameObject
                             }
                             else if (mGameObjects[i].pBlendMode != GameObjectDefinition.BlendMode.UNDEFINED)
                             {
-                                throw new Exception("Unhandled blend mode.");
+                                System.Diagnostics.Debug.Assert(false, "Unhandled blend mode.");
                             }
                         }
 
@@ -597,10 +597,7 @@ namespace MBHEngine.GameObject
 
             set
             {
-                if (mPlayer != null)
-                {
-                    throw new Exception("Setting Player more than once.  If this is intentional this exception should be removed.");
-                }
+                System.Diagnostics.Debug.Assert(mPlayer == null, "Setting Player more than once.  If this is intentional this assert should be removed.");
 
                 mPlayer = value;
             }

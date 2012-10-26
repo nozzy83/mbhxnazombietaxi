@@ -136,7 +136,9 @@ namespace MBHEngine.Behaviour
                     }
                 default:
                     {
-                        throw new Exception("Unhandled FSM Flow State.");
+                        System.Diagnostics.Debug.Assert(false, "Unhandled FSM Flow State.");
+
+                        break;
                     }
             }
 
@@ -168,7 +170,9 @@ namespace MBHEngine.Behaviour
             // Check for duplicate entries.
             if (mStates.ContainsKey(id))
             {
-                throw new Exception("Attempting to add two FSMState objects with the same ID to a FiniteStateMachine: " + id);
+                System.Diagnostics.Debug.Assert(false, "Attempting to add two FSMState objects with the same ID to a FiniteStateMachine: " + id);
+
+                return;
             }
             else
             {
@@ -202,7 +206,7 @@ namespace MBHEngine.Behaviour
                 }
                 else
                 {
-                    throw new Exception("FSMState returned a new state which is not managed by this state machine: " + nextState);
+                    System.Diagnostics.Debug.Assert(false, "FSMState returned a new state which is not managed by this state machine: " + nextState);
                 }
             }
         }
