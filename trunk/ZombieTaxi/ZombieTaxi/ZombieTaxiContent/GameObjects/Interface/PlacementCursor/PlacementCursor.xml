@@ -12,7 +12,7 @@
       <Item>Sprite</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

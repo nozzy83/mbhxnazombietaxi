@@ -369,41 +369,49 @@ namespace MBHEngine.GameObject
 
             switch (behaviourType)
             {
-                case "MBHEngine.Code.Behaviour.Behaviour":
+                case "MBHEngine.Behaviour.Behaviour":
                     {
                         return new MBHEngine.Behaviour.Behaviour(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.SpriteRender":
+                case "MBHEngine.Behaviour.SpriteRender":
                     {
                         return new MBHEngine.Behaviour.SpriteRender(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.SimulatedPhysics":
+                case "MBHEngine.Behaviour.SimulatedPhysics":
                     {
                         return new MBHEngine.Behaviour.SimulatedPhysics(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.TileMapRender":
+                case "MBHEngine.Behaviour.TileMapRender":
                     {
                         return new MBHEngine.Behaviour.TileMapRender(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.FrameRateDisplay":
+                case "MBHEngine.Behaviour.FrameRateDisplay":
                     {
                         return new MBHEngine.Behaviour.FrameRateDisplay(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.Level":
+                case "MBHEngine.Behaviour.Level":
                     {
                         return new MBHEngine.Behaviour.Level(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.TileCollision":
+                case "MBHEngine.Behaviour.TileCollision":
                     {
                         return new MBHEngine.Behaviour.TileCollision(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.Timer":
+                case "MBHEngine.Behaviour.Timer":
                     {
                         return new MBHEngine.Behaviour.Timer(this, fileName);
                     }
-                case "MBHEngine.Code.Behaviour.PathFind":
+                case "MBHEngine.Behaviour.PathFind":
                     {
                         return new MBHEngine.Behaviour.PathFind(this, fileName);
+                    }
+                case "MBHEngine.Behaviour.RemoveTileOnDeath":
+                    {
+                        return new MBHEngine.Behaviour.RemoveTileOnDeath(this, fileName);
+                    }
+                case "MBHEngine.Behaviour.Health":
+                    {
+                        return new MBHEngine.Behaviour.Health(this, fileName);
                     }
                 default:
                     {

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\Effects\Dust</mSpriteFileName>
+    <mFrameHeight>8</mFrameHeight>
+    <mHasShadow>false</mHasShadow>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>Explode</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>3</mNumFrames>
+        <mLooping>false</mLooping>
+        <mRemoveGameObjectOnComplete>true</mRemoveGameObjectOnComplete>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+

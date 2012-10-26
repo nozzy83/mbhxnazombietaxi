@@ -11,7 +11,7 @@
       <Item>Level</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.Level</Item>
+      <Item>MBHEngine.Behaviour.Level</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

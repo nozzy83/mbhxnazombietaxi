@@ -118,9 +118,11 @@
     <Compile Include="Code\Behaviour\BehaviourMessage.cs" />
     <Compile Include="Code\Behaviour\FiniteStateMachine.cs" />
     <Compile Include="Code\Behaviour\FrameRateDisplay.cs" />
+    <Compile Include="Code\Behaviour\Health.cs" />
     <Compile Include="Code\Behaviour\Level.cs" />
     <Compile Include="Code\Behaviour\OgmoRender.cs" />
     <Compile Include="Code\Behaviour\PathFind.cs" />
+    <Compile Include="Code\Behaviour\RemoveTileOnDeath.cs" />
     <Compile Include="Code\Behaviour\SimulatedPhysics.cs" />
     <Compile Include="Code\Behaviour\SpriteRender.cs" />
     <Compile Include="Code\Behaviour\TileCollision.cs" />

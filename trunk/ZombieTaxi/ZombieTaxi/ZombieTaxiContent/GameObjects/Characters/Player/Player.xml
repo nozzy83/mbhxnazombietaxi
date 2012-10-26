@@ -24,11 +24,11 @@
       <Item>ObjectPlacement</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
-      <Item>MBHEngine.Code.Behaviour.TileCollision</Item>
-      <Item>ZombieTaxi.Behaviours.Health</Item>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
+      <Item>MBHEngine.Behaviour.TileCollision</Item>
+      <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.TwinStick</Item>
-      <Item>MBHEngine.Code.Behaviour.PathFind</Item>
+      <Item>MBHEngine.Behaviour.PathFind</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>ZombieTaxi.Behaviours.Inventory</Item>
       <Item>ZombieTaxi.Behaviours.ObjectPlacement</Item>

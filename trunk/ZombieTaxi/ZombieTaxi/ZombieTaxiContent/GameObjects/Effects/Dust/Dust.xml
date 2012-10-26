@@ -7,16 +7,12 @@
     <mPosition>0 0</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
-    <mCollisionBoxDimensions>16.0 16.0</mCollisionBoxDimensions>
-    <mCollisionRoot>0 -8</mCollisionRoot>
-    <mMotionRoot>8 15</mMotionRoot>
+    <mMotionRoot>4 4</mMotionRoot>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
-      <Item>DamageOnContact</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
-      <Item>ZombieTaxi.Behaviours.DamageOnContact</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
