@@ -453,8 +453,13 @@ namespace MBHEngine.GameObject
             // This is to terminate the Countdown timer object
             if (go != null)
             {
-                //go.Shutdown();
-                mGameObjectsToRemove.Add(go);
+                // Make sure this object isn't removed more than once (can cause
+                // significant issues with GameObjectFactory.
+                if (!mGameObjectsToRemove.Contains(go))
+                {
+                    //go.Shutdown();
+                    mGameObjectsToRemove.Add(go);
+                }
             }
         }
 

@@ -312,7 +312,7 @@ namespace MBHEngine.Behaviour
                     {
                         mCollisionGrid[x, y].mType = Level.Tile.TileTypes.Solid;
 
-                        GameObject.GameObject g = new GameObject.GameObject("GameObjects\\Environments\\Wall\\Wall");
+                        GameObject.GameObject g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\Wall\\Wall");
                         g.pPosX =(x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f);
                         g.pPosY = (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f);
                         GameObjectManager.pInstance.Add(g);
