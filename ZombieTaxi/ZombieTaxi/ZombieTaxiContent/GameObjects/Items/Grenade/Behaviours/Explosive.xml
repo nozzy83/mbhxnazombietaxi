@@ -9,6 +9,7 @@
     <mDamageCaused>100</mDamageCaused>
     <mDamageAppliedTo>
       <Item>ENEMY</Item>
+      <Item>WALL</Item>
     </mDamageAppliedTo>
   </Asset>
 </XnaContent>

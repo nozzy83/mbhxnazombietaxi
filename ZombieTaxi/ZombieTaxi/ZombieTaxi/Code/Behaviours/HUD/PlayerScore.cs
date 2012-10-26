@@ -85,9 +85,9 @@ namespace ZombieTaxi.Behaviours.HUD
             // Finally negate the number since we want to move left, not right.
             Single centerOffset = mScoreDisplay.Length * 0.5f * characterWidth * - 1.0f;
 
-            Single xPos = centerOffset + mParentGOH.pOrientation.mPosition.X;
-            batch.DrawString(mFont, mScoreDisplay, new Vector2(xPos + 1, mParentGOH.pOrientation.mPosition.Y + 1), Color.Black);
-            batch.DrawString(mFont, mScoreDisplay, new Vector2(xPos, mParentGOH.pOrientation.mPosition.Y), Color.White);
+            Single xPos = centerOffset + mParentGOH.pPosition.X;
+            batch.DrawString(mFont, mScoreDisplay, new Vector2(xPos + 1, mParentGOH.pPosition.Y + 1), Color.Black);
+            batch.DrawString(mFont, mScoreDisplay, new Vector2(xPos, mParentGOH.pPosition.Y), Color.White);
         }
 
         /// <summary>

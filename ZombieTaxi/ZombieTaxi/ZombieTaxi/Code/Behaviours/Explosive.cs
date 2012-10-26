@@ -179,9 +179,9 @@ namespace ZombieTaxi.Behaviours
 
             GameObject fx = GameObjectFactory.pInstance.GetTemplate(mExplosionEffect);
             mGetAttachmentPointMsg.mName = "Ground";
-            mGetAttachmentPointMsg.mPoisitionInWorld = mParentGOH.pOrientation.mPosition; // Set a default incase it doesn't have a Ground attachment point.
+            mGetAttachmentPointMsg.mPoisitionInWorld = mParentGOH.pPosition; // Set a default incase it doesn't have a Ground attachment point.
             mParentGOH.OnMessage(mGetAttachmentPointMsg);
-            fx.pOrientation.mPosition = mGetAttachmentPointMsg.mPoisitionInWorld;
+            fx.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld;
             fx.OnMessage(mSetActiveAnimationMessage);
             GameObjectManager.pInstance.Add(fx);
 

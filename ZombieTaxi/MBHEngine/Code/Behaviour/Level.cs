@@ -311,6 +311,11 @@ namespace MBHEngine.Behaviour
                     if (RandomManager.pInstance.RandomPercent() <= 0.05f)
                     {
                         mCollisionGrid[x, y].mType = Level.Tile.TileTypes.Solid;
+
+                        GameObject.GameObject g = new GameObject.GameObject("GameObjects\\Environments\\Wall\\Wall");
+                        g.pPosX =(x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f);
+                        g.pPosY = (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f);
+                        GameObjectManager.pInstance.Add(g);
                     }
 
                     DetermineAndSetImage(mCollisionGrid[x, y]);
@@ -392,7 +397,7 @@ namespace MBHEngine.Behaviour
             if (tile.mType == Tile.TileTypes.Solid)
             {
                 // Solid tiles all use the same image.
-                tile.mImageIndex = 0;
+                tile.mImageIndex = 1;
             }
             else
             {
@@ -474,7 +479,7 @@ namespace MBHEngine.Behaviour
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
-            //Vector2 playerPos = GameObjectManager.pInstance.pPlayer.pOrientation.mPosition;
+            //Vector2 playerPos = GameObjectManager.pInstance.pPlayer.pPosition;
             //Tile playerTile = GetTileAtPosition(playerPos.X, playerPos.Y);
             //if (playerTile != null)
             //{

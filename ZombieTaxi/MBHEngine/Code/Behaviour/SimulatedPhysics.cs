@@ -148,8 +148,8 @@ namespace MBHEngine.Behaviour
             float rot = mBody.GetAngle();
 
             // Replace the current orientation information with the updated physics data.
-            mParentGOH.pOrientation.mPosition = PhysicsManager.pInstance.PhysicalWorldToScreen(pos);
-            mParentGOH.pOrientation.mRotation = rot;
+            mParentGOH.pPosition = PhysicsManager.pInstance.PhysicalWorldToScreen(pos);
+            mParentGOH.pRotation = rot;
         }
 
         /// <summary>

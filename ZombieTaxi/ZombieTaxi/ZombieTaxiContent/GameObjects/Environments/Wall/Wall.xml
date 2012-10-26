@@ -1,23 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
-    <mRenderPriority>50</mRenderPriority>
+    <mRenderPriority>41</mRenderPriority>
     <mDoUpdate>true</mDoUpdate>
     <mDoRender>true</mDoRender>
     <mPosition>0 0</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
-    <mCollisionBoxDimensions>1.0 1.0</mCollisionBoxDimensions>
-    <mMotionRoot>0.5 0.5</mMotionRoot>
+    <mCollisionBoxDimensions>8 8</mCollisionBoxDimensions>
+    <mMotionRoot>4 4</mMotionRoot>
+    <mClassifications>
+      <Item>WALL</Item>
+    </mClassifications>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
-      <Item>Timer</Item>
-      <Item>Explosive</Item>
+      <Item>Health</Item>
+      <Item>DamageFlash</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Code.Behaviour.SpriteRender</Item>
-      <Item>MBHEngine.Code.Behaviour.Timer</Item>
-      <Item>ZombieTaxi.Behaviours.Explosive</Item>
+      <Item>ZombieTaxi.Behaviours.Health</Item>
+      <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

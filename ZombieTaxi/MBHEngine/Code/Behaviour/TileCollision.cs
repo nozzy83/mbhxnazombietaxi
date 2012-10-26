@@ -52,7 +52,7 @@ namespace MBHEngine.Behaviour
             //mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(def.mSpriteFileName);
             
             // Start the previous position at the current position.  It will get overwritten in th update anyway.
-            mPreviousPos = mParentGOH.pOrientation.mPosition;
+            mPreviousPos = mParentGOH.pPosition;
 
             // Preallocate messages to avoid garbage collection.
             mLevelCollisionMsg = new Level.CheckForCollisionMessage();
@@ -70,7 +70,7 @@ namespace MBHEngine.Behaviour
         public override void PreUpdate(GameTime gameTime)
         {
             // Store the previous position before ay other behaviours have a chance to start moving it.
-            mPreviousPos = mParentGOH.pOrientation.mPosition;
+            mPreviousPos = mParentGOH.pPosition;
         }
 
         /// <summary>
@@ -81,8 +81,8 @@ namespace MBHEngine.Behaviour
         {
             // Copy the current data into the message used for checking collision against the level.
             mLevelCollisionMsg.mDesiredRect.Copy(mParentGOH.pCollisionRect);
-            mLevelCollisionMsg.mDesiredRect.pCenterPoint = mParentGOH.pOrientation.mPosition + mParentGOH.pCollisionRoot;
             mLevelCollisionMsg.mOriginalRect.Copy(mParentGOH.pCollisionRect);
+            mLevelCollisionMsg.mOriginalRect.pCenterPoint = mParentGOH.pPrevPos + mParentGOH.pCollisionRoot;
 
             // Check for collision against the current level.
             WorldManager.pInstance.pCurrentLevel.OnMessage(mLevelCollisionMsg);
@@ -102,13 +102,13 @@ namespace MBHEngine.Behaviour
 #endif
 
                     // If we collided along the x-axis, but the object directly against that collision point.
-                    if (mParentGOH.pOrientation.mPosition.X > mPreviousPos.X)
+                    if (mParentGOH.pPosition.X > mPreviousPos.X)
                     {
-                        mParentGOH.pOrientation.mPosition.X = mLevelCollisionMsg.mCollisionPointX - mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
+                        mParentGOH.pPosX = mLevelCollisionMsg.mCollisionPointX - mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
                     }
-                    else if (mParentGOH.pOrientation.mPosition.X < mPreviousPos.X)
+                    else if (mParentGOH.pPosition.X < mPreviousPos.X)
                     {
-                        mParentGOH.pOrientation.mPosition.X = mLevelCollisionMsg.mCollisionPointX + mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
+                        mParentGOH.pPosX = mLevelCollisionMsg.mCollisionPointX + mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
                     }
                 }
                 if (mLevelCollisionMsg.mCollisionDetectedY)
@@ -117,13 +117,13 @@ namespace MBHEngine.Behaviour
                     //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected Y");
 #endif
 
-                    if (mParentGOH.pOrientation.mPosition.Y > mPreviousPos.Y)
+                    if (mParentGOH.pPosY > mPreviousPos.Y)
                     {
-                        mParentGOH.pOrientation.mPosition.Y = mLevelCollisionMsg.mCollisionPointY - mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
+                        mParentGOH.pPosY = mLevelCollisionMsg.mCollisionPointY - mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
                     }
-                    else if (mParentGOH.pOrientation.mPosition.Y < mPreviousPos.Y)
+                    else if (mParentGOH.pPosition.Y < mPreviousPos.Y)
                     {
-                        mParentGOH.pOrientation.mPosition.Y = mLevelCollisionMsg.mCollisionPointY + mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
+                        mParentGOH.pPosY = mLevelCollisionMsg.mCollisionPointY + mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
                     }
                 }
 

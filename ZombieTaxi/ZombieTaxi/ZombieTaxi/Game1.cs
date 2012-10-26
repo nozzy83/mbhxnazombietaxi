@@ -146,15 +146,15 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.pPlayer = player;
 
             GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\StonePickup\\StonePickup");
-            go.pOrientation.mPosition = new Vector2(50, 50);
+            go.pPosition = new Vector2(50, 50);
             GameObjectManager.pInstance.Add(go);
 
             GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
             GameObjectManager.pInstance.Add(chef);
             
             //GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
-            //enemy.pOrientation.mPosition.X = 50;
-            //enemy.pOrientation.mPosition.Y = 50;
+            //enemy.pPosition.X = 50;
+            //enemy.pPosition.Y = 50;
             //GameObjectManager.pInstance.Add(enemy);
             
             // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager.
@@ -164,7 +164,7 @@ namespace ZombieTaxi
             // The vingette effect used to dim out the edges of the screen.
             GameObject ving = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
 #if SMALL_WINDOW
-            ving.pOrientation.mScale = new Vector2(0.5f, 0.5f);
+            ving.pScale = new Vector2(0.5f, 0.5f);
 #endif
             GameObjectManager.pInstance.Add(ving);
 

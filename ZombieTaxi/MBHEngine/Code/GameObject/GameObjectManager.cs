@@ -160,12 +160,12 @@ namespace MBHEngine.GameObject
                     // closer to the bottom of the screen and render them on top of the
                     // other.
 
-                    if (x.pOrientation.mPosition.Y < y.pOrientation.mPosition.Y)
+                    if (x.pPosition.Y < y.pPosition.Y)
                     {
                         // Y is closer to the bottom.
                         return -1;
                     }
-                    else if (x.pOrientation.mPosition.Y > y.pOrientation.mPosition.Y)
+                    else if (x.pPosition.Y > y.pPosition.Y)
                     {
                         // X is closer to the bottom.
                         return 1;
@@ -330,79 +330,91 @@ namespace MBHEngine.GameObject
             // Keep track of the blend modes so that we can detect when it needs to change.
             GameObjectDefinition.BlendMode currentBlend = GameObjectDefinition.BlendMode.UNDEFINED;
 
+            Int32 objectsRender = 0;
+
             for (int i = 0; i < mGameObjects.Count; i++)
             {
                 if (mGameObjects[i].pDoRender == true)
                 {
-                    // Has the blend mode changed from the previous game object to this one?
-                    if (currentBlend != mGameObjects[i].pBlendMode)
+                    if (mGameObjects[i].pCollisionRect.pDimensions == Vector2.Zero || 
+                        CameraManager.pInstance.IsOnCamera(mGameObjects[i].pRenderRect))
                     {
-                        if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.UNDEFINED)
+                        // Has the blend mode changed from the previous game object to this one?
+                        if (currentBlend != mGameObjects[i].pBlendMode)
                         {
-                            throw new Exception("Attempting to rendering Game Object with UNDEFINED blend mode.");
+                            if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.UNDEFINED)
+                            {
+                                throw new Exception("Attempting to rendering Game Object with UNDEFINED blend mode.");
+                            }
+
+                            // Did the last game object set the blend mode, meaning we have to end it?
+                            // This is true for the first game object being rendered.
+                            if (currentBlend != GameObjectDefinition.BlendMode.UNDEFINED)
+                            {
+                                batch.End();
+                            }
+
+                            // Update the current blend mode so that we can tell when it changes.
+                            currentBlend = mGameObjects[i].pBlendMode;
+
+                            if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.STANDARD)
+                            {
+                                batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, CameraManager.pInstance.pFinalTransform);
+
+                                // Keep the sprites looking crisp.
+                                batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+                                batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                            }
+                            else if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.MULTIPLY)
+                            {
+                                batch.Begin(SpriteSortMode.Immediate, mMultiply, null, null, null, null, CameraManager.pInstance.pFinalTransform);
+
+                                // Keep the sprites looking crisp.
+                                batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+                                batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                            }
+                            else if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.MULTIPLY_UI)
+                            {
+                                // Use the Multiply blend mode but ignore the camera, so that it renders in screen
+                                // space.
+                                batch.Begin(SpriteSortMode.Immediate, mMultiply);
+
+                                // Keep the sprites looking crisp.
+                                batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+                                batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                            }
+                            else if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.STANDARD_UI)
+                            {
+                                batch.Begin(
+                                    SpriteSortMode.Immediate,
+                                    BlendState.AlphaBlend,
+                                    null, null, null, null,
+                                    CameraManager.pInstance.pFinalTransformUI);
+
+                                // Keep the sprites looking crisp.
+                                batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+                                batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                            }
+                            else if (mGameObjects[i].pBlendMode != GameObjectDefinition.BlendMode.UNDEFINED)
+                            {
+                                throw new Exception("Unhandled blend mode.");
+                            }
                         }
 
-                        // Did the last game object set the blend mode, meaning we have to end it?
-                        // This is true for the first game object being rendered.
-                        if (currentBlend != GameObjectDefinition.BlendMode.UNDEFINED)
-                        {
-                            batch.End();
-                        }
+                        mGameObjects[i].Render(batch);
 
-                        // Update the current blend mode so that we can tell when it changes.
-                        currentBlend = mGameObjects[i].pBlendMode;
+                        objectsRender++;
 
-                        if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.STANDARD)
-                        {
-                            batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, CameraManager.pInstance.pFinalTransform);
-
-                            // Keep the sprites looking crisp.
-                            batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-                            batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
-                        }
-                        else if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.MULTIPLY)
-                        {
-                            batch.Begin(SpriteSortMode.Immediate, mMultiply, null, null, null, null, CameraManager.pInstance.pFinalTransform);
-
-                            // Keep the sprites looking crisp.
-                            batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-                            batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
-                        }
-                        else if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.MULTIPLY_UI)
-                        {
-                            // Use the Multiply blend mode but ignore the camera, so that it renders in screen
-                            // space.
-                            batch.Begin(SpriteSortMode.Immediate, mMultiply);
-
-                            // Keep the sprites looking crisp.
-                            batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-                            batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
-                        }
-                        else if (mGameObjects[i].pBlendMode == GameObjectDefinition.BlendMode.STANDARD_UI)
-                        {
-                            batch.Begin(
-                                SpriteSortMode.Immediate, 
-                                BlendState.AlphaBlend, 
-                                null, null, null, null,
-                                CameraManager.pInstance.pFinalTransformUI);
-
-                            // Keep the sprites looking crisp.
-                            batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-                            batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
-                        }
-                        else if (mGameObjects[i].pBlendMode != GameObjectDefinition.BlendMode.UNDEFINED)
-                        {
-                            throw new Exception("Unhandled blend mode.");
-                        }
+                        DebugShapeDisplay.pInstance.AddTransform(mGameObjects[i].pPosition);
                     }
-
-                    mGameObjects[i].Render(batch);
-
-                    DebugShapeDisplay.pInstance.AddTransform(mGameObjects[i].pOrientation.mPosition);
                 }
             }
 
             batch.End();
+
+#if ALLOW_GARBAGE
+            DebugMessageDisplay.pInstance.AddDynamicMessage("Objects Rendered: " + objectsRender);
+#endif
 
         }
 
@@ -462,7 +474,7 @@ namespace MBHEngine.GameObject
                 {
                     if (mGameObjects[i].pClassifications.Contains(classifications[j]))
                     {
-                        if (Vector2.DistanceSquared(centerPoint, mGameObjects[i].pOrientation.mPosition) < radSqr)
+                        if (Vector2.DistanceSquared(centerPoint, mGameObjects[i].pPosition) < radSqr)
                         {
                             refObjects.Add(mGameObjects[i]);
 

@@ -80,13 +80,13 @@ namespace ZombieTaxi.Behaviours
         /// <param name="batch">The sprite batch to render to.</param>
         public override void Render(SpriteBatch batch)
         {
-            batch.Draw(mTextureBG, mParentGOH.pOrientation.mPosition, Color.White);
+            batch.Draw(mTextureBG, mParentGOH.pPosition, Color.White);
             batch.Draw(
                 mTextureFill, 
-                new Vector2(mParentGOH.pOrientation.mPosition.X + 1, mParentGOH.pOrientation.mPosition.Y + 1),
+                new Vector2(mParentGOH.pPosition.X + 1, mParentGOH.pPosition.Y + 1),
                 mFillRect, 
                 Color.White);
-            batch.Draw(mTextureBorder, mParentGOH.pOrientation.mPosition, Color.White);
+            batch.Draw(mTextureBorder, mParentGOH.pPosition, Color.White);
         }
     }
 }

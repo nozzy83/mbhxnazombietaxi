@@ -55,7 +55,7 @@ namespace ZombieTaxi.Behaviours
             //InventoryDefinition def = GameObjectManager.pInstance.pContentManager.Load<InventoryDefinition>(fileName);
 
             mCursor = new GameObject("GameObjects\\Interface\\PlacementCursor\\PlacementCursor");
-            mCursor.pOrientation.mPosition = mParentGOH.pOrientation.mPosition;
+            mCursor.pPosition = mParentGOH.pPosition;
             GameObjectManager.pInstance.Add(mCursor);
 
             mCursorOffset = Vector2.Zero;
@@ -79,7 +79,7 @@ namespace ZombieTaxi.Behaviours
 
             // The the tile which the player is currently standing on. This will be our
             // starting point.
-            mGetTileAtPositionMsg.mPosition = mParentGOH.pOrientation.mPosition;
+            mGetTileAtPositionMsg.mPosition = mParentGOH.pPosition;
             lvl.OnMessage(mGetTileAtPositionMsg);
 
             // We jump by tiles in terms of offsets (rather than pixels or something), so
@@ -93,19 +93,19 @@ namespace ZombieTaxi.Behaviours
             offsetPx.Y = mGetMapInfoMsg.mInfo.mTileHeight * mCursorOffset.Y;
 
             // Reposition the cursor.
-            mCursor.pOrientation.mPosition = mGetTileAtPositionMsg.mTile.mCollisionRect.pCenterPoint + offsetPx;
+            mCursor.pPosition = mGetTileAtPositionMsg.mTile.mCollisionRect.pCenterPoint + offsetPx;
 
             // Place and remove tiles.
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
             {
                 mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Solid;
-                mSetTileTypeAtPositionMsg.mPosition = mCursor.pOrientation.mPosition;
+                mSetTileTypeAtPositionMsg.mPosition = mCursor.pPosition;
                 MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
             }
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
             {
                 mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Empty;
-                mSetTileTypeAtPositionMsg.mPosition = mCursor.pOrientation.mPosition;
+                mSetTileTypeAtPositionMsg.mPosition = mCursor.pPosition;
                 MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
             }
         }
