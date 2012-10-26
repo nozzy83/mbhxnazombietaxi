@@ -114,7 +114,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\Explosion\\Explosion", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\Dust\\Dust", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Flare\\Flare", 10);
-            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\StonePickup\\StonePickup", 10);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\StonePickup\\StonePickup", 100);
             
 
             // The tiled background image that travels will the player creating the illusion of

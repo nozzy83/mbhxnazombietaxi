@@ -2,22 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MBHEngine.GameObject;
 using Microsoft.Xna.Framework;
 
 namespace MBHEngine.Behaviour
 {
     /// <summary>
-    /// When this GameObject posts a OnZeroHealth message, this behaviour calls into the 
-    /// current level and tells it to remove any collision volumes at the position of this
-    /// GameObject. This would be commom for things like destructable walls.
+    /// Waits for OnZeroHealth message at which point it spawns another GameObject
     /// </summary>
-    public class RemoveTileOnDeath : Behaviour
+    public class SpawnOnDeath : Behaviour
     {
-
-        /// <summary>
-        /// Preallocated messages to avoid garbage collection.
-        /// </summary>
-        private Level.SetTileTypeAtPositionMessage mSetTileTypeAtPositionMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -25,7 +19,7 @@ namespace MBHEngine.Behaviour
         /// </summary>
         /// <param name="parentGOH">The game object that this behaviour is attached to.</param>
         /// <param name="fileName">The file defining this behaviour.</param>
-        public RemoveTileOnDeath(GameObject.GameObject parentGOH, String fileName)
+        public SpawnOnDeath(GameObject.GameObject parentGOH, String fileName)
             : base(parentGOH, fileName)
         {
         }
@@ -37,8 +31,6 @@ namespace MBHEngine.Behaviour
         public override void LoadContent(String fileName)
         {
             base.LoadContent(fileName);
-
-            mSetTileTypeAtPositionMsg = new Level.SetTileTypeAtPositionMessage();
         }
 
         /// <summary>
@@ -52,9 +44,9 @@ namespace MBHEngine.Behaviour
         {
             if (msg is Health.OnZeroHealth)
             {
-                mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Empty;
-                mSetTileTypeAtPositionMsg.mPosition = mParentGOH.pPosition;
-                MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
+                GameObject.GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\StonePickup\\StonePickup");
+                go.pPosition = mParentGOH.pPosition;
+                GameObjectManager.pInstance.Add(go);
             }
         }
     }
