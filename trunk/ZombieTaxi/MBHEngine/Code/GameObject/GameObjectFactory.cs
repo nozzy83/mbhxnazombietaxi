@@ -127,6 +127,8 @@ namespace MBHEngine.GameObject
         /// <returns>A GameObject of the requested type, or null if none are available.</returns>
         public GameObject GetTemplate(String fileName)
         {
+            //CheckForDupes(fileName);
+
             // Make sure this type of Object was actually added to the Dictionary at some point.
             if (mObjects.ContainsKey(fileName))
             {
@@ -162,6 +164,11 @@ namespace MBHEngine.GameObject
                 return;
             }
 
+#if DEBUG
+            // Sanity check to make sure this object isn't added more than once.
+            CheckForDupes(go.pFactoryInfo.pTemplateName);
+#endif // DEBUG
+
             // Reset all Behaviours so that the next client gets a "fresh" GameObject.
             go.ResetBehaviours();
 
@@ -188,5 +195,23 @@ namespace MBHEngine.GameObject
                 return mInstance;
             }
         }
+
+#if DEBUG
+        /// <summary>
+        /// Sanity check to make sure the same object isn't Added more than once which
+        /// will result in the Factory handing off the same GameObject to different clients.
+        /// </summary>
+        /// <param name="templateName">The template name.</param>
+        private void CheckForDupes(String templateName)
+        {
+            List<Int32> ids = new List<int>(1000);
+            foreach (GameObject obj in mObjects[templateName])
+            {
+                System.Diagnostics.Debug.Assert(!ids.Contains(obj.pID), "Adding same object to factory multiple times.");
+
+                ids.Add(obj.pID);
+            }
+        }
+#endif // DEBUG
     }
 }

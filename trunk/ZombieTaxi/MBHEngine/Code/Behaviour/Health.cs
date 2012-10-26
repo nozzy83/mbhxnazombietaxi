@@ -150,6 +150,14 @@ namespace MBHEngine.Behaviour
             }
         }
 
+        /// <summary>
+        /// Resets a behaviour to its initial state.
+        /// </summary>
+        public override void Reset()
+        {
+            mCurrentHealth = mMaxHealth;
+        }
+
 #if ALLOW_GARBAGE
         /// <summary>
         /// Returns a bunch of information about the behaviour which can be dumped to
