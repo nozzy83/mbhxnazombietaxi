@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.ObjectPlacementDefinition">
+    <mUpdatePasses>
+      <Item>DEFAULT</Item>
+      <Item>PLACEMENT</Item>
+    </mUpdatePasses>
   </Asset>
 </XnaContent>
 

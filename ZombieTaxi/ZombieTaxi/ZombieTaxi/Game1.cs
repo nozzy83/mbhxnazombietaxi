@@ -214,15 +214,6 @@ namespace ZombieTaxi
                 IsMouseVisible = mDebugDrawEnabled;
             }
 
-            if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2))
-            {
-                GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.PLACEMENT;
-            }
-            else
-            {
-                GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.DEFAULT;
-            }
-
 #if DEBUG && false // Temporarily disable this feature while working on tile placement mode.
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_RIGHT, true))
             {

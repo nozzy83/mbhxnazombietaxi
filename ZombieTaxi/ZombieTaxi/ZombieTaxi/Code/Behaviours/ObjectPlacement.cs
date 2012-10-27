@@ -7,6 +7,7 @@ using MBHEngine.GameObject;
 using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.Behaviour;
 using MBHEngine.Input;
+using MBHEngineContentDefs;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -85,6 +86,20 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2))
+            {
+                GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.PLACEMENT;
+            }
+            else
+            {
+                GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.DEFAULT;
+            }
+
+            if (GameObjectManager.pInstance.pCurUpdatePass != BehaviourDefinition.Passes.PLACEMENT)
+            {
+                return;
+            }
+
             // Move the cursor based on user input.
             MoveCursor();
 
@@ -154,19 +169,23 @@ namespace ZombieTaxi.Behaviours
             //       up and running!
             //
 
-            if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_LEFT, true))
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_LEFT, true) ||
+                InputManager.pInstance.CheckAction(InputManager.InputActions.LA_LEFT, true))
             {
                 mCursorOffset.X -= 1;
             }
-            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_RIGHT, true))
+            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_RIGHT, true) ||
+                InputManager.pInstance.CheckAction(InputManager.InputActions.LA_RIGHT, true))
             {
                 mCursorOffset.X += 1;
             }
-            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_UP, true))
+            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_UP, true) ||
+                InputManager.pInstance.CheckAction(InputManager.InputActions.LA_UP, true))
             {
                 mCursorOffset.Y -= 1;
             }
-            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_DOWN, true))
+            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_DOWN, true) ||
+                InputManager.pInstance.CheckAction(InputManager.InputActions.LA_DOWN, true))
             {
                 mCursorOffset.Y += 1;
             }

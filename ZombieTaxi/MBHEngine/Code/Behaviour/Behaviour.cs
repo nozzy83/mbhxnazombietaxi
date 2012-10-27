@@ -21,6 +21,16 @@ namespace MBHEngine.Behaviour
         protected GameObject.GameObject mParentGOH;
 
         /// <summary>
+        /// If populated, the object will only be updated during these passes.
+        /// </summary>
+        protected List<BehaviourDefinition.Passes> mUpdatePasses;
+
+        /// <summary>
+        /// Do not render when the current GameObject pass is in this list.
+        /// </summary>
+        protected List<BehaviourDefinition.Passes> mRenderPassExclusions;
+
+        /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
         /// </summary>
@@ -41,8 +51,21 @@ namespace MBHEngine.Behaviour
         /// <param name="fileName">The file to load from.</param>
         public virtual void LoadContent(String fileName)
         {
-            // No data stored here right now, so leaving it commented out for the time being.
-            //BehaviourDefinition def = GameObjectManager.pInstance.pContentManager.Load<BehaviourDefinition>(fileName);
+            if (null != fileName)
+            {
+                // No data stored here right now, so leaving it commented out for the time being.
+                BehaviourDefinition def = GameObjectManager.pInstance.pContentManager.Load<BehaviourDefinition>(fileName);
+
+                mUpdatePasses = def.mUpdatePasses;
+
+                mRenderPassExclusions = def.mRenderPassExclusions;
+            }
+
+            if (null == mUpdatePasses)
+            {
+                mUpdatePasses = new List<BehaviourDefinition.Passes>(1);
+                mUpdatePasses.Add(BehaviourDefinition.Passes.DEFAULT);
+            }
         }
 
         /// <summary>
@@ -107,6 +130,29 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public virtual void Reset()
         {
+        }
+
+        /// <summary>
+        /// A list of all the passes that can be active for this object to recieve updates.
+        /// </summary>
+        public virtual List<BehaviourDefinition.Passes> pUpdatePasses
+        {
+            get
+            {
+                return mUpdatePasses;
+            }
+        }
+
+        /// <summary>
+        /// A list of all the passes that if currently active should signal this Behaviour to NOT be rendered.
+        /// The Behaviour does not want to be rendered during these Passes. If null just always render.
+        /// </summary>
+        public virtual List<BehaviourDefinition.Passes> pRenderPassExclusions
+        {
+            get
+            {
+                return mRenderPassExclusions;
+            }
         }
     }
 }
