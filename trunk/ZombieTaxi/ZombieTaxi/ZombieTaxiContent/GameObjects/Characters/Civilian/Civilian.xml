@@ -19,6 +19,7 @@
       <Item>PathFind</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
+      <Item>SimpleMomentum</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
@@ -26,6 +27,7 @@
       <Item>MBHEngine.Behaviour.PathFind</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

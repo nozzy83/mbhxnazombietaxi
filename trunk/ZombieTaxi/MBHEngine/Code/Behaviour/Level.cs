@@ -247,6 +247,8 @@ namespace MBHEngine.Behaviour
         /// <param name="fileName">The file to load from.</param>
         public override void LoadContent(String fileName)
         {
+            base.LoadContent(fileName);
+
             LevelDefinition def = GameObjectManager.pInstance.pContentManager.Load<LevelDefinition>(fileName);
 
             mMapInfo = new MapInfo();
@@ -388,8 +390,6 @@ namespace MBHEngine.Behaviour
             // Load an image to use for rendering the level.
             mMapInfo.mTileMap = GameObjectManager.pInstance.pContentManager.Load<Texture2D>
                 (def.mTileMapImageName);
-
-            base.LoadContent(fileName);
         }
 
         /// <summary>

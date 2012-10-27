@@ -83,7 +83,12 @@ namespace MBHEngine.GameObject
         /// <summary>
         /// This will defined as a multiply blend state.
         /// </summary>
-        BlendState mMultiply;
+        private BlendState mMultiply;
+
+        /// <summary>
+        /// The current update pass.
+        /// </summary>
+        private BehaviourDefinition.Passes mCurrentUpdatePass;
 
         /// <summary>
         /// We make the constructor private so that no one accidentally creates
@@ -118,6 +123,8 @@ namespace MBHEngine.GameObject
             mMultiply = new BlendState();
             mMultiply.ColorSourceBlend = Blend.Zero;
             mMultiply.ColorDestinationBlend = Blend.SourceColor;
+
+            mCurrentUpdatePass = BehaviourDefinition.Passes.DEFAULT;
         }
 
         /// <summary>
@@ -605,6 +612,21 @@ namespace MBHEngine.GameObject
                 System.Diagnostics.Debug.Assert(mPlayer == null, "Setting Player more than once.  If this is intentional this assert should be removed.");
 
                 mPlayer = value;
+            }
+        }
+
+        /// <summary>
+        /// The currently set Pass.
+        /// </summary>
+        public BehaviourDefinition.Passes pCurUpdatePass
+        {
+            get
+            {
+                return mCurrentUpdatePass;
+            }
+            set
+            {
+                mCurrentUpdatePass = value;
             }
         }
 

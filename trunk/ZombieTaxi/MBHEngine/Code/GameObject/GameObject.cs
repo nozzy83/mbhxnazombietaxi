@@ -235,9 +235,15 @@ namespace MBHEngine.GameObject
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public virtual void PreUpdate(GameTime gameTime)
         {
+            BehaviourDefinition.Passes curPass = GameObjectManager.pInstance.pCurUpdatePass;
+
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                mBehaviours[i].PreUpdate(gameTime);
+                if (0 == mBehaviours[i].pUpdatePasses.Count ||
+                    mBehaviours[i].pUpdatePasses.Contains(curPass))
+                {
+                    mBehaviours[i].PreUpdate(gameTime);
+                }
             }
         }
 
@@ -247,12 +253,16 @@ namespace MBHEngine.GameObject
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public virtual void Update(GameTime gameTime)
         {
+            BehaviourDefinition.Passes curPass = GameObjectManager.pInstance.pCurUpdatePass;
+
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                mBehaviours[i].Update(gameTime);
+                if (0 == mBehaviours[i].pUpdatePasses.Count ||
+                    mBehaviours[i].pUpdatePasses.Contains(curPass))
+                {
+                    mBehaviours[i].Update(gameTime);
+                }
             }
-
-            mPosition += mDirection.mForward * mDirection.mSpeed;
         }
 
         /// <summary>
@@ -262,9 +272,15 @@ namespace MBHEngine.GameObject
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public virtual void PostUpdate(GameTime gameTime)
         {
+            BehaviourDefinition.Passes curPass = GameObjectManager.pInstance.pCurUpdatePass;
+
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                mBehaviours[i].PostUpdate(gameTime);
+                if (0 == mBehaviours[i].pUpdatePasses.Count ||
+                    mBehaviours[i].pUpdatePasses.Contains(curPass))
+                {
+                    mBehaviours[i].PostUpdate(gameTime);
+                }
             }
 
             // With all behaviours done updating, it should be safe to
@@ -282,9 +298,15 @@ namespace MBHEngine.GameObject
         /// <param name="batch">The sprite batch to render to.</param>
         public virtual void Render(SpriteBatch batch)
         {
+            BehaviourDefinition.Passes curPass = GameObjectManager.pInstance.pCurUpdatePass;
+
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                mBehaviours[i].Render(batch);
+                if (null == mBehaviours[i].pRenderPassExclusions ||
+                    !(mBehaviours[i].pRenderPassExclusions.Contains(curPass)))
+                {
+                    mBehaviours[i].Render(batch);
+                }
             }
         }
 
@@ -416,6 +438,10 @@ namespace MBHEngine.GameObject
                 case "MBHEngine.Behaviour.SpawnOnDeath":
                     {
                         return new MBHEngine.Behaviour.SpawnOnDeath(this, fileName);
+                    }
+                case "MBHEngine.Behaviour.SimpleMomentum":
+                    {
+                        return new MBHEngine.Behaviour.SimpleMomentum(this, fileName);
                     }
                 default:
                     {

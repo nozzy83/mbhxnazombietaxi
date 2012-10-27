@@ -13,11 +13,13 @@
       <Item>Sprite</Item>
       <Item>Timer</Item>
       <Item>Explosive</Item>
+      <Item>SimpleMomentum</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>MBHEngine.Behaviour.Timer</Item>
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
+      <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

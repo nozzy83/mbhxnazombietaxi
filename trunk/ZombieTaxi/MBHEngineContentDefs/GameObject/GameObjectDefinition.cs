@@ -23,6 +23,18 @@ namespace MBHEngineContentDefs
         }
 
         /// <summary>
+        /// The different types of blending that a gameobject can use when rendering.
+        /// </summary>
+        public enum BlendMode
+        {
+            UNDEFINED = 0,
+            STANDARD,
+            MULTIPLY,
+            STANDARD_UI,
+            MULTIPLY_UI,
+        };
+
+        /// <summary>
         /// Determines the order at which IGameObjects should be rendered.
         /// The higher the number the later it will be rendered.
         /// </summary>
@@ -77,18 +89,6 @@ namespace MBHEngineContentDefs
         /// </summary>
         [ContentSerializer(Optional = true)]
         public List<Classifications> mClassifications;
-
-        /// <summary>
-        /// The different types of blending that a gameobject can use when rendering.
-        /// </summary>
-        public enum BlendMode
-        {
-            UNDEFINED = 0,
-            STANDARD,
-            MULTIPLY,
-            STANDARD_UI,
-            MULTIPLY_UI,
-        };
 
         /// <summary>
         /// The type of blending to be used when rendering this object.

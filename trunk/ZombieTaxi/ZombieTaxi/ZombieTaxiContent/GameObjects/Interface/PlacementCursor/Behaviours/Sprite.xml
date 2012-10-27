@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mUpdatePasses>
+      <Item>PLACEMENT</Item>
+    </mUpdatePasses>
+    <mRenderPassExclusions>
+      <Item>DEFAULT</Item>
+    </mRenderPassExclusions>
     <mSpriteFileName>Sprites\Interface\PlacementCursor</mSpriteFileName>
     <mFrameHeight>16</mFrameHeight>
     <mAnimationSets>
