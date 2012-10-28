@@ -115,7 +115,7 @@ namespace MBHEngine.Math
         {
             // If the watch is being managed by the Active list, remove it from there and put it back into
             // the Expired stack so that someone else can use it.
-            if (mActiveWatches.Contains(watch))
+            //if (mActiveWatches.Contains(watch))
             {
                 mActiveWatches.Remove(watch);
                 mExpiredWatches.Push(watch);

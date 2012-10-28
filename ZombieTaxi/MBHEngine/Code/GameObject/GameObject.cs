@@ -94,6 +94,13 @@ namespace MBHEngine.GameObject
         protected Direction mDirection;
 
         /// <summary>
+        /// True if this object will not move while being managed by the GameObjectManager.
+        /// If it is a GameObjectFactory managed object, it is fine to move it in between
+        /// GetTemplate and adding it to the GameObjectManager.
+        /// </summary>
+        protected Boolean mIsStatic;
+
+        /// <summary>
         /// A rectangle surrounding this Game Object.  Used for all collision
 		/// detection routines.
         /// </summary>
@@ -190,6 +197,7 @@ namespace MBHEngine.GameObject
                 mPosition = def.mPosition;
                 mRotation = def.mRotation;
                 mScale = def.mScale;
+                mIsStatic = def.mIsStatic;
                 mCollisionRectangle = new Math.Rectangle(def.mCollisionBoxDimensions);
                 mCollisionRectangle.pCenterPoint = mPosition;
                 // Being lazy for now. Just assume that a scaler of collision box is big enough to always show character.
@@ -461,7 +469,7 @@ namespace MBHEngine.GameObject
         /// <returns>A formatted string of debug information.</returns>
         public virtual String [] GetDebugInfo()
         {
-            String [] info = new String[3];
+            String [] info = new String[4];
 
             Int32 i = 0;
 
@@ -472,6 +480,9 @@ namespace MBHEngine.GameObject
             i++;
 
             info[i] = "Managed: " + pFactoryInfo.pIsManaged;
+            i++;
+
+            info[i] = "Static: " + mIsStatic;
             i++;
 
             return info;
@@ -496,6 +507,21 @@ namespace MBHEngine.GameObject
             mCollisionRectangle.pCenterPoint = pPosition + mCollisionRoot;
             mRenderRectangle.pCenterPoint = pPosition + mCollisionRoot;
         }
+
+#if DEBUG
+        private void StaticObjectMovementSafetyCheck()
+        {
+            if (mIsStatic)
+            {
+                List<GameObject> list = GameObjectManager.pInstance.GetObjectsInCell(mPosition);
+
+                if (null != list)
+                {
+                    System.Diagnostics.Debug.Assert(!list.Contains(this), "Attempting to move a static object that is currently managed by the GameObjectManager. Remove it before attempting to move.");
+                }
+            }
+        }
+#endif // DEBUG
 
         /// <summary>
         /// The factory information for this game object.
@@ -553,6 +579,9 @@ namespace MBHEngine.GameObject
             get { return mPosition; }
             set 
             { 
+#if DEBUG
+                StaticObjectMovementSafetyCheck();
+#endif // DEBUG
                 mPosition = value;
                 UpdateBounds();
             }
@@ -573,7 +602,11 @@ namespace MBHEngine.GameObject
         {
             get { return mPosition.X; }
             set 
-            { 
+            {
+#if DEBUG
+                StaticObjectMovementSafetyCheck();
+#endif // DEBUG
+
                 mPosition.X = value;
 
                 UpdateBounds();
@@ -587,7 +620,11 @@ namespace MBHEngine.GameObject
         {
             get { return mPosition.Y; }
             set 
-            { 
+            {
+#if DEBUG
+                StaticObjectMovementSafetyCheck();
+#endif // DEBUG
+
                 mPosition.Y = value;
 
                 UpdateBounds();
@@ -712,6 +749,21 @@ namespace MBHEngine.GameObject
             get
             {
                 return mBehaviours;
+            }
+        }
+
+        /// <summary>
+        /// Will this object never move once it is added to the GameObjectManager.
+        /// </summary>
+        public Boolean pIsStatic
+        {
+            get
+            {
+                return mIsStatic;
+            }
+            set
+            {
+                mIsStatic = value;
             }
         }
     }

@@ -66,6 +66,14 @@ namespace MBHEngineContentDefs
         public Vector2 mScale;
 
         /// <summary>
+        /// True if this object will not move while being managed by the GameObjectManager.
+        /// If it is a GameObjectFactory managed object, it is fine to move it in between
+        /// GetTemplate and adding it to the GameObjectManager.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Boolean mIsStatic;
+
+        /// <summary>
         /// The width and height of the collision box.
         /// </summary>
         [ContentSerializer(Optional = true)]

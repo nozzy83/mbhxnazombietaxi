@@ -390,6 +390,9 @@ namespace MBHEngine.Behaviour
             // Load an image to use for rendering the level.
             mMapInfo.mTileMap = GameObjectManager.pInstance.pContentManager.Load<Texture2D>
                 (def.mTileMapImageName);
+
+            // Let the GameObjectManager know that the level data has changed.
+            GameObjectManager.pInstance.OnMapInfoChange(mMapInfo);
         }
 
         /// <summary>
