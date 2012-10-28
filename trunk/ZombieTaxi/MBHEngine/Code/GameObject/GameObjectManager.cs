@@ -15,6 +15,7 @@ using MBHEngine.Debug;
 using MBHEngineContentDefs;
 using MBHEngine.Render;
 using MBHEngine.Behaviour;
+using System.Collections;
 //using dreambuildplay2010.Code.Utilities;
 //using dreambuildplay2010.Code.Game.GameStates;
 
@@ -37,6 +38,19 @@ namespace MBHEngine.GameObject
         /// of this class is to manage this list.
         /// </summary>
         private List<GameObject> mGameObjects;
+
+        /// <summary>
+        /// A subset of mGameObjects holding references to all of the objects that are not
+        /// flaged as being static.
+        /// </summary>
+        private List<GameObject> mDynamicGameObjects;
+
+        /// <summary>
+        /// A subset of mGameObjects holding references to all of the objects that are
+        /// flaged as being static. This 2D array is index by the X,Y position of the 
+        /// object scaled by mCellSize.
+        /// </summary>
+        private List<GameObject> [,] mStaticGameObjects;
 
         /// <summary>
         /// A list of all the GameObjects that need to be added at the next possible
@@ -91,12 +105,24 @@ namespace MBHEngine.GameObject
         private BehaviourDefinition.Passes mCurrentUpdatePass;
 
         /// <summary>
+        /// The size of a single cell. Cells are square.
+        /// </summary>
+        private Int32 mCellSize;
+
+        /// <summary>
+        /// The number of cells in a single row. Assumes a square board.
+        /// </summary>
+        private Int32 mNumCells;
+
+        /// <summary>
         /// We make the constructor private so that no one accidentally creates
         /// an instance of the class.
         /// </summary>
         private GameObjectManager()
         {
             mGameObjects            = new List<GameObject>();
+            mDynamicGameObjects     = new List<GameObject>();
+            // Note: mStaticGameObject is allocated in OnMapInfoChange.
             mGameObjectsToAdd       = new List<GameObject>();
             mGameObjectsToRemove    = new List<GameObject>();
         }
@@ -125,6 +151,9 @@ namespace MBHEngine.GameObject
             mMultiply.ColorDestinationBlend = Blend.SourceColor;
 
             mCurrentUpdatePass = BehaviourDefinition.Passes.DEFAULT;
+
+            // Just an arbitrary choice.
+            mCellSize = 100;
         }
 
         /// <summary>
@@ -202,6 +231,23 @@ namespace MBHEngine.GameObject
         /// <param name="gameTime">The amount of time passed since last update.</param>
         public void Update(GameTime gameTime)
         {
+#if DEBUG
+            // Draw cell boundaries.
+            //
+
+            Int32 size = mNumCells * mCellSize;
+
+            for (Int32 y = 0; y < mNumCells; y++)
+            {
+                DebugShapeDisplay.pInstance.AddSegment(new Vector2(0, y * mCellSize), new Vector2(size, y * mCellSize), Color.Black);
+            }
+
+            for (Int32 x = 0; x < mNumCells; x++)
+            {
+                DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mCellSize, 0), new Vector2(x * mCellSize, size), Color.Black);
+            }
+#endif
+
             // Keep track of how many objects were updated this frame.
             int count = 0;
 
@@ -253,6 +299,22 @@ namespace MBHEngine.GameObject
                     GameObjectFactory.pInstance.RecycleTemplate(mGameObjectsToRemove[i]);
                 }
 
+                // See if this is also going to be referenced in the dynamic objects list.
+                if (!mGameObjectsToRemove[i].pIsStatic)
+                {
+                    mDynamicGameObjects.Remove(mGameObjectsToRemove[i]);
+                }
+
+                // See if this is going to be reference in the static objects list.
+                if (mGameObjectsToRemove[i].pIsStatic)
+                {
+                    // Figure out which cell this object would be in.
+                    Vector2 index = CellIndexFromPosition(mGameObjectsToRemove[i].pPosition);
+
+                    // Remove it from the cell it should be in.
+                    mStaticGameObjects[(Int32)index.X, (Int32)index.Y].Remove(mGameObjectsToRemove[i]);
+                }
+
                 // What happens if someone adds and removes an element within the same
                 // update?  It would mean we are about to remove an item that hasn't
                 // actually been added yet!  To get around this flaw, we will attempt to
@@ -277,10 +339,32 @@ namespace MBHEngine.GameObject
             // based on render priority.
             //
             int curIndex = 0;
-            for (int j = 0; j < mGameObjectsToAdd.Count; j++)
+            for (int i = 0; i < mGameObjectsToAdd.Count; i++)
             {
+                // Check if this is a dynamic object which isn't already being managed by this list.
+                if (!mGameObjectsToAdd[i].pIsStatic)
+                {
+#if DEBUG
+                    System.Diagnostics.Debug.Assert(!mDynamicGameObjects.Contains(mGameObjectsToAdd[i]), "Attempting to add GameObject already in mDynamicGameObjects.");
+#endif // DEBUG
+                    mDynamicGameObjects.Add(mGameObjectsToAdd[i]);
+                }
+
+                // Has this object been flagged as being static?
+                if (mGameObjectsToAdd[i].pIsStatic)
+                {
+                    // Figure out which cell this object would be in.
+                    Vector2 index = CellIndexFromPosition(mGameObjectsToAdd[i].pPosition);
+
+#if DEBUG
+                    System.Diagnostics.Debug.Assert(!mStaticGameObjects[(Int32)index.X, (Int32)index.Y].Contains(mGameObjectsToAdd[i]), "Attempting to add GameObject already in mStaticGameObjects.");
+#endif // DEBUG
+
+                    mStaticGameObjects[(Int32)index.X, (Int32)index.Y].Add(mGameObjectsToAdd[i]);
+                }
+
                 // If this game object is already in the list, don't add it again.
-                if (!mGameObjects.Contains(mGameObjectsToAdd[j]))
+                if (!mGameObjects.Contains(mGameObjectsToAdd[i]))
                 {
                     bool alreadyAdded = false;
 
@@ -290,10 +374,10 @@ namespace MBHEngine.GameObject
                     // element must be placed somewhere after the current one.
                     for (; curIndex < mGameObjects.Count; curIndex++)
                     {
-                        if (mGameObjectsToAdd[j].pRenderPriority < mGameObjects[curIndex].pRenderPriority)
+                        if (mGameObjectsToAdd[i].pRenderPriority < mGameObjects[curIndex].pRenderPriority)
                         {
                             // We have found the proper place for this element.
-                            mGameObjects.Insert(curIndex, mGameObjectsToAdd[j]);
+                            mGameObjects.Insert(curIndex, mGameObjectsToAdd[i]);
 
                             // We don't want to test against the elemt we just added.  Since it was
                             // inserted at i, the object we just compared against is actually at i + 1
@@ -311,7 +395,7 @@ namespace MBHEngine.GameObject
                         // If we make it to this point all the remaining elements have a greater or equal
                         // render priority to the highest priority item already existing.
                         // This will also take care of the cases where this is the first item being added.
-                        mGameObjects.Add(mGameObjectsToAdd[j]);
+                        mGameObjects.Add(mGameObjectsToAdd[i]);
 
                         // We don't want to test against the element we just added.  Since it was
                         // inserted at i, the object we just compared against is actually at i + 1
@@ -479,16 +563,47 @@ namespace MBHEngine.GameObject
         /// <param name="classifications">The types of objects to check for.</param>
         public void GetGameObjectsInRange(Vector2 centerPoint, Single radius, ref List<GameObject> refObjects, List<GameObjectDefinition.Classifications> classifications)
         {
+            // Calculate which cell the source object is in. We only need to test collision
+            // against objects in that cell.
+            // TODO: The should likely include surrounding cells.
+            Vector2 index = CellIndexFromPosition(centerPoint);
+
+            // Loop through the cell we are in and the surround cells for safety.
+            for (Int32 y = (Int32)index.Y - 1; y <= (Int32)index.Y + 1; y++)
+            {
+                for (Int32 x = (Int32)index.X - 1; x <= (Int32)index.X + 1; x++)
+                {
+                    // It is possible this object is outside of the world.
+                    if (IsValidCellIndex(x, y))
+                    {
+                        GetGameObjectsInRange(centerPoint, radius, mStaticGameObjects[x, y], ref refObjects, classifications);
+                    }
+                }
+            }
+
+            GetGameObjectsInRange(centerPoint, radius, mDynamicGameObjects, ref refObjects, classifications);
+        }
+
+        /// <summary>
+        /// Populates a list of all the objects within a certain range of a position.
+        /// </summary>
+        /// <param name="centerPoint">The position to test from.</param>
+        /// <param name="radius">The radius from that position that the other objects must be within.</param>
+        /// <param name="candidates">A list of all possible candidates source might be colliding with.</param>
+        /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.</param>
+        /// <param name="classifications">The types of objects to check for.</param>
+        private void GetGameObjectsInRange(Vector2 centerPoint, Single radius, List<GameObject> candidates, ref List<GameObject> refObjects, List<GameObjectDefinition.Classifications> classifications)
+        {
             Single radSqr = radius * radius;
-            for (int i = 0; i < mGameObjects.Count; i++)
+            for (int i = 0; i < candidates.Count; i++)
             {
                 for (Int32 j = 0; j < classifications.Count; j++)
                 {
-                    if (mGameObjects[i].pClassifications.Contains(classifications[j]))
+                    if (candidates[i].pClassifications.Contains(classifications[j]))
                     {
-                        if (Vector2.DistanceSquared(centerPoint, mGameObjects[i].pPosition) < radSqr)
+                        if (Vector2.DistanceSquared(centerPoint, candidates[i].pPosition) < radSqr)
                         {
-                            refObjects.Add(mGameObjects[i]);
+                            refObjects.Add(candidates[i]);
 
                             // This object has already been added, so move on to the next object.
                             break;
@@ -504,6 +619,35 @@ namespace MBHEngine.GameObject
         /// <param name="rect">A collision rectangle to check against.</param>
         /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.</param>
         public void GetGameObjectsInRange(Math.Rectangle rect, ref List<GameObject> refObjects)
+        {
+            // Calculate which cell the source object is in. We only need to test collision
+            // against objects in that cell.
+            // TODO: The should likely include surrounding cells.
+            Vector2 index = CellIndexFromPosition(rect.pCenterPoint);
+
+            // Loop through the cell we are in and the surround cells for safety.
+            for (Int32 y = (Int32)index.Y - 1; y <= (Int32)index.Y + 1; y++)
+            {
+                for (Int32 x = (Int32)index.X - 1; x <= (Int32)index.X + 1; x++)
+                {
+                    // It is possible this object is outside of the world.
+                    if (IsValidCellIndex(x, y))
+                    {
+                        GetGameObjectsInRange(rect, mStaticGameObjects[x, y], ref refObjects);
+                    }
+                }
+            }
+
+            GetGameObjectsInRange(rect, mDynamicGameObjects, ref refObjects);
+        }
+
+        /// <summary>
+        /// Populates a list of all the objects within a certain range of a position.
+        /// </summary>
+        /// <param name="rect">A collision rectangle to check against.</param>
+        /// <param name="candidates">A list of all possible candidates source might be colliding with.</param>
+        /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.</param>
+        private void GetGameObjectsInRange(Math.Rectangle rect, List<GameObject> candidates, ref List<GameObject> refObjects)
         {
             for (int i = 0; i < mGameObjects.Count; i++)
             {
@@ -523,11 +667,46 @@ namespace MBHEngine.GameObject
         /// these classifications narrow down the search.  This data is set in the Game Object definition XML.</param>
         public void GetGameObjectsInRange(GameObject source, ref List<GameObject> refObjects, List<GameObjectDefinition.Classifications> classifications)
         {
-            // Loop through every object being managed.
-            for (int i = 0; i < mGameObjects.Count; i++)
+            // Calculate which cell the source object is in. We only need to test collision
+            // against objects in that cell.
+            // TODO: The should likely include surrounding cells.
+            Vector2 index = CellIndexFromPosition(source.pPosition);
+
+            // Loop through the cell we are in and the surround cells for safety.
+            for (Int32 y = (Int32)index.Y - 1; y <= (Int32)index.Y + 1; y++)
+            {
+                for (Int32 x = (Int32)index.X - 1; x <= (Int32)index.X + 1; x++)
+                {
+                    // It is possible this object is outside of the world.
+                    if (IsValidCellIndex(x, y))
+                    {
+                        // Get the list of object in this cell.
+                        List<GameObject> staticObjs = mStaticGameObjects[x, y];
+
+                        GetGameObjectsInRange(source, staticObjs, ref refObjects, classifications);
+                    }
+                }
+            }
+            
+            // Dynamic objects all need to be tested against.
+            GetGameObjectsInRange(source, mDynamicGameObjects, ref refObjects, classifications);
+        }
+
+        /// <summary>
+        /// Populates a list of all the objects that overlap the source gameobject. Only tests against
+        /// list of candidates passed into this function.
+        /// </summary>
+        /// <param name="source">The object checking collision.</param>
+        /// <param name="candidates">A list of all possible candidates source might be colliding with.</param>
+        /// <param name="refObjects">A preallocated list of objects.  This is to avoid GC.</param>
+        /// <param name="classifications">Since we likely don't want to test against every object in the world, 
+        /// these classifications narrow down the search.  This data is set in the Game Object definition XML.</param>
+        private void GetGameObjectsInRange(GameObject source, List<GameObject> candidates, ref List<GameObject> refObjects, List<GameObjectDefinition.Classifications> classifications)
+        {
+            for (int i = 0; i < candidates.Count; i++)
             {
                 // Make sure we aren't finding ourselves.
-                if (mGameObjects[i] == source)
+                if (candidates[i] == source)
                 {
                     continue;
                 }
@@ -536,13 +715,13 @@ namespace MBHEngine.GameObject
                 for (Int32 j = 0; j < classifications.Count; j++)
                 {
                     // Does this game object have one of the classifications we are interested in?
-                    if (mGameObjects[i].pClassifications.Contains(classifications[j]))
+                    if (candidates[i].pClassifications.Contains(classifications[j]))
                     {
                         // Does this game object overlap the source object?
-                        if (source.pCollisionRect.Intersects(mGameObjects[i].pCollisionRect))
+                        if (source.pCollisionRect.Intersects(candidates[i].pCollisionRect))
                         {
                             // Add it to the preallocated list which was passed in.
-                            refObjects.Add(mGameObjects[i]);
+                            refObjects.Add(candidates[i]);
 
                             // This object has already been added, so move on to the next object.
                             break;
@@ -550,6 +729,21 @@ namespace MBHEngine.GameObject
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Takes a position and figures out which cell that position is in.
+        /// </summary>
+        /// <param name="pos">A position in the world.</param>
+        /// <returns>X and Y indexes into Cell arrays.</returns>
+        private Vector2 CellIndexFromPosition(Vector2 pos)
+        {
+            Vector2 index = new Vector2();
+
+            index.X = (Int32)System.Math.Floor((Double)pos.X / mCellSize);
+            index.Y = (Int32)System.Math.Floor((Double)pos.Y / mCellSize);
+
+            return index;
         }
 
         /// <summary>
@@ -562,6 +756,71 @@ namespace MBHEngine.GameObject
             {
                 mGameObjects[i].OnMessage(msg, sender);
             }
+        }
+
+        /// <summary>
+        /// Called by Level so that we can update the Cell information based on the new
+        /// size.
+        /// </summary>
+        /// <param name="info">Information about the current level.</param>
+        public void OnMapInfoChange(Level.MapInfo info)
+        {
+            System.Diagnostics.Debug.Assert(info.mMapWidth == info.mMapHeight, "Cells calculations assume square maps.");
+            System.Diagnostics.Debug.Assert(info.mTileWidth == info.mTileHeight, "Cells calculations assume square maps.");
+
+            mNumCells = (info.mMapWidth * info.mTileWidth) / mCellSize;
+
+            System.Diagnostics.Debug.Assert(mStaticGameObjects == null, "Attempting to recallocate cells. Not yet set up to handle this.");
+
+            mStaticGameObjects = new List<GameObject>[mNumCells, mNumCells];
+
+            for (Int32 y = 0; y < mNumCells; y++)
+            {
+                for (Int32 x = 0; x < mNumCells; x++)
+                {
+                    mStaticGameObjects[x, y] = new List<GameObject>(100);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all the static objects in a cell, based on world position.
+        /// </summary>
+        /// <param name="postion">The position contained in a cell you want to check.</param>
+        /// <returns>A list of all the static objects in the cell at the position specified. null if the position is not inside a valid cell.</returns>
+        public List<GameObject> GetObjectsInCell(Vector2 postion)
+        {
+            Vector2 index = CellIndexFromPosition(postion);
+
+            if (IsValidCellIndex(index))
+            {
+                return mStaticGameObjects[(Int32)index.X, (Int32)index.Y];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Checks if X and Y indexes are valid indicies inside the cell array.
+        /// </summary>
+        /// <param name="indexX">The first index into the 2D static object array.</param>
+        /// <param name="indexY">The second index into the 2D static object array.</param>
+        /// <returns>True if these are valid indicies.</returns>
+        public Boolean IsValidCellIndex(Int32 indexX, Int32 indexY)
+        {
+            return (indexX >= 0 && indexY >= 0 && indexX < mNumCells && indexY < mNumCells);
+        }
+
+        /// <summary>
+        /// Checks if X and Y indexes are valid indicies inside the cell array.
+        /// </summary>
+        /// <param name="index">The indicies into the 2D static object array.</param>
+        /// <returns>True if these are valid indicies.</returns>
+        public Boolean IsValidCellIndex(Vector2 index)
+        {
+            return IsValidCellIndex((Int32)index.X, (Int32)index.Y);
         }
 
         /// <summary>
