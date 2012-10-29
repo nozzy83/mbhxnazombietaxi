@@ -496,6 +496,7 @@ namespace MBHEngine.GameObject
 
                         objectsRender++;
 
+                        DebugShapeDisplay.pInstance.AddAABB(mGameObjects[i].pCollisionRect, Color.Green);
                         DebugShapeDisplay.pInstance.AddTransform(mGameObjects[i].pPosition);
                     }
                 }
