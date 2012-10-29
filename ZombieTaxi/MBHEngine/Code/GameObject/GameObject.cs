@@ -295,8 +295,6 @@ namespace MBHEngine.GameObject
             // now update and draw the collision volume for this object.
             UpdateBounds();
 
-            DebugShapeDisplay.pInstance.AddAABB(pCollisionRect, Color.Green);
-
             mPrevPosition = mPosition;
         }
 
