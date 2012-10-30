@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviour\BehaviourDefinition.cs" />
+    <Compile Include="Behaviour\MagneticDefinition.cs" />
     <Compile Include="Behaviour\SimpleMomentumDefinition.cs" />
     <Compile Include="Behaviour\SpawnOnDeathDefinition.cs" />
     <Compile Include="Behaviour\HealthDefinition.cs" />

@@ -116,10 +116,12 @@
     <Compile Include="Code\Behaviour\Behaviour.cs" />
     <Compile Include="Code\Behaviour\BehaviourCreator.cs" />
     <Compile Include="Code\Behaviour\BehaviourMessage.cs" />
+    <None Include="Code\Behaviour\Example.cs" />
     <Compile Include="Code\Behaviour\FiniteStateMachine.cs" />
     <Compile Include="Code\Behaviour\FrameRateDisplay.cs" />
     <Compile Include="Code\Behaviour\Health.cs" />
     <Compile Include="Code\Behaviour\Level.cs" />
+    <Compile Include="Code\Behaviour\Magnetic.cs" />
     <Compile Include="Code\Behaviour\OgmoRender.cs" />
     <Compile Include="Code\Behaviour\PathFind.cs" />
     <Compile Include="Code\Behaviour\RemoveTileOnDeath.cs" />

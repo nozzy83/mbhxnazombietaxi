@@ -13,10 +13,12 @@
     <mBehaviourFileNames>
       <Item>Sprite</Item>
       <Item>Pickup</Item>
+      <Item>Magnetic</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>ZombieTaxi.Behaviours.Pickup</Item>
+      <Item>MBHEngine.Behaviour.Magnetic</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

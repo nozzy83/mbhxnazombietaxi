@@ -59,7 +59,6 @@ namespace ZombieTaxi.Behaviours
 #if ALLOW_GARBAGE
                 DebugMessageDisplay.pInstance.AddConstantMessage("Pickup grabbed");
 #endif
-
                 // Add the object to the player's inventory.
                 mAddObjectMsg.mObj = mParentGOH;
                 player.OnMessage(mAddObjectMsg);
