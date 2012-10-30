@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.MagneticDefinition">
+    <mMaxDist>24</mMaxDist>
+    <mMinSpeed>0</mMinSpeed>
+    <mMaxSpeed>1</mMaxSpeed>
+  </Asset>
+</XnaContent>
+

@@ -449,6 +449,10 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.SimpleMomentum(this, fileName);
                     }
+                case "MBHEngine.Behaviour.Magnetic":
+                    {
+                        return new MBHEngine.Behaviour.Magnetic(this, fileName);
+                    }
                 default:
                     {
 #if ALLOW_GARBAGE
