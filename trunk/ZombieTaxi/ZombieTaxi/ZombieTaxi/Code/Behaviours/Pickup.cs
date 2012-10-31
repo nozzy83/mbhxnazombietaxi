@@ -16,6 +16,12 @@ namespace ZombieTaxi.Behaviours
     class Pickup : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
+        /// The name of the Template which should be added to the Player's inventory when 
+        /// this Pickup is picked up.
+        /// </summary>
+        private String mInventoryTemplateFileName;
+
+        /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
         private Inventory.AddObjectMessage mAddObjectMsg;
@@ -41,6 +47,8 @@ namespace ZombieTaxi.Behaviours
 
             PickupDefinition def = GameObjectManager.pInstance.pContentManager.Load<PickupDefinition>(fileName);
 
+            mInventoryTemplateFileName = def.mInventoryTemplateFileName;
+
             mAddObjectMsg = new Inventory.AddObjectMessage();
         }
 
@@ -59,24 +67,17 @@ namespace ZombieTaxi.Behaviours
 #if ALLOW_GARBAGE
                 DebugMessageDisplay.pInstance.AddConstantMessage("Pickup grabbed");
 #endif
+                // Grab an instance of the object that needs to be added to the Player's invantory
+                // when this object is picked up.
+                GameObject obj = GameObjectFactory.pInstance.GetTemplate(mInventoryTemplateFileName);
+
                 // Add the object to the player's inventory.
-                mAddObjectMsg.mObj = mParentGOH;
+                mAddObjectMsg.mObj = obj;
                 player.OnMessage(mAddObjectMsg);
 
                 // Stop updating and rendering the object. Also prevent things like collision checks finding it.
                 GameObjectManager.pInstance.Remove(mParentGOH);
             }
-        }
-
-        /// <summary>
-        /// The main interface for communicating between behaviours.  Using polymorphism, we
-        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
-        /// can then check for particular upcasted message types, and either grab some data 
-        /// from it (set message) or store some data in it (get message).
-        /// </summary>
-        /// <param name="msg">The message being communicated to the behaviour.</param>
-        public override void OnMessage(ref BehaviourMessage msg)
-        {
         }
     }
 }

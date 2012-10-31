@@ -20,6 +20,7 @@
       <Item>Health</Item>
       <Item>DamageFlash</Item>
       <Item>Explosive</Item>
+      <Item>TilePlacement</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
@@ -28,6 +29,7 @@
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
+      <Item>ZombieTaxi.Behaviours.TilePlacement</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

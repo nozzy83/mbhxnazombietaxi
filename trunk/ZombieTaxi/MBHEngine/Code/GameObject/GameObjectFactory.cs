@@ -129,22 +129,31 @@ namespace MBHEngine.GameObject
         {
             //CheckForDupes(fileName);
 
+            Boolean isManaged = mObjects.ContainsKey(fileName);
+
+#if ALLOW_GARBAGE
+            // The requested type of GameObject is not managed by the Factory.  For now throw an error,
+            // but at some point we may want to change this to allocate some additional ones.
+            System.Diagnostics.Debug.Assert(true == isManaged, "Attempted to get template which is not managed by Factory: " + fileName);
+#endif //ALLOW_GARBAGE
+
             // Make sure this type of Object was actually added to the Dictionary at some point.
-            if (mObjects.ContainsKey(fileName))
+            if (isManaged)
             {
+                Boolean hasRemaining = (mObjects[fileName].Count > 0);
+#if ALLOW_GARBAGE
+                // There are no GameObjects of the requested type available.  For now throw an error,
+                // but at some point we may want to change this to allocate some additional ones.
+                System.Diagnostics.Debug.Assert(hasRemaining, "Ran out of templates of type: " + fileName);
+#endif //ALLOW_GARBAGE
+
                 // And make sure that Stack is not currently empty.
-                if (mObjects[fileName].Count > 0)
+                if (hasRemaining)
                 {
                     // Pop one off the stack and return it to the client for use.
                     return mObjects[fileName].Pop();
                 }
             }
-
-#if ALLOW_GARBAGE
-            // There are no GameObjects of the requested type available.  For now throw and exception,
-            // but at some point we may want to change this to an assert and then allocate some additional ones.
-            System.Diagnostics.Debug.Assert(false, "Ran out of templates of type: " + fileName);
-#endif // ALLOW_GARBAGE
 
             return null;
         }

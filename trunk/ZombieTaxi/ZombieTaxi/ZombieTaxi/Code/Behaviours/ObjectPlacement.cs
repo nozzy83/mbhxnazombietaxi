@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.Behaviour;
 using MBHEngine.Input;
 using MBHEngineContentDefs;
+using MBHEngine.World;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -16,6 +17,33 @@ namespace ZombieTaxi.Behaviours
     /// </summary>
     class ObjectPlacement : MBHEngine.Behaviour.Behaviour
     {
+        /// <summary>
+        /// Sent out when the user attempts to place an object in the world.
+        /// </summary>
+        public class OnPlaceObjectMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The position they wish to place it at.
+            /// </summary>
+            public Vector2 mPosition;
+
+            /// <summary>
+            /// Set to true of the object was successfully placed. If set to false, the 
+            /// object will be returned to the Player's Inventory.
+            /// </summary>
+            public Boolean mOutObjectPlaced;
+
+            /// <summary>
+            /// Return the Message to a default state.
+            /// </summary>
+            public void Reset()
+            {
+                mPosition = Vector2.Zero;
+
+                mOutObjectPlaced = false;
+            }
+        }
+
         /// <summary>
         /// Cursor used to show the user which tile they are manipulating.
         /// </summary>
@@ -44,6 +72,9 @@ namespace ZombieTaxi.Behaviours
         private Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
         private Level.GetMapInfoMessage mGetMapInfoMsg;
         private Level.SetTileTypeAtPositionMessage mSetTileTypeAtPositionMsg;
+        private Inventory.GetCurrentObjectMessage mGetCurrentObjectMsg;
+        private ObjectPlacement.OnPlaceObjectMessage mOnPlaceObjectMsg;
+        private Inventory.AddObjectMessage mAddObjectMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -78,6 +109,9 @@ namespace ZombieTaxi.Behaviours
             mGetTileAtPositionMsg = new Level.GetTileAtPositionMessage();
             mGetMapInfoMsg = new Level.GetMapInfoMessage();
             mSetTileTypeAtPositionMsg = new Level.SetTileTypeAtPositionMessage();
+            mGetCurrentObjectMsg = new Inventory.GetCurrentObjectMessage();
+            mOnPlaceObjectMsg = new OnPlaceObjectMessage();
+            mAddObjectMsg = new Inventory.AddObjectMessage();
         }
 
         /// <summary>
@@ -86,6 +120,8 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
+            // Toggle between PLACEMENT mode on regular gameplay.
+            //
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.R2))
             {
                 GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.PLACEMENT;
@@ -97,6 +133,7 @@ namespace ZombieTaxi.Behaviours
 
             if (GameObjectManager.pInstance.pCurUpdatePass != BehaviourDefinition.Passes.PLACEMENT)
             {
+                // No need to continue on if we are not in placement mode.
                 return;
             }
 
@@ -127,18 +164,34 @@ namespace ZombieTaxi.Behaviours
             // Place and remove tiles.
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
             {
-                mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Solid;
-                mSetTileTypeAtPositionMsg.mPosition = mCursor.pPosition;
-                MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
+                // Remove the Object at the top of the Inventory.
+                mGetCurrentObjectMsg.mOutObj = null;
+                mParentGOH.OnMessage(mGetCurrentObjectMsg);
 
-                // Only spawn a tile if we actually changed the tile type.
-                // TODO: This logic should probably live in another behaviour so that different objects
-                //       can do different things when placed.
-                if (mSetTileTypeAtPositionMsg.mType != mSetTileTypeAtPositionMsg.mOutPreviousType)
+                // We only want to attempt to place an object if we have something in the inventory to place.
+                if (null != mGetCurrentObjectMsg.mOutObj)
                 {
-                    GameObject g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\Wall\\Wall");
-                    g.pPosition = mCursor.pPosition;
-                    GameObjectManager.pInstance.Add(g);
+                    mOnPlaceObjectMsg.Reset();
+
+                    // Tell the object to place itself.
+                    mOnPlaceObjectMsg.mPosition = mCursor.pPosition;
+                    mGetCurrentObjectMsg.mOutObj.OnMessage(mOnPlaceObjectMsg);
+
+                    // It is possible that someone caught this event as decide this object should not
+                    // be placed.
+                    if (mOnPlaceObjectMsg.mOutObjectPlaced)
+                    {
+                        // The object has been placed in the world, so the GameObjectManager needs to
+                        // start managing it.
+                        GameObjectManager.pInstance.Add(mGetCurrentObjectMsg.mOutObj);
+                    }
+                    else
+                    {
+                        // The object was removed from the inventory with the GerCurrentObjectMessage, so
+                        // since it wasn't placed, it needs to be added back.
+                        mAddObjectMsg.mObj = mGetCurrentObjectMsg.mOutObj;
+                        mParentGOH.OnMessage(mAddObjectMsg);
+                    }
                 }
             }
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
