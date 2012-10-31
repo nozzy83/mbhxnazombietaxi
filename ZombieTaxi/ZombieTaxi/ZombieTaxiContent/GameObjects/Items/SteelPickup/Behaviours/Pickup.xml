@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.PickupDefinition">
-    <mInventoryTemplateFileName>GameObjects\Environments\WallStone\WallStone</mInventoryTemplateFileName>
+    <mInventoryTemplateFileName>GameObjects\Environments\WallSteel\WallSteel</mInventoryTemplateFileName>
   </Asset>
 </XnaContent>
 

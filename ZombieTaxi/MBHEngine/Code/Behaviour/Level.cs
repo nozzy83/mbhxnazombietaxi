@@ -319,7 +319,22 @@ namespace MBHEngine.Behaviour
                     {
                         mCollisionGrid[x, y].mType = Level.Tile.TileTypes.Solid;
 
-                        GameObject.GameObject g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\Wall\\Wall");
+                        GameObject.GameObject g;
+                        
+                        Single chance = (Single)RandomManager.pInstance.RandomPercent( );
+
+                        if (chance < 0.33f)
+                        {
+                            g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
+                        }
+                        else if (chance < 0.66f)
+                        {
+                            g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallStone\\WallStone");
+                        }
+                        else 
+                        {
+                            g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallSteel\\WallSteel");
+                        }
                         g.pPosX =(x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f);
                         g.pPosY = (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f);
                         GameObjectManager.pInstance.Add(g);
