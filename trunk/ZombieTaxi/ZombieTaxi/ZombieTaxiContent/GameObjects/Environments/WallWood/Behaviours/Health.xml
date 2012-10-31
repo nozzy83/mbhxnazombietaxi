@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.HealthDefinition">
+    <mCurrentHealth>5</mCurrentHealth>
+    <mMaxHealth>5</mMaxHealth>
+    <mRemoveOnDeath>true</mRemoveOnDeath>
+  </Asset>
+</XnaContent>
+
