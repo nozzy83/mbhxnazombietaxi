@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
 using MBHEngine.Behaviour;
 
-namespace ZombieTaxi.Behaviours
+namespace ZombieTaxi.Behaviours.HUD
 {
     /// <summary>
     /// HUD element used for rendering the players current health as a meter.
