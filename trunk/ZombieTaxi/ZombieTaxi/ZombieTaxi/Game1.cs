@@ -179,11 +179,11 @@ namespace ZombieTaxi
 #endif
             GameObjectManager.pInstance.Add(ving);
 
-            // The HUD element representing the player's health.
-            GameObject health = new GameObject("GameObjects\\Interface\\PlayerHealthBar\\PlayerHealthBar");
-            GameObjectManager.pInstance.Add(health);
-
+            // Add the HUD elements.
+            //
+            GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\PlayerHealthBar\\PlayerHealthBar"));
             GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\PlayerScore\\PlayerScore"));
+            GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\PlayerInventory\\PlayerInventory"));
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");

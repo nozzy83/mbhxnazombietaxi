@@ -136,13 +136,14 @@
     <None Include="Code\Behaviours\Example.cs" />
     <Compile Include="Code\Behaviours\Explosive.cs" />
     <Compile Include="Code\Behaviours\ExtractionPoint.cs" />
+    <Compile Include="Code\Behaviours\HUD\PlayerInventory.cs" />
     <Compile Include="Code\Behaviours\HUD\PlayerScore.cs" />
     <Compile Include="Code\Behaviours\InfiniteBG.cs" />
     <Compile Include="Code\Behaviours\Inventory.cs" />
     <Compile Include="Code\Behaviours\Kamikaze.cs" />
     <Compile Include="Code\Behaviours\ObjectPlacement.cs" />
     <Compile Include="Code\Behaviours\Pickup.cs" />
-    <Compile Include="Code\Behaviours\PlayerHealthBar.cs" />
+    <Compile Include="Code\Behaviours\HUD\PlayerHealthBar.cs" />
     <Compile Include="Code\Behaviours\Projectile.cs" />
     <Compile Include="Code\Behaviours\RandomEnemyGenerator.cs" />
     <Compile Include="Code\Behaviours\TilePlacement.cs" />

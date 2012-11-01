@@ -35,6 +35,28 @@ namespace ZombieTaxi.Behaviours
             /// null if the Queue is empty.
             /// </summary>
             public GameObject mOutObj;
+
+            public void Reset()
+            {
+                mOutObj = null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the Object at the top of the Inventory Queue without actually removing it.
+        /// </summary>
+        public class PeekCurrentObjectMessage : MBHEngine.Behaviour.BehaviourMessage
+        {
+            /// <summary>
+            /// The object at the front of the Inventory Queue.
+            /// null if the Queue is empty.
+            /// </summary>
+            public GameObject mOutObj;
+
+            public void Reset()
+            {
+                mOutObj = null;
+            }
         }
 
         /// <summary>
@@ -98,6 +120,15 @@ namespace ZombieTaxi.Behaviours
 
                     // For now just grab the one of the top.
                     temp.mOutObj = mObjects.Dequeue();
+                }
+            }
+            else if (msg is PeekCurrentObjectMessage)
+            {
+                if (0 != mObjects.Count)
+                {
+                    PeekCurrentObjectMessage temp = (PeekCurrentObjectMessage)msg;
+
+                    temp.mOutObj = mObjects.Peek();
                 }
             }
         }

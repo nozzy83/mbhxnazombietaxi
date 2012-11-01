@@ -44,10 +44,6 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new RandomEnemyGenerator(go, fileName);
                     }
-                case "ZombieTaxi.Behaviours.PlayerHealthBar":
-                    {
-                        return new PlayerHealthBar(go, fileName);
-                    }
                 case "ZombieTaxi.Behaviours.Civilian":
                     {
                         return new Civilian(go, fileName);
@@ -60,9 +56,17 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new ExtractionPoint(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.HUD.PlayerHealthBar":
+                    {
+                        return new PlayerHealthBar(go, fileName);
+                    }
                 case "ZombieTaxi.Behaviours.HUD.PlayerScore":
                     {
                         return new PlayerScore(go, fileName);
+                    }
+                case "ZombieTaxi.Behaviours.HUD.PlayerInventory":
+                    {
+                        return new PlayerInventory(go, fileName);
                     }
                 case "ZombieTaxi.Behaviours.DamageOnContact":
                     {

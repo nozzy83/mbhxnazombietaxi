@@ -83,6 +83,19 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Retrieve a reference to the Texture2D used to render this Sprite.
+        /// </summary>
+        public class GetTexture2DMessage : BehaviourMessage
+        {
+            public Texture2D mOutTexture;
+
+            public void Reset()
+            {
+                mOutTexture = null;
+            }
+        }
+
+        /// <summary>
         /// Defines a single set of animation.  A sprite sheet will usually contain a number of animation
         /// sets.
         /// </summary>
@@ -513,6 +526,11 @@ namespace MBHEngine.Behaviour
             {
                 SetColorMessage temp = (SetColorMessage)msg;
                 mColor = temp.mColor;
+            }
+            else if (msg is GetTexture2DMessage)
+            {
+                GetTexture2DMessage temp = (GetTexture2DMessage)msg;
+                temp.mOutTexture = mTexture;
             }
         }
 

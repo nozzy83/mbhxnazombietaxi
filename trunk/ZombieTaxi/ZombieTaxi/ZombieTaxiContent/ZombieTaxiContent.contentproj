@@ -414,7 +414,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameObjects\Interface\PlayerHealthBar\PlayerHealthBar.xml">
+    <Compile Include="GameObjects\Interface\HUD\PlayerHealthBar\PlayerHealthBar.xml">
       <Name>PlayerHealthBar</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
@@ -428,7 +428,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameObjects\Interface\PlayerHealthBar\Behaviours\PlayerHealthBar.xml">
+    <Compile Include="GameObjects\Interface\HUD\PlayerHealthBar\Behaviours\PlayerHealthBar.xml">
       <Name>PlayerHealthBar</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
@@ -1144,6 +1144,27 @@
   <ItemGroup>
     <Compile Include="GameObjects\Items\DetectorPickup\DetectorPickup.xml">
       <Name>DetectorPickup</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Interface\InventoryView.png">
+      <Name>InventoryView</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Interface\HUD\PlayerInventory\Behaviours\PlayerInventory.xml">
+      <Name>PlayerInventory</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameObjects\Interface\HUD\PlayerInventory\PlayerInventory.xml">
+      <Name>PlayerInventory</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>

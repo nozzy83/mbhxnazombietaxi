@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviour\CivilianDefinition.cs" />
+    <Compile Include="Behaviour\HUD\PlayerInventoryDefinition.cs" />
     <Compile Include="Behaviour\TilePlacementDefinition.cs" />
     <Compile Include="Behaviour\DamageFlashDefinition.cs" />
     <Compile Include="Behaviour\DamageOnContactDefinition.cs" />
