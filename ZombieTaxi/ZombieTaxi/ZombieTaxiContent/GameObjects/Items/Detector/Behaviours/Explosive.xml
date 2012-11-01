@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.ExplosiveDefinition">
+    <mEffectFileName>GameObjects\Effects\Dust\Dust</mEffectFileName>
+    <mAnimationsToPlay>
+      <Item>Explode</Item>
+    </mAnimationsToPlay>
+    <mManualExplosion>false</mManualExplosion>
+    <mDamageCaused>0</mDamageCaused>
+    <mDamageAppliedTo>
+    </mDamageAppliedTo>
+  </Asset>
+</XnaContent>
+

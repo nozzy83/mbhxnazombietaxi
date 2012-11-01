@@ -112,15 +112,19 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\BulletSpark\\BulletSpark", 32);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\Dust\\Dust", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\Explosion\\Explosion", 10);
-            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallWood\\WallWood", 1000);
-            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallStone\\WallStone", 1000);
-            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallSteel\\WallSteel", 1000);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallWood\\WallWood", 600);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallStone\\WallStone", 600);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallSteel\\WallSteel", 600);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Bullet\\Bullet", 100);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Grenade\\Grenade", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Flare\\Flare", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\WoodPickup\\WoodPickup", 100);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\StonePickup\\StonePickup", 100);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\SteelPickup\\SteelPickup", 100);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\DetectorPickup\\DetectorPickup", 100);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\GunTurretPickup\\GunTurretPickup", 100);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Detector\\Detector", 600);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\GunTurret\\GunTurret", 600);
             
 
             // The tiled background image that travels will the player creating the illusion of
