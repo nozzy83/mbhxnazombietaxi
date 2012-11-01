@@ -323,17 +323,25 @@ namespace MBHEngine.Behaviour
                         
                         Single chance = (Single)RandomManager.pInstance.RandomPercent( );
 
-                        if (chance < 0.33f)
+                        if (chance < 0.2f)
                         {
                             g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
                         }
-                        else if (chance < 0.66f)
+                        else if (chance < 0.4f)
                         {
                             g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallStone\\WallStone");
                         }
-                        else 
+                        else if (chance < 0.6f)
                         {
                             g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallSteel\\WallSteel");
+                        }
+                        else if (chance < 0.8f)
+                        {
+                            g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\GunTurret\\GunTurret");
+                        }
+                        else
+                        {
+                            g = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Detector\\Detector");
                         }
                         g.pPosX =(x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f);
                         g.pPosY = (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f);
