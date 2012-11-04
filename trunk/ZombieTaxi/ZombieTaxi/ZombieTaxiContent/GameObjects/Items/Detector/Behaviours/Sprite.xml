@@ -12,7 +12,7 @@
     </mAttachmentPoints>
     <mAnimationSets>
       <Item>
-        <mTicksPerFrame>10</mTicksPerFrame>
+        <mTicksPerFrame>20</mTicksPerFrame>
         <mName>Flashing</mName>
         <mStartingFrame>0</mStartingFrame>
         <mNumFrames>4</mNumFrames>

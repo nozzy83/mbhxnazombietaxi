@@ -67,6 +67,28 @@ namespace ZombieTaxi.Behaviours
         private List<MBHEngineContentDefs.GameObjectDefinition.Classifications> mRemoveClassifications;
 
         /// <summary>
+        /// The texture used to render the item under the cursor.
+        /// </summary>
+        private Texture2D mTextureItem;
+
+        /// <summary>
+        /// Items need to have slightly different positions than the background to account for 
+        /// padding and border.
+        /// </summary>
+        private Vector2 mItemOffset;
+
+        /// <summary>
+        /// The texture used for the inventory item might be animation, so we only want to render the
+        /// first frame.
+        /// </summary>
+        private Rectangle mItemSourceRect;
+
+        /// <summary>
+        /// The color used to render the item sprite.
+        /// </summary>
+        private Color mItemColor;
+
+        /// <summary>
         /// Preallocated messages to avoid garbage collection.
         /// </summary>
         private Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
@@ -75,6 +97,9 @@ namespace ZombieTaxi.Behaviours
         private Inventory.GetCurrentObjectMessage mGetCurrentObjectMsg;
         private ObjectPlacement.OnPlaceObjectMessage mOnPlaceObjectMsg;
         private Inventory.AddObjectMessage mAddObjectMsg;
+        private Inventory.SelectNextItemMessage mSelectNextItemMsg;
+        private SpriteRender.GetTexture2DMessage mGetTexture2DMsg;
+        private Inventory.PeekCurrentObjectMessage mPeekCurrentObjectMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -103,6 +128,10 @@ namespace ZombieTaxi.Behaviours
 
             mCursorOffset = Vector2.Zero;
 
+            mItemOffset = new Vector2(-4, -4);
+            mItemSourceRect = new Rectangle(0, 0, 8, 8);
+            mItemColor = new Color(255, 255, 255, 200);
+
             mRemoveClassifications = new List<MBHEngineContentDefs.GameObjectDefinition.Classifications>(1);
             mRemoveClassifications.Add(MBHEngineContentDefs.GameObjectDefinition.Classifications.WALL);
 
@@ -112,6 +141,9 @@ namespace ZombieTaxi.Behaviours
             mGetCurrentObjectMsg = new Inventory.GetCurrentObjectMessage();
             mOnPlaceObjectMsg = new OnPlaceObjectMessage();
             mAddObjectMsg = new Inventory.AddObjectMessage();
+            mSelectNextItemMsg = new Inventory.SelectNextItemMessage();
+            mGetTexture2DMsg = new SpriteRender.GetTexture2DMessage();
+            mPeekCurrentObjectMsg = new Inventory.PeekCurrentObjectMessage();
         }
 
         /// <summary>
@@ -136,6 +168,16 @@ namespace ZombieTaxi.Behaviours
                 // No need to continue on if we are not in placement mode.
                 return;
             }
+
+            // Switch to the next item in the inventory.
+            //
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.L1, true))
+            {
+                mParentGOH.OnMessage(mSelectNextItemMsg);
+            }
+
+            // Update the texture which appears on the cursor.
+            UpdateItemTexture();
 
             // Move the cursor based on user input.
             MoveCursor();
@@ -213,6 +255,49 @@ namespace ZombieTaxi.Behaviours
                 {
                     GameObjectManager.pInstance.Remove(mCollidedObjects[i]);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Updates the texture that gets rendering on the cursor.
+        /// </summary>
+        private void UpdateItemTexture()
+        {
+            mGetTexture2DMsg.Reset();
+            mPeekCurrentObjectMsg.Reset();
+
+            GameObjectManager.pInstance.pPlayer.OnMessage(mPeekCurrentObjectMsg);
+
+            // Check if their is any object currently active.
+            if (null != mPeekCurrentObjectMsg.mOutObj)
+            {
+                // Now check what texture is used to render that item.
+                mPeekCurrentObjectMsg.mOutObj.OnMessage(mGetTexture2DMsg);
+
+                // Store it for Render to use.
+                mTextureItem = mGetTexture2DMsg.mOutTexture;
+            }
+            else
+            {
+                // If there is no current item in the Inventory than show it as empty.
+                mTextureItem = null;
+            }
+        }
+
+        /// <summary>
+        /// Called once render cycle by the game object manager.
+        /// </summary>
+        /// <param name="batch">The sprite batch to render to.</param>
+        public override void Render(SpriteBatch batch)
+        {
+            base.Render(batch);
+
+            if (null != mTextureItem && GameObjectManager.pInstance.pCurUpdatePass == BehaviourDefinition.Passes.PLACEMENT)
+            {
+                batch.Draw(mTextureItem,
+                mCursor.pPosition + mItemOffset,
+                mItemSourceRect,
+                mItemColor);
             }
         }
 
