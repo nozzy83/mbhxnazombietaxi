@@ -768,5 +768,16 @@ namespace MBHEngine.GameObject
                 mIsStatic = value;
             }
         }
+
+        /// <summary>
+        /// The name of the template file which defined this object's starting properties.
+        /// </summary>
+        public String pTemplateFileName
+        {
+            get
+            {
+                return mTemplateFileName;
+            }
+        }
     }
 }

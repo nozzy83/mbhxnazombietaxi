@@ -187,9 +187,12 @@ namespace ZombieTaxi.Behaviours
                     }
                     else
                     {
+                        mAddObjectMsg.Reset();
+
                         // The object was removed from the inventory with the GerCurrentObjectMessage, so
                         // since it wasn't placed, it needs to be added back.
                         mAddObjectMsg.mObj = mGetCurrentObjectMsg.mOutObj;
+                        mAddObjectMsg.mDoSelectObj = true;
                         mParentGOH.OnMessage(mAddObjectMsg);
                     }
                 }
