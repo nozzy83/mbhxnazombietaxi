@@ -50,6 +50,9 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             public GameObject mOutObj;
 
+            /// <summary>
+            /// Put the message back into its default state.
+            /// </summary>
             public void Reset()
             {
                 mOutObj = null;
@@ -67,10 +70,26 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             public GameObject mOutObj;
 
+            /// <summary>
+            /// The number of instances of this object type stored in the Inventory.
+            /// </summary>
+            public UInt32 mOutCount;
+
+            /// <summary>
+            /// Put the message back into its default state.
+            /// </summary>
             public void Reset()
             {
                 mOutObj = null;
+                mOutCount = 0;
             }
+        }
+
+        /// <summary>
+        /// Tells the inventory to go to the next group of items.
+        /// </summary>
+        public class SelectNextItemMessage : MBHEngine.Behaviour.BehaviourMessage
+        {
         }
 
         /// <summary>
@@ -228,6 +247,60 @@ namespace ZombieTaxi.Behaviours
                     if (-1 != mCurrentObject)
                     {
                         temp.mOutObj = mObjects[mCurrentObject];
+
+                        String type = mObjects[mCurrentObject].pTemplateFileName;
+
+                        // We need to also return the number of objects of this type in the inventory.
+                        // Since they are sorted in groups we just loop until we reach an item of
+                        // a different type.
+                        for (Int32 i = mCurrentObject; i < mObjects.Count; i++)
+                        {
+                            // If its the same type, increase the count.
+                            if (mObjects[i].pTemplateFileName == type)
+                            {
+                                temp.mOutCount++;
+                            }
+                            else
+                            {
+                                // As soon as we hit another type, stop looking.
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (msg is SelectNextItemMessage)
+            {
+                if (0 != mObjects.Count)
+                {
+                    System.Diagnostics.Debug.Assert(mCurrentObject != -1, "mObjects isn't empty but mCurrentObject is undefined. This should never happen.");
+
+                    if (-1 != mCurrentObject)
+                    {
+                        String type = mObjects[mCurrentObject].pTemplateFileName;
+
+                        Int32 count = mObjects.Count;
+
+                        // The loop is slightly odd. We loop for the number of object in the list, but
+                        // we don't use i to index into the array. Instead we are incrementing mCurrentObject
+                        // as we go and using that to iterate. Once we hit an object of another type we stop 
+                        // looping and mCurrentObject is left pointing at the next object of a different type.
+                        for (Int32 i = 0; i < count; i++)
+                        {
+                            mCurrentObject++;
+
+                            // Loop back to the start.
+                            if (mCurrentObject >= count)
+                            {
+                                mCurrentObject = 0;
+                            }
+
+                            // If we hit another type, we are done.
+                            if (mObjects[mCurrentObject].pTemplateFileName != type)
+                            {
+                                break;
+                            }
+                        }
                     }
                 }
             }
