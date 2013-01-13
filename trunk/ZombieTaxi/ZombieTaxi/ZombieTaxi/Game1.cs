@@ -149,6 +149,23 @@ namespace ZombieTaxi
             GameObject player = new GameObject("GameObjects\\Characters\\Player\\Player");
             GameObjectManager.pInstance.Add(player);
 
+            // Cheat to start the player with some walls in their inventory.
+            if (CommandLineManager.pInstance["CheatFillInventory"] != null)
+            {
+                Inventory.AddObjectMessage addObj = new Inventory.AddObjectMessage();
+                for (Int32 i = 0; i < 10; i++)
+                {
+                    addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
+                    player.OnMessage(addObj);
+
+                    addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallStone\\WallStone");
+                    player.OnMessage(addObj);
+
+                    addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallSteel\\WallSteel");
+                    player.OnMessage(addObj);
+                }
+            }
+
             // Store the player for easy access.
             GameObjectManager.pInstance.pPlayer = player;
 
