@@ -92,7 +92,11 @@ namespace MBHEngine.Behaviour
         /// <returns>A formatted string of debug information.</returns>
         public override String[] GetDebugInfo()
         {
-            return null;
+            String [] info = new String[1];
+
+            info[0] = "Info: " + "Some Data";
+
+            return info;
         }
 #endif // ALLOW_GARBAGE
     }
