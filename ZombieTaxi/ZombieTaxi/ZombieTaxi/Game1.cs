@@ -135,10 +135,6 @@ namespace ZombieTaxi
             bg.pRenderPriority = 20;
             GameObjectManager.pInstance.Add(bg);
 
-            // The place where the player must bring back recused characters to.
-            GameObject safeHouse = new GameObject("GameObjects\\Environments\\SafeHouse\\SafeHouse");
-            GameObjectManager.pInstance.Add(safeHouse);
-
             // Create the level.
             WorldManager.pInstance.Initialize();
 
