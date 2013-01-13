@@ -478,6 +478,63 @@ namespace MBHEngine.Input
         }
 
         /// <summary>
+        /// Gets a custom built GamePadThumbSticks object containing directional information which
+        /// also incorperates keyboard presses as well (although those are always either 0 
+        /// or 1.
+        /// </summary>
+        /// <returns>A GamePadThumbSticks state which contains </returns>
+        public GamePadThumbSticks GetDirectionalInfo()
+        {
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            Vector2 leftThumb = mCurrentGamePadState.ThumbSticks.Left;
+            Vector2 rightThumb = mCurrentGamePadState.ThumbSticks.Right;
+
+            // LA as Keyboard.
+            //
+            if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_LEFT]))
+            {
+                leftThumb.X = -1.0f;
+            }
+            else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_RIGHT]))
+            {
+                leftThumb.X = 1.0f;
+            }
+
+            if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_DOWN]))
+            {
+                leftThumb.Y = -1.0f;
+            }
+            else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_UP]))
+            {
+                leftThumb.Y = 1.0f;
+            }
+
+
+            // RA as keyboard.
+            //
+            if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_LEFT]))
+            {
+                rightThumb.X = -1.0f;
+            }
+            else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_RIGHT]))
+            {
+                rightThumb.X = 1.0f;
+            }
+
+            if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_DOWN]))
+            {
+                rightThumb.Y = -1.0f;
+            }
+            else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_UP]))
+            {
+                rightThumb.Y = 1.0f;
+            }
+
+            return new GamePadThumbSticks(leftThumb, rightThumb);
+        }
+
+        /// <summary>
         /// Access to the static instance of this class.
         /// </summary>
         public static InputManager pInstance
