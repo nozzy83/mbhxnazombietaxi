@@ -12,9 +12,16 @@
     </mAttachmentPoints>
     <mAnimationSets>
       <Item>
-        <mTicksPerFrame>2</mTicksPerFrame>
+        <mTicksPerFrame>5</mTicksPerFrame>
         <mName>Run</mName>
         <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>2</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+      <Item>
+        <mTicksPerFrame>2</mTicksPerFrame>
+        <mName>RunMad</mName>
+        <mStartingFrame>2</mStartingFrame>
         <mNumFrames>2</mNumFrames>
         <mLooping>true</mLooping>
       </Item>

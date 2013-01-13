@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MBHEngineContentDefs;
+using MBHEngine.GameObject;
 
 namespace MBHEngine.Math
 {
@@ -26,10 +28,17 @@ namespace MBHEngine.Math
         private Boolean mIsPaused;
 
         /// <summary>
+        /// If populated, the object will only be updated during these passes.
+        /// </summary>
+        protected List<BehaviourDefinition.Passes> mUpdatePasses;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         public StopWatch()
         {
+            mUpdatePasses = new List<BehaviourDefinition.Passes>(4);
+
             ResetValues();
         }
 
@@ -39,6 +48,8 @@ namespace MBHEngine.Math
         /// <param name="lifeTime">The number of frames the StopWatch counts down from.</param>
         public StopWatch(Single lifeTime)
         {
+            mUpdatePasses = new List<BehaviourDefinition.Passes>(4);
+
             ResetValues();
 
             mLifeTime = lifeTime;
@@ -54,6 +65,7 @@ namespace MBHEngine.Math
             mLifeTime = 0;
             mNumFramesPassed = 0;
             mIsPaused = false;
+            mUpdatePasses.Clear();
         }
 
         /// <summary>
@@ -66,7 +78,12 @@ namespace MBHEngine.Math
         {
             if (!pIsPaused)
             {
-                mNumFramesPassed += numFrames;
+                BehaviourDefinition.Passes curPass = GameObjectManager.pInstance.pCurUpdatePass;
+
+                if (0 == mUpdatePasses.Count || mUpdatePasses.Contains(curPass))
+                {
+                    mNumFramesPassed += numFrames;
+                }
             }
         }
 
@@ -93,6 +110,16 @@ namespace MBHEngine.Math
         public void ForceExpire()
         {
             mNumFramesPassed = mLifeTime;
+        }
+
+        /// <summary>
+        /// Sets which update passes are required to be active for this StopWatch to be updated.
+        /// If not set it will be updated on every pass.
+        /// </summary>
+        /// <param name="pass">The pass on which this StopWatch should be updated.</param>
+        public void SetUpdatePass(BehaviourDefinition.Passes pass)
+        {
+            mUpdatePasses.Add(pass);
         }
 
         /// <summary>
