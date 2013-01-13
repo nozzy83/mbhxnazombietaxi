@@ -117,14 +117,14 @@ namespace ZombieTaxi.Behaviours
         public override void Update(GameTime gameTime)
         {
             // Grab the current state of the gamepad.
-            GamePadState g = InputManager.pInstance.pActiveGamePadState;
+            GamePadThumbSticks padState = InputManager.pInstance.GetDirectionalInfo();
 
             // Store the original position prior to polling any input for use with collision reactions.
             Vector2 origPos = mParentGOH.pPosition;
 
             // The character will move at this rate in the direction of the Left Analog Stick.
             Vector2 dir1 = new Vector2(mMoveSpeed, -mMoveSpeed);
-            dir1 *= g.ThumbSticks.Left;
+            dir1 *= padState.Left;
             mParentGOH.pPosition += dir1;
 
             // The position the Gun gets attached to is configured via an AttachPoint in the 
@@ -137,12 +137,10 @@ namespace ZombieTaxi.Behaviours
             mGun.pPosition = mGunAttachPos;
 
             // Flip the sprite to face the direction that we are moving.
-            if (g.ThumbSticks.Left.X > 0)
+            if (padState.Left.X > 0)
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
                 mParentGOH.OnMessage(mSpriteFxMsg);
-                mSpriteActiveAnimMsg.mAnimationSetName = "Run";
-                mParentGOH.OnMessage(mSpriteActiveAnimMsg);
 
                 // Initially the gun is positioned assuming the R-Stick is not pressed.  Just point straight
                 // in the direction the player is walking.
@@ -150,16 +148,21 @@ namespace ZombieTaxi.Behaviours
                 mGun.OnMessage(mSpriteFxMsg);
                 mGun.pRotation = 0.0f;
             }
-            else if (g.ThumbSticks.Left.X < 0)
+            else if (padState.Left.X < 0)
             {
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
                 mParentGOH.OnMessage(mSpriteFxMsg);
-                mSpriteActiveAnimMsg.mAnimationSetName = "Run";
-                mParentGOH.OnMessage(mSpriteActiveAnimMsg);
 
                 mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
                 mGun.OnMessage(mSpriteFxMsg);
                 mGun.pRotation = MathHelper.ToRadians(180.0f);
+            }
+            
+            // If the player is moving in any direction play the walking animation.
+            if (padState.Left != Vector2.Zero)
+            {
+                mSpriteActiveAnimMsg.mAnimationSetName = "Run";
+                mParentGOH.OnMessage(mSpriteActiveAnimMsg);
             }
             else
             {
@@ -169,7 +172,7 @@ namespace ZombieTaxi.Behaviours
 
             // Convert the direction of the right analog stick into an angle so that it can be used to set the rotation of
             // the sprite.
-            Double angle = Math.Atan2(-g.ThumbSticks.Right.Y, g.ThumbSticks.Right.X);
+            Double angle = Math.Atan2(-padState.Right.Y, padState.Right.X);
             if (angle < 0)
             {
                 angle += 2 * Math.PI;
@@ -183,7 +186,7 @@ namespace ZombieTaxi.Behaviours
 #endif // ALLOW_GARBAGE
 
             // Determine the direction that right analog stick is pointing (if any).
-            Vector2 dir = Vector2.Normalize(g.ThumbSticks.Right);
+            Vector2 dir = Vector2.Normalize(padState.Right);
 
             // If the user is pressing the right analog stick, then they need to fire a bullet.
             if (!Single.IsNaN(dir.X) && !Single.IsNaN(dir.Y))
