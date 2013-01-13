@@ -76,6 +76,23 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Very similar to GetTileAtPositionMessage except that because this version takes a GameObject
+        /// it can perform a more accurate search.
+        /// </summary>
+        public class GetTileAtObjectMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The object which we want to know which tile it is standing it.
+            /// </summary>
+            public GameObject.GameObject mObject;
+
+            /// <summary>
+            /// The tile which mObject is standing it.
+            /// </summary>
+            public Tile mTile;
+        }
+
+        /// <summary>
         /// Set the type of a tile at a specific location. Updates surround tiles to make sure
         /// collision continues to work properly.
         /// </summary>
@@ -638,6 +655,14 @@ namespace MBHEngine.Behaviour
 
                 msg = temp;
             }
+            else if (msg is GetTileAtObjectMessage)
+            {
+                GetTileAtObjectMessage temp = (GetTileAtObjectMessage)msg;
+
+                temp.mTile = GetTileAtObject(temp.mObject);
+
+                msg = temp;
+            }
             else if (msg is SetTileTypeAtPositionMessage)
             {
                 SetTileTypeAtPositionMessage temp = (SetTileTypeAtPositionMessage)msg;
@@ -686,6 +711,39 @@ namespace MBHEngine.Behaviour
             {
                 return mCollisionGrid[xIndex, yIndex];
             }
+        }
+
+        /// <summary>
+        /// Finds the tile that an Object is currently standing on. It starts by trying to use the
+        /// position, which incorperates the motion root, but if that is directly on the edge of a
+        /// tile, it could give unexpected results. So in that case, we fall back to the center point
+        /// of the object's collision volume.
+        /// </summary>
+        /// <param name="obj">The GameObject who we want to know which Tile it is standing in.</param>
+        /// <returns>The tile that obj is standing in/</returns>
+        private Tile GetTileAtObject(GameObject.GameObject obj)
+        {
+            // By default just use the position values.
+            float x = obj.pPosX;
+            float y = obj.pPosY;
+
+            // If the object is standing right on an edge the tile it chooses might be incorrect (it
+            // will always shift up/left). So for instance, if the motion root of the object is right at
+            // the bottom of the object, visually it will be standing in the upper tile, but our logic 
+            // will place it in the bottom tile. In those cases, default to the collision volumes position.
+            if ((int)x % mMapInfo.mTileWidth == 0)
+            {
+                x = obj.pCollisionRect.pCenterPoint.X;
+            }
+            if ((int)y % mMapInfo.mTileHeight == 0)
+            {
+                y = obj.pCollisionRect.pCenterPoint.Y;
+            }
+
+            System.Diagnostics.Debug.Assert((int)x % mMapInfo.mTileWidth != 0, "X position is still directly inbetween 2 tiles. Will choose tile to left by default even if not visually accurate.");
+            System.Diagnostics.Debug.Assert((int)y % mMapInfo.mTileHeight != 0, "Y position is still directly inbetween 2 tiles. Will choose tile above by default even if not visually accurate.");
+            
+            return GetTileAtPosition(x, y);
         }
 
         /// <summary>

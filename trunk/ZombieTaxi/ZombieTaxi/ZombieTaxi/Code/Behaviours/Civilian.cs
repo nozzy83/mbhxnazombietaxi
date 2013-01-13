@@ -383,7 +383,7 @@ namespace ZombieTaxi.Behaviours
             /// Preallocate messages to avoid GC.
             /// </summary>
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
-            private Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
+            private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
             private GetSafeHouseMessage mGetSafeHouseMsg;
 
             /// <summary>
@@ -392,7 +392,7 @@ namespace ZombieTaxi.Behaviours
             public FSMStateWanderInSafeHouse()
             {
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
-                mGetTileAtPositionMsg = new Level.GetTileAtPositionMessage();
+                mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
                 mGetSafeHouseMsg = new GetSafeHouseMessage();
             }
 
@@ -404,8 +404,8 @@ namespace ZombieTaxi.Behaviours
                 GameObject curLvl = WorldManager.pInstance.pCurrentLevel;
 
                 // Grab the tile at the source position.
-                mGetTileAtPositionMsg.mPosition = pParentGOH.pPosition;
-                curLvl.OnMessage(mGetTileAtPositionMsg);
+                mGetTileAtObjectMsg.mObject = pParentGOH;
+                curLvl.OnMessage(mGetTileAtObjectMsg);
 
                 // Pick a random direction to move in.  Don't do diagonals because that can cause 
                 // the sprite to clip through walls.
@@ -446,7 +446,7 @@ namespace ZombieTaxi.Behaviours
                 mTarget = null;
 
                 // The tile we are thinking about moving to.
-                Level.Tile newTarget = mGetTileAtPositionMsg.mTile.mAdjecentTiles[dir];
+                Level.Tile newTarget = mGetTileAtObjectMsg.mTile.mAdjecentTiles[dir];
 
                 // Only try to move to a tile if it is empty.
                 if ((newTarget.mType & Level.Tile.TileTypes.Solid) != Level.Tile.TileTypes.Solid)
@@ -460,7 +460,7 @@ namespace ZombieTaxi.Behaviours
                         mSetActiveAnimationMsg.mAnimationSetName = "Walk";
                         pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
-                        SetNewTarget(mGetTileAtPositionMsg.mTile.mAdjecentTiles[dir]);
+                        SetNewTarget(mGetTileAtObjectMsg.mTile.mAdjecentTiles[dir]);
                     }
                 }
             }
@@ -492,6 +492,10 @@ namespace ZombieTaxi.Behaviours
                 // WaitInSafeHouse state.
                 if (mTarget != null)
                 {
+                    // Debug to show which Tile objects the Civilian is moving to and from.
+                    //mTarget.mType |= Level.Tile.TileTypes.CollisionChecked;
+                    //mGetTileAtObjectMsg.mTile.mType |= Level.Tile.TileTypes.CollisionChecked;
+
                     // We keep moving towards the target tile until a min distance for its centerpoint.
                     // The min distance is based on the speed of this Game Object to avoid overhsooting the
                     // target over and over again.
