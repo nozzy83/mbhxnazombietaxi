@@ -6,6 +6,7 @@ using MBHEngine.Behaviour;
 using MBHEngine.Input;
 using MBHEngine.Debug;
 using ZombieTaxi.Behaviours.HUD;
+using MBHEngine.Math;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -17,9 +18,10 @@ namespace ZombieTaxi.Behaviours
         private enum FollowType
         {
             None = 0,
-            PathFinding,
-            DirectApproach,
-            Frozen,
+            PathFinding,    // Smartly finds a path towards the player.
+            DirectApproach, // Walks towards the player without regard for obstructions.
+            Frozen,         // Does nothing. Stands in place and does not render.
+            BLine,          // Similar to DirectApproach except much faster, and expected to be seen my user.
         };
 
         /// <summary>
@@ -43,6 +45,11 @@ namespace ZombieTaxi.Behaviours
         private Single mExplodeDistanceSqr;
 
         /// <summary>
+        /// The distance at which it starts to BLine it for the target.
+        /// </summary>
+        private Single mBLineDistanceSqr;
+
+        /// <summary>
         /// The speed it moves when path finding.
         /// </summary>
         private Single mMoveSpeedPathFinding;
@@ -53,14 +60,31 @@ namespace ZombieTaxi.Behaviours
         private Single mMoveSpeedDirectApproach;
 
         /// <summary>
+        /// The speed it moves when B-Lining it for the player.
+        /// </summary>
+        private Single mMoveSpeedBLine;
+
+        /// <summary>
+        /// Once we start BLining, we want to explode after a short amount of time.
+        /// </summary>
+        private StopWatch mBLineTimer;
+
+        /// <summary>
+        /// This flag allows us to easily switch to the BLine behaviour when needed. For instance,
+        /// if we can't find a path to the destination.
+        /// </summary>
+        private Boolean mForceBLine;
+
+        /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
         private PathFind.SetDestinationMessage mSetDestinationMsg;
         private PathFind.SetSourceMessage mSetSourceMsg;
-        private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
+        private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
         private Explosive.DetonateMessage mDetonateMsg;
         private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
+        private SpriteRender.SetActiveAnimationMessage mSetActiveAnimMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -82,20 +106,30 @@ namespace ZombieTaxi.Behaviours
             base.LoadContent(fileName);
 
             mCurrentFollowType = FollowType.None;
+            mExplodeDistanceSqr = 8 * 8;
+            mBLineDistanceSqr = 40 * 40;
             mCloseRangeDistanceSqr = 88 * 88;
             mFrozenDistanceSqr = 160 * 160;
-            mExplodeDistanceSqr = 8 * 8;
 
             mMoveSpeedPathFinding = 0.8f;
             mMoveSpeedDirectApproach = 0.5f;
+            mMoveSpeedBLine = mMoveSpeedDirectApproach * 1.5f;
+
+            mForceBLine = false;
+
+            mBLineTimer = StopWatchManager.pInstance.GetNewStopWatch();
+            mBLineTimer.pLifeTime = 120.0f;
+            mBLineTimer.pIsPaused = true;
+            mBLineTimer.SetUpdatePass(MBHEngineContentDefs.BehaviourDefinition.Passes.DEFAULT);
 
             // Allocate these ahead of time to avoid triggering GC.
             mSetDestinationMsg = new PathFind.SetDestinationMessage();
             mSetSourceMsg = new PathFind.SetSourceMessage();
-            mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
+            mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
             mDetonateMsg = new Explosive.DetonateMessage();
             mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
+            mSetActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
         }
 
         /// <summary>
@@ -106,7 +140,7 @@ namespace ZombieTaxi.Behaviours
         {
             GameObject player = GameObjectManager.pInstance.pPlayer;
 
-            // Don't try anything until the player has actually be loaded.
+            // Don't try anything until the player has actually been loaded.
             if (player == null) return;
 
             /*
@@ -133,6 +167,44 @@ namespace ZombieTaxi.Behaviours
 
                 mParentGOH.OnMessage(mDetonateMsg);
                 GameObjectManager.pInstance.Remove(mParentGOH);
+            }
+            else if (distToPlayer < mBLineDistanceSqr || mForceBLine)
+            {
+                // BLining it means just running straight at the player, regardless
+                // of what is in the way. This can result is dumb looking AI, but
+                // we have some ways of hiding it, such as exploding after a certain
+                // amount of time.
+                //
+
+                // Run at the player.
+                mParentGOH.pDirection.mForward = Vector2.Normalize(player.pPosition - mParentGOH.pPosition);
+
+                // If we weren't already charging update some stuff.
+                if (mCurrentFollowType != FollowType.BLine)
+                {
+                    // Reset the timer that counts down to when this guys should explode.
+                    mBLineTimer.Restart();
+
+                    // Start the timer.
+                    mBLineTimer.pIsPaused = false;
+
+                    // The BLining is a very fast run.
+                    mParentGOH.pDirection.mSpeed = mMoveSpeedBLine;
+
+                    // Update the state.
+                    mCurrentFollowType = FollowType.BLine;
+
+                    // Give him a special animation to show that he is pissed!
+                    mSetActiveAnimMsg.mAnimationSetName = "RunMad";
+                    mParentGOH.OnMessage(mSetActiveAnimMsg);
+                }
+
+                // After a certain number of frames just explode.
+                if (mBLineTimer.IsExpired())
+                {
+                    mParentGOH.OnMessage(mDetonateMsg);
+                    GameObjectManager.pInstance.Remove(mParentGOH);
+                }
             }
             // When they are really faraway, freeze them in place.  This is for performance issues, as well as
             // making sure the player doesnt have every enemy in the game attacking at the same time.
@@ -197,7 +269,7 @@ namespace ZombieTaxi.Behaviours
                     {
                         // This node has been reached, so next update it will start moving towards the next node.
                         p.mReached = true;
-                        
+
                         // However, if this is the destination node (or the closest we have found so far), then
                         // recalculate a path starting here.
                         //if (mGetCurrentBestNodeMsg.mBest == p)
@@ -222,7 +294,13 @@ namespace ZombieTaxi.Behaviours
 
                         // Move towards the nodes center point.
                         Vector2 d = p.mTile.mCollisionRect.pCenterBottom - mParentGOH.pPosition;
-                        d = Vector2.Normalize(d);
+
+                        // If the player hasn't moved this frame our vector has a length of 0, resulting in
+                        // a NaN result from Normalize.
+                        if (d != Vector2.Zero)
+                        {
+                            d = Vector2.Normalize(d);
+                        }
                         mParentGOH.pDirection.mForward = d;
                     }
                 }
@@ -273,6 +351,28 @@ namespace ZombieTaxi.Behaviours
                 mIncrementScoreMsg.mAmount = 10;
                 GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, mParentGOH);
             }
+            else if (msg is PathFind.OnPathFindFailedMessage)
+            {
+                // If we didn't find the path in a single frame, just give up and BLine it for 
+                // the target.
+                mForceBLine = true;
+            }
         }
+
+#if ALLOW_GARBAGE
+        /// <summary>
+        /// Returns a bunch of information about the behaviour which can be dumped to
+        /// a debug display for debugging at runtime.
+        /// </summary>
+        /// <returns>A formatted string of debug information.</returns>
+        public override String[] GetDebugInfo()
+        {
+            String [] info = new String[1];
+
+            info[0] = "Follow: " + mCurrentFollowType.ToString();
+
+            return info;
+        }
+#endif // ALLOW_GARBAGE
     }
 }

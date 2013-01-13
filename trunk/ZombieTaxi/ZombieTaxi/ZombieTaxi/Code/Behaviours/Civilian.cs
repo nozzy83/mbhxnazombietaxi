@@ -86,7 +86,7 @@ namespace ZombieTaxi.Behaviours
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
             private PathFind.SetDestinationMessage mSetDestinationMsg;
             private PathFind.SetSourceMessage mSetSourceMsg;
-            private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
+            private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
             private SetSafeHouseMessage mSetSafeHouseMsg;
             private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
 
@@ -106,7 +106,7 @@ namespace ZombieTaxi.Behaviours
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
                 mSetDestinationMsg = new PathFind.SetDestinationMessage();
                 mSetSourceMsg = new PathFind.SetSourceMessage();
-                mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
+                mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
                 mSetSafeHouseMsg = new SetSafeHouseMessage();
                 mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
                 mIncrementScoreMsg.mAmount = 100;
@@ -562,7 +562,7 @@ namespace ZombieTaxi.Behaviours
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
             private PathFind.SetDestinationMessage mSetDestinationMsg;
             private PathFind.SetSourceMessage mSetSourceMsg;
-            private PathFind.GetCurrentBestNode mGetCurrentBestNodeMsg;
+            private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
             private GetExtractionPointMessage mGetExtractionPointMsg;
             private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
 
@@ -574,7 +574,7 @@ namespace ZombieTaxi.Behaviours
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
                 mSetDestinationMsg = new PathFind.SetDestinationMessage();
                 mSetSourceMsg = new PathFind.SetSourceMessage();
-                mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNode();
+                mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
                 mGetExtractionPointMsg = new GetExtractionPointMessage();
                 mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
                 mIncrementScoreMsg.mAmount = 500;

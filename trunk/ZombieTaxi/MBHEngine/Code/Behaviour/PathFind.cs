@@ -36,9 +36,16 @@ namespace MBHEngine.Behaviour
         /// Retrives the current best node in the path.  By traversing from here back to the source
         /// using mPrev, you can deterime the whole path.
         /// </summary>
-        public class GetCurrentBestNode : BehaviourMessage
+        public class GetCurrentBestNodeMessage : BehaviourMessage
         {
             public PathNode mBest;
+        }
+
+        /// <summary>
+        /// Sent when the path finder fails to find the target each frame.
+        /// </summary>
+        public class OnPathFindFailedMessage : BehaviourMessage
+        {
         }
 
         /// <summary>
@@ -171,6 +178,7 @@ namespace MBHEngine.Behaviour
         /// Preallocated to avoid garbage at runtime.
         /// </summary>
         private MBHEngine.Behaviour.Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
+        private OnPathFindFailedMessage mOnPathFindFailedMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -222,6 +230,7 @@ namespace MBHEngine.Behaviour
             // Preallocate messages to avoid GC during gameplay.
             //
             mGetTileAtPositionMsg = new Level.GetTileAtPositionMessage();
+            mOnPathFindFailedMsg = new OnPathFindFailedMessage();
         }
 
         /// <summary>
@@ -298,6 +307,34 @@ namespace MBHEngine.Behaviour
                 return;
             }
 
+            // If the path hasn't already been invalidated this frame, we need to check that
+            // the path didn't get blocked from something like the Player placing blocks.
+            // TODO: This could be changed to only do this check when receiving specific events,
+            //       such as the ObjectPlacement Behaviour telling it that a new block has been
+            //       placed.
+            if (!mPathInvalidated)
+            {
+                // Loop through the current path and check for any tiles that are not
+                // empty. If they aren't empty this path is no longer valid as there is 
+                // something now blocking it.
+                //
+                PathNode node = mCurBest;
+                while (null != node)
+                {
+                    if (node.mTile.mType != Level.Tile.TileTypes.Empty)
+                    {
+                        // Setting this flag will force the path finder to start from 
+                        // the begining.
+                        mPathInvalidated = true;
+
+                        // No need to loop any further. One blockade is enough.
+                        break;
+                    }
+
+                    node = node.mPrev;
+                }
+            }
+
             // If the path has become invalid, we need to restart the pathing algorithm.
             if (mPathInvalidated)
             {
@@ -318,6 +355,9 @@ namespace MBHEngine.Behaviour
                 // Add it to the list, and start the search!
                 mOpenNodes.Add(p);
 
+                // If the path was invalidated that assume that it is not longer solved.
+                mSolved = false;
+
                 // The path is no longer invalid.  It has begun.
                 mPathInvalidated = false;
             }
@@ -325,7 +365,9 @@ namespace MBHEngine.Behaviour
             // This path finding is very expensive over long distances.  To avoid slowing down the game,
             // the solver is time sliced; it will only execute a small chunk of the algorithm per frame.
             Int32 timeSliceCount = 0;
-            Int32 timeSliceCap = 10;
+			
+			// TODO: Configure this from XML script.
+            Int32 timeSliceCap = 30;
             
             // Continue searching until we hit the destination or run out of open nodes to check against.
             while (!mSolved && mOpenNodes.Count > 0 && timeSliceCount < timeSliceCap) // && InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
@@ -472,6 +514,14 @@ namespace MBHEngine.Behaviour
                 }
             }
 
+            // Some objects might want to react to the path finder not succeeding in a single
+            // frame. For instance, an enemy my stop searching and instead just run straight at
+            // their target.
+            if (!mSolved)
+            {
+                mParentGOH.OnMessage(mOnPathFindFailedMsg);
+            }
+
             // Draw the path.
             if (mCurBest != null)
             {
@@ -556,9 +606,9 @@ namespace MBHEngine.Behaviour
                     mSolved = false;
                 }
             }
-            else if (msg is GetCurrentBestNode)
+            else if (msg is GetCurrentBestNodeMessage)
             {
-                GetCurrentBestNode tmp = (GetCurrentBestNode)msg;
+                GetCurrentBestNodeMessage tmp = (GetCurrentBestNodeMessage)msg;
                 tmp.mBest = mCurBest;
             }
         }
