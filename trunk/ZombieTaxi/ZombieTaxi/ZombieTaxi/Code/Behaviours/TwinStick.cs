@@ -301,6 +301,7 @@ namespace ZombieTaxi.Behaviours
                 {
                     // The place where the player must bring back recused characters to.
                     GameObject safeHouse = new GameObject("GameObjects\\Environments\\SafeHouse\\SafeHouse");
+                    safeHouse.pPosition = mParentGOH.pPosition;
                     GameObjectManager.pInstance.Add(safeHouse);
 
                     mSafeHousePlaced = true;
