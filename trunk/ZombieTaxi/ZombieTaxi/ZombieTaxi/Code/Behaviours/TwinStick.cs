@@ -42,6 +42,11 @@ namespace ZombieTaxi.Behaviours
         private StopWatch mGrenadeCooldown;
 
         /// <summary>
+        /// We only want to place a safe house once.
+        /// </summary>
+        private Boolean mSafeHousePlaced;
+
+        /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
@@ -94,6 +99,8 @@ namespace ZombieTaxi.Behaviours
 
             mGrenadeCooldown = StopWatchManager.pInstance.GetNewStopWatch();
             mGrenadeCooldown.pLifeTime = 60;
+
+            mSafeHousePlaced = false;
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
@@ -285,11 +292,24 @@ namespace ZombieTaxi.Behaviours
 
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.L1, true))
             {
-                GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Flare\\Flare");
-                go.pPosition = mGun.pPosition;
-                GameObjectManager.pInstance.Add(go);
+                // The first time they press L1, we place the safe house. After that, we drop extraction
+                // flares.
+                if (!mSafeHousePlaced)
+                {
+                    // The place where the player must bring back recused characters to.
+                    GameObject safeHouse = new GameObject("GameObjects\\Environments\\SafeHouse\\SafeHouse");
+                    GameObjectManager.pInstance.Add(safeHouse);
 
-                go.OnMessage(mSetExtractionPointActivateMsg);
+                    mSafeHousePlaced = true;
+                }
+                else
+                {
+                    GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Items\\Flare\\Flare");
+                    go.pPosition = mGun.pPosition;
+                    GameObjectManager.pInstance.Add(go);
+
+                    go.OnMessage(mSetExtractionPointActivateMsg);
+                }
             }
 
 #if ALLOW_GARBAGE
