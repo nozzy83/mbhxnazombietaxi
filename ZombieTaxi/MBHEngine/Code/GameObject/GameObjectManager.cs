@@ -53,6 +53,12 @@ namespace MBHEngine.GameObject
         private List<GameObject> [,] mStaticGameObjects;
 
         /// <summary>
+        /// A list of all game object which were defined to have a Classifications. This allows
+        /// for much quicker look up of all GameObjects of a particular type.
+        /// </summary>
+        private Dictionary<GameObjectDefinition.Classifications, List<GameObject>> mGameObjectsByClassification;
+
+        /// <summary>
         /// A list of all the GameObjects that need to be added at the next possible
         /// time.  We can't just add the objects right away because we could be 
         /// interating through the list at the time.
@@ -120,11 +126,17 @@ namespace MBHEngine.GameObject
         /// </summary>
         private GameObjectManager()
         {
-            mGameObjects            = new List<GameObject>();
-            mDynamicGameObjects     = new List<GameObject>();
+            mGameObjects                    = new List<GameObject>();
+            mDynamicGameObjects             = new List<GameObject>();
+            mGameObjectsByClassification    = new Dictionary<GameObjectDefinition.Classifications,List<GameObject>>();
+            Int32 numEnum = Enum.GetNames(typeof(GameObjectDefinition.Classifications)).Length;
+            for (Int32 i = 0; i < numEnum; i++)
+            {
+                mGameObjectsByClassification[(GameObjectDefinition.Classifications)i] = new List<GameObject>();
+            }
             // Note: mStaticGameObject is allocated in OnMapInfoChange.
-            mGameObjectsToAdd       = new List<GameObject>();
-            mGameObjectsToRemove    = new List<GameObject>();
+            mGameObjectsToAdd               = new List<GameObject>();
+            mGameObjectsToRemove            = new List<GameObject>();
         }
 
         /// <summary>
@@ -315,6 +327,11 @@ namespace MBHEngine.GameObject
                     mStaticGameObjects[(Int32)index.X, (Int32)index.Y].Remove(mGameObjectsToRemove[i]);
                 }
 
+                for (Int32 tag = 0; tag < mGameObjectsToRemove[i].pClassifications.Count; tag++)
+                {
+                    mGameObjectsByClassification[(GameObjectDefinition.Classifications)tag].Remove(mGameObjectsToRemove[i]);
+                }
+
                 // What happens if someone adds and removes an element within the same
                 // update?  It would mean we are about to remove an item that hasn't
                 // actually been added yet!  To get around this flaw, we will attempt to
@@ -361,6 +378,13 @@ namespace MBHEngine.GameObject
 #endif // DEBUG
 
                     mStaticGameObjects[(Int32)index.X, (Int32)index.Y].Add(mGameObjectsToAdd[i]);
+                }
+
+                for (Int32 tagIndex = 0; tagIndex < mGameObjectsToAdd[i].pClassifications.Count; tagIndex++)
+                {
+                    GameObjectDefinition.Classifications tag = mGameObjectsToAdd[i].pClassifications[tagIndex];
+
+                    mGameObjectsByClassification[tag].Add(mGameObjectsToAdd[i]);
                 }
 
                 // If this game object is already in the list, don't add it again.
@@ -730,6 +754,16 @@ namespace MBHEngine.GameObject
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Retrieve all GameObject with a particular Classifications.
+        /// </summary>
+        /// <param name="classification">A classification the GameObject must have (although not exclusively).</param>
+        /// <returns>A list of all GameObject which have the specified Classifications.</returns>
+        public List<GameObject> GetGameObjectsOfClassification(GameObjectDefinition.Classifications classification)
+        {
+            return mGameObjectsByClassification[classification];
         }
 
         /// <summary>

@@ -197,6 +197,7 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\PlayerHealthBar\\PlayerHealthBar"));
             GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\PlayerScore\\PlayerScore"));
             GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\PlayerInventory\\PlayerInventory"));
+            GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\MiniMap\\MiniMap"));
 
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");

@@ -114,8 +114,11 @@ namespace MBHEngine.GameObject
         /// <summary>
         /// A list of classifications which this game objects fits into.  This can be used to filter
         /// larger lists of game objects into smaller ones.
+        /// We want it private so that no one tries to change these values after it has been added to
+        /// the GameObject manager since it stores GameObject based on this info and it would get
+        /// out of sync.
         /// </summary>
-        protected List<GameObjectDefinition.Classifications> mClassifications;
+        private List<GameObjectDefinition.Classifications> mClassifications;
 
         /// <summary>
         /// The type of blending to be used when rendering this object.
