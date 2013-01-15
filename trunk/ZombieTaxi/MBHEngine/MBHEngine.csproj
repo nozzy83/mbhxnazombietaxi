@@ -147,6 +147,7 @@
     <Compile Include="Code\Math\Rectangle.cs" />
     <Compile Include="Code\Math\StopWatch.cs" />
     <Compile Include="Code\Math\StopWatchManager.cs" />
+    <Compile Include="Code\Math\Util.cs" />
     <Compile Include="Code\Render\CameraManager.cs" />
     <Compile Include="Code\Render\DebugDrawBox2D.cs" />
     <Compile Include="Code\Render\DebugDrawBox2DSpritePoly.cs" />

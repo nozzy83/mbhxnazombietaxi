@@ -68,6 +68,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new PlayerInventory(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.HUD.MiniMap":
+                    {
+                        return new MiniMap(go, fileName);
+                    }
                 case "ZombieTaxi.Behaviours.DamageOnContact":
                     {
                         return new DamageOnContact(go, fileName);

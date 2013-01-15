@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
+    <mRenderPriority>1000</mRenderPriority>
+    <mDoUpdate>true</mDoUpdate>
+    <mDoRender>true</mDoRender>
+    <mPosition>123 69</mPosition>
+    <mRotation>0</mRotation>
+    <mScale>1 1</mScale>
+    <mBlendMode>STANDARD_UI</mBlendMode>
+    <mBehaviourFileNames>
+      <Item>MiniMap</Item>
+    </mBehaviourFileNames>
+    <mBehaviourClassNames>
+      <Item>ZombieTaxi.Behaviours.HUD.MiniMap</Item>
+    </mBehaviourClassNames>
+  </Asset>
+</XnaContent>
+
