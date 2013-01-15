@@ -87,6 +87,7 @@ namespace ZombieTaxi.Behaviours
             private PathFind.SetDestinationMessage mSetDestinationMsg;
             private PathFind.SetSourceMessage mSetSourceMsg;
             private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
+            private PathFind.ClearDestinationMessage mClearDestinationMsg;
             private SetSafeHouseMessage mSetSafeHouseMsg;
             private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
 
@@ -107,6 +108,7 @@ namespace ZombieTaxi.Behaviours
                 mSetDestinationMsg = new PathFind.SetDestinationMessage();
                 mSetSourceMsg = new PathFind.SetSourceMessage();
                 mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
+                mClearDestinationMsg = new PathFind.ClearDestinationMessage();
                 mSetSafeHouseMsg = new SetSafeHouseMessage();
                 mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
                 mIncrementScoreMsg.mAmount = 100;
@@ -175,6 +177,8 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             public override void OnEnd()
             {
+                pParentGOH.OnMessage(mClearDestinationMsg);
+
                 // Clear the forward direction of this object so that it doesn't keep moving.
                 pParentGOH.pDirection.mForward = Vector2.Zero;
             }

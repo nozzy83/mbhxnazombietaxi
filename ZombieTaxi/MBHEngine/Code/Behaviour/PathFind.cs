@@ -24,6 +24,13 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Clears the currently set destination, effectivly stopping the path finding algorithm.
+        /// </summary>
+        public class ClearDestinationMessage : BehaviourMessage
+        {
+        }
+
+        /// <summary>
         /// Update the source position of the path finder.  This will reset any path finding 
         /// data solved up to this point.
         /// </summary>
@@ -578,6 +585,12 @@ namespace MBHEngine.Behaviour
                     // now.
                     mDestinationTile = mGetTileAtPositionMsg.mTile;
                 }
+            }
+            else if (msg is ClearDestinationMessage)
+            {
+                mDestinationTile = null;
+                mSolved = false;
+                mPathInvalidated = true;
             }
             else if (msg is SetSourceMessage)
             {
