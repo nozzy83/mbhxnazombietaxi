@@ -55,7 +55,7 @@ namespace ZombieTaxi.Behaviours
         /// caled Update.
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
-        public virtual void PostUpdate(GameTime gameTime)
+        public override void PostUpdate(GameTime gameTime)
         {
         }
 
@@ -63,7 +63,7 @@ namespace ZombieTaxi.Behaviours
         /// Called once render cycle by the game object manager.
         /// </summary>
         /// <param name="batch">The sprite batch to render to.</param>
-        public virtual void Render(SpriteBatch batch)
+        public override void Render(SpriteBatch batch)
         {
         }
 
@@ -93,7 +93,11 @@ namespace ZombieTaxi.Behaviours
         /// <returns>A formatted string of debug information.</returns>
         public override String[] GetDebugInfo()
         {
-            return null;
+            String [] info = new String[1];
+
+            info[0] = "Info: " + "Some Data";
+
+            return info;
         }
 #endif // ALLOW_GARBAGE
     }
