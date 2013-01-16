@@ -267,7 +267,13 @@ namespace ZombieTaxi
             {
                 mFameSkipCount++; 
             }
-            GameObjectPicker.pInstance.Update(gameTime);
+
+            if (mDebugDrawEnabled)
+            {
+                // This does some pretty expensive stuff, so only do it when it is really useful.
+                GameObjectPicker.pInstance.Update(gameTime);
+            }
+
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
 #if DEBUG
