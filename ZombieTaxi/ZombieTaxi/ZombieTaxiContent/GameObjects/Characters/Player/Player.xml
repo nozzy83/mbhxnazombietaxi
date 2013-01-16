@@ -14,6 +14,7 @@
       <Item>PLAYER</Item>
     </mClassifications>
     <mBehaviourFileNames>
+      <Item>MarkOnMiniMap</Item>
       <Item>Sprite</Item>
       <Item>TileCollision</Item>
       <Item>Health</Item>
@@ -24,6 +25,7 @@
       <Item>ObjectPlacement</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
+      <Item>ZombieTaxi.Behaviours.MarkOnMiniMap</Item>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>MBHEngine.Behaviour.TileCollision</Item>
       <Item>MBHEngine.Behaviour.Health</Item>

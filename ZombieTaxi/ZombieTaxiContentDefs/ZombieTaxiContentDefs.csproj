@@ -95,6 +95,7 @@
     <Compile Include="Behaviour\CivilianDefinition.cs" />
     <Compile Include="Behaviour\HUD\MiniMapDefinition.cs" />
     <Compile Include="Behaviour\HUD\PlayerInventoryDefinition.cs" />
+    <Compile Include="Behaviour\MarkOnMiniMapDefinition.cs" />
     <Compile Include="Behaviour\TilePlacementDefinition.cs" />
     <Compile Include="Behaviour\DamageFlashDefinition.cs" />
     <Compile Include="Behaviour\DamageOnContactDefinition.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Behaviour\ProjectileDefinition.cs" />
     <Compile Include="Behaviour\RandomEnemyGeneratorDefinition.cs" />
     <Compile Include="Behaviour\TwinStickDefinition.cs" />
+    <Compile Include="Marker\MarkerProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

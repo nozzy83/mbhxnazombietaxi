@@ -240,6 +240,17 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// Called at the end of the frame where this was added to the GameObjectManager.
+        /// </summary>
+        public virtual void PostInitialization()
+        {
+            for (int i = 0; i < mBehaviours.Count; i++)
+            {
+                mBehaviours[i].PostInitialization();
+            }
+        }
+
+        /// <summary>
         /// Called once per frame before the update function. Is called for ALL gameobjects, prior 
         /// to calling Update.
         /// </summary>
