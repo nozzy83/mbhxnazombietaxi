@@ -47,41 +47,44 @@ namespace MBHEngine.GameObject
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+#if DEBUG
             // Get the current state of the mouse.
             MouseState ms = Mouse.GetState();
-
-            // Project that mouse position into 2D world space so that it can be tested for collision.
-            Vector2 proj = CameraManager.pInstance.ProjectMouseToWorldSpace(new Vector2(ms.X, ms.Y));
-
-            // Reposition the collision rect of the mouse pointer to the position of the actual 
-            // mouse in world space.
-            mMouseRect.pCenterPoint = proj;
-
-            // Clear any objects that might still be stored from the previous frame.
-            mCollidedObjects.Clear();
-
-            // Check if any objects are colliding with the mouse.
-            GameObjectManager.pInstance.GetGameObjectsInRange(mMouseRect, ref mCollidedObjects);
-
-            // Temp storing which object the mouse is currently over top of (if any).
-            GameObject mousedObject = null;
 
             // Only count mouse clicks that happen after the button was previously released.
             Boolean clickChanged = (mPreviousMouseState.LeftButton != ms.LeftButton);
 
+            // Temp storing which object the mouse is currently over top of (if any).
+            GameObject mousedObject = null;
+
             const String dbgLayer = "GameObjectPicker";
 
-            // Did the mouse actually collide with any objects?
-            if (mCollidedObjects.Count > 0)
+            // If while hovering over an object, the user presses the mouse button, that object
+            // not becomes the new "selected" object.
+            if (ms.LeftButton == ButtonState.Pressed && clickChanged)
             {
-                // We just use index 0 for now. Eventually we might need to determine some sort
-                // of sorting order, perhaps based on rect size, or render order.
-                mousedObject = mCollidedObjects[0];
+                // Project that mouse position into 2D world space so that it can be tested for collision.
+                Vector2 proj = CameraManager.pInstance.ProjectMouseToWorldSpace(new Vector2(ms.X, ms.Y));
 
-                // If while hovering over an object, the user presses the mouse button, that object
-                // not becomes the new "selected" object.
-                if (ms.LeftButton == ButtonState.Pressed && clickChanged)
+                // Reposition the collision rect of the mouse pointer to the position of the actual 
+                // mouse in world space.
+                mMouseRect.pCenterPoint = proj;
+
+                // Clear any objects that might still be stored from the previous frame.
+                mCollidedObjects.Clear();
+
+                // Check if any objects are colliding with the mouse.
+                // NOTE: This is a really expensive call right now, so we don't want to be doing
+                //       it every frame. Instead we only do it when you click.
+                GameObjectManager.pInstance.GetGameObjectsInRange(mMouseRect, ref mCollidedObjects);
+
+                // Did the mouse actually collide with any objects?
+                if (mCollidedObjects.Count > 0)
                 {
+                    // We just use index 0 for now. Eventually we might need to determine some sort
+                    // of sorting order, perhaps based on rect size, or render order.
+                    mousedObject = mCollidedObjects[0];
+
                     if (mousedObject != mSelectedGameObject)
                     {
                         DebugMessageDisplay.pInstance.pCurrentTag = dbgLayer;
@@ -110,6 +113,9 @@ namespace MBHEngine.GameObject
             }
 
 #if ALLOW_GARBAGE
+            /* Removing this functionality for now because it is too expensive to search for collisions with
+             * every object in the world, every frame.
+             * 
             // Display some information about the object we are hovering over.
             //
             if (null != mousedObject)
@@ -121,6 +127,7 @@ namespace MBHEngine.GameObject
             {
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Picked GO (over): --");
             }
+            */
 
             // The Behaviour and GameObject classes expose a bunch of debug information through the GetDebugInfo
             // functions. If there is an object currently selected, we want to get that info about the selected
@@ -168,6 +175,8 @@ namespace MBHEngine.GameObject
 
             // Update the previous state with the current state.
             mPreviousMouseState = Mouse.GetState();
+
+#endif // DEBUG
         }
 
         /// <summary>
