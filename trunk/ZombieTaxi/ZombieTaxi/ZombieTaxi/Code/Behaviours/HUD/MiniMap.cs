@@ -6,11 +6,86 @@ using MBHEngine.World;
 using MBHEngineContentDefs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ZombieTaxiContentDefs;
 
-namespace ZombieTaxi.Behaviours
+namespace ZombieTaxi.Behaviours.HUD
 {
+    /// <summary>
+    /// HUD element which draws a little box on the screen with pixels on it to represent different objects in the 
+    /// world.
+    /// </summary>
     class MiniMap : MBHEngine.Behaviour.Behaviour
     {
+        /// <summary>
+        /// Tell the MiniMap an Object that should be marked.
+        /// </summary>
+        public class MarkObjectMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The MarkerProfileDefinition to use when marking this object.
+            /// </summary>
+            public String mMarkerProfile;
+
+            /// <summary>
+            /// The GameObject to mark. It will dynamically following the object.
+            /// </summary>
+            public GameObject mObjectToMark;
+        }
+
+        /// <summary>
+        /// Contains all the information for a single Marker on the MiniMap.
+        /// </summary>
+        public struct Marker
+        {
+            /// <summary>
+            /// Tells the Marker how to render.
+            /// </summary>
+            private MarkerProfile mProfile;
+
+            /// <summary>
+            /// The object that is being marked.
+            /// </summary>
+            private GameObject mObjectToMark;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="fileName">MarkerProfileDefinition file.</param>
+            /// <param name="objectToMark">A GameObject to mark.</param>
+            public Marker(String fileName, GameObject objectToMark) 
+            {
+                /// <todo> 
+                /// This should use some sort of factory. No need to load these profiles
+                /// over and over again, especially in the middle of the game. 
+                /// </todo>
+                mProfile = GameObjectManager.pInstance.pContentManager.Load<MarkerProfile>(fileName);
+
+                mObjectToMark = objectToMark;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public GameObject pObjectToMark
+            {
+                get
+                {
+                    return mObjectToMark;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public MarkerProfile pProfile
+            {
+                get
+                {
+                    return mProfile;
+                }
+            }
+        }
+
         /// <summary>
         /// The minimap is just a proceedurally created texture which we directly draw 
         /// pixels to.
@@ -42,6 +117,11 @@ namespace ZombieTaxi.Behaviours
         /// Preallocate messages to avoid GC.
         /// </summary>
         private Level.GetMapInfoMessage mGetMapInfoMsg;
+
+        /// <summary>
+        /// A list of all the Markers on this MiniMap.
+        /// </summary>
+        private List<Marker> mMarkers;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -92,6 +172,8 @@ namespace ZombieTaxi.Behaviours
 
             mParentGOH.pPosX = rightEdge - mMiniMapSize.X - safeZonePadding;
             mParentGOH.pPosY = bottomEdge - mMiniMapSize.Y - safeZonePadding;
+
+            mMarkers = new List<Marker>(32);
         }
 
         /// <summary>
@@ -112,36 +194,19 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
+            Vector2 mapPos;
+            Int32 index;
+
             // Start with a blank map.
             ClearColorData();
 
-
-            // Place the Player object.
-            //
-
-            Vector2 mapPos = GameObjectManager.pInstance.pPlayer.pPosition * mWorldToMapScale;
-            
-            // Map X,Y into 1D array of Color.
-            Int32 index = MBHEngine.Math.Util.Map2DTo1DArray(mMiniMapSize.X, mapPos);
-
-            // It is possible for the player to leave the play area.
-            if (index >= 0 && index < mColorData.Length)
+            // Go through every Marker and render it to the mColorData Array.
+            for (Int32 i = 0; i < mMarkers.Count; i++)
             {
-                mColorData[index] = Color.Wheat;
-            }
+                GameObject obj = mMarkers[i].pObjectToMark;
 
-
-            // Place the SafeZone objects.
-            //
-
-            // Start by getting a list of all the SafeHouse objects in the game.
-            List<GameObject> safeHouses = GameObjectManager.pInstance.GetGameObjectsOfClassification(GameObjectDefinition.Classifications.SAFE_HOUSE);
-
-            // For each SafeHouse draw a dot on the map.
-            for (Int32 i = 0; i < safeHouses.Count; i++)
-            {
-                // Covert the SafeHouse position into a pixel index on the map.
-                mapPos = safeHouses[i].pPosition * mWorldToMapScale;
+                // Covert the position into a pixel index on the map.
+                mapPos = obj.pPosition * mWorldToMapScale;
 
                 // Map X,Y into 1D array of Color.
                 index = MBHEngine.Math.Util.Map2DTo1DArray(mMiniMapSize.X, mapPos);
@@ -149,8 +214,8 @@ namespace ZombieTaxi.Behaviours
                 // Just in case the object gets placed outside the valid map area.
                 if (index >= 0 && index < mColorData.Length)
                 {
-                    mColorData[index] = Color.Red;
-                }
+                    mColorData[index] = mMarkers[i].pProfile.mColor;
+                }            
             }
 
             // Sometimes the game will throw an exception because we are trying to write to a texture which
@@ -171,6 +236,33 @@ namespace ZombieTaxi.Behaviours
                 mMapTexture,
                 new Vector2(mParentGOH.pPosition.X + 1, mParentGOH.pPosition.Y + 1),
                 Color.White);
+        }
+
+        /// <summary>
+        /// The main interface for communicating between behaviours.  Using polymorphism, we
+        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
+        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// from it (set message) or store some data in it (get message).
+        /// </summary>
+        /// <param name="msg">The message being communicated to the behaviour.</param>
+        public override void OnMessage(ref BehaviourMessage msg)
+        {
+            if (msg is MarkObjectMessage)
+            {
+                MarkObjectMessage tmp = (MarkObjectMessage)msg;
+
+                MarkObjects(tmp.mMarkerProfile, tmp.mObjectToMark);
+            }
+        }
+
+        /// <summary>
+        /// Adds a new Marker to the MiniMap.
+        /// </summary>
+        /// <param name="markerProfile">MarkerProfileDefinition file.</param>
+        /// <param name="objectToMark">The GameObject being marked.</param>
+        private void MarkObjects(String markerProfile, GameObject objectToMark)
+        {
+            mMarkers.Add(new Marker(markerProfile, objectToMark));
         }
     }
 }

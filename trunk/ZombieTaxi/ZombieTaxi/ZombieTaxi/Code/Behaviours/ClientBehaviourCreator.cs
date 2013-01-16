@@ -92,6 +92,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new TilePlacement(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.MarkOnMiniMap":
+                    {
+                        return new MarkOnMiniMap(go, fileName);
+                    }
                 default:
                     {
                         return null;

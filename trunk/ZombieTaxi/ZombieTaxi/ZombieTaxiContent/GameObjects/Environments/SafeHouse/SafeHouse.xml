@@ -14,9 +14,11 @@
     </mClassifications>
     <mBlendMode>MULTIPLY</mBlendMode>
     <mBehaviourFileNames>
+      <Item>MarkOnMiniMap</Item>
       <Item>Sprite</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
+      <Item>ZombieTaxi.Behaviours.MarkOnMiniMap</Item>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
     </mBehaviourClassNames>
   </Asset>

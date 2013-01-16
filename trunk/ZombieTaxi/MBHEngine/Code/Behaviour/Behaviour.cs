@@ -69,6 +69,13 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Called at the end of the frame where mParentGOH was added to the GameObjectManager.
+        /// </summary>
+        public virtual void PostInitialization()
+        {
+        }
+
+        /// <summary>
         /// Called once per frame before the update function. Is called for ALL gameobjects, prior 
         /// to calling Update.
         /// </summary>

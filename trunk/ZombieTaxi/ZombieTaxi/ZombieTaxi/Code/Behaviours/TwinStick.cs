@@ -13,6 +13,7 @@ using MBHEngine.Behaviour;
 using MBHEngine.World;
 using Microsoft.Xna.Framework;
 using ZombieTaxiContentDefs;
+using MBHEngineContentDefs;
 
 namespace ZombieTaxi.Behaviours
 {
