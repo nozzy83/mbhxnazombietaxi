@@ -556,6 +556,10 @@ namespace MBHEngine.Behaviour
                 mUnusedNodes.Push(mClosedNodes[i]);
             }
             mClosedNodes.Clear();
+
+            // The nodes are gone, so it doesn't make sense that we would
+			// hold on to a reference to once of them.
+            mCurBest = null;
         }
 
         /// <summary>
@@ -590,7 +594,10 @@ namespace MBHEngine.Behaviour
             {
                 mDestinationTile = null;
                 mSolved = false;
-                mPathInvalidated = true;
+
+                // Release the Nodes. We don't need them anymore. If a new destination
+                // is set, we will need to start from scratch anyway.
+                ClearNodeLists();
             }
             else if (msg is SetSourceMessage)
             {
