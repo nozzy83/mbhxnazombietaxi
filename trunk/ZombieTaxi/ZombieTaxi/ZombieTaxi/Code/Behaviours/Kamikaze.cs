@@ -133,6 +133,14 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~Kamikaze()
+        {
+            StopWatchManager.pInstance.RecycleStopWatch(mBLineTimer);
+        }
+
+        /// <summary>
         /// Called once per frame by the game object.
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
