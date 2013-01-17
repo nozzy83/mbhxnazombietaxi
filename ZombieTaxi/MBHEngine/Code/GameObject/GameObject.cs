@@ -242,11 +242,22 @@ namespace MBHEngine.GameObject
         /// <summary>
         /// Called at the end of the frame where this was added to the GameObjectManager.
         /// </summary>
-        public virtual void PostInitialization()
+        public virtual void OnAdd()
         {
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                mBehaviours[i].PostInitialization();
+                mBehaviours[i].OnAdd();
+            }
+        }
+
+        /// <summary>
+        /// Called at the end of the frame where this was removed from the GameObjectManager.
+        /// </summary>
+        public virtual void OnRemove()
+        {
+            for (int i = 0; i < mBehaviours.Count; i++)
+            {
+                mBehaviours[i].OnRemove();
             }
         }
 

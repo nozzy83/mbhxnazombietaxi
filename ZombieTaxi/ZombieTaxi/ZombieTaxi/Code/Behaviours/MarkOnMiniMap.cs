@@ -46,7 +46,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Called at the end of the frame where mParentGOH was added to the GameObjectManager.
         /// </summary>
-        public override void PostInitialization()
+        public override void OnAdd()
         {
             // This can't happen until PostInitialization because it might have been created in the
             // frame and BroadcastMessage won't work right away.

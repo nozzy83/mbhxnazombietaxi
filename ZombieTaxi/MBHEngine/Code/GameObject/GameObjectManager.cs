@@ -345,7 +345,6 @@ namespace MBHEngine.GameObject
                     }
                 }
             }
-            mGameObjectsToRemove.Clear();
 
             // Loop through all the game objects that exist.  We want to insert the new game objects
             // in the order that they were added, based on render priority.  If the new object shares
@@ -428,6 +427,21 @@ namespace MBHEngine.GameObject
                     }
                 }
             }
+
+            if (mGameObjectsToRemove.Count != 0)
+            {
+                // At this point all objects for the frame have been removed from
+                // the GameObjectManager. This is an ideal time to give objects
+                // a chance to do some cleanup which requires objects to 
+                // be removed (eg. Delete stuff).
+                for (Int32 i = 0; i < mGameObjectsToRemove.Count; i++)
+                {
+                    mGameObjectsToRemove[i].OnRemove();
+                }
+
+                mGameObjectsToRemove.Clear();
+            }
+
             if (mGameObjectsToAdd.Count != 0)
             {
                 // At this point all objects for the frame have been added to
@@ -436,7 +450,7 @@ namespace MBHEngine.GameObject
 				// be added (eg. BroadCastMessage).
                 for (Int32 i = 0; i < mGameObjectsToAdd.Count; i++)
                 {
-                    mGameObjectsToAdd[i].PostInitialization();
+                    mGameObjectsToAdd[i].OnAdd();
                 }
 
                 mGameObjectsToAdd.Clear();
