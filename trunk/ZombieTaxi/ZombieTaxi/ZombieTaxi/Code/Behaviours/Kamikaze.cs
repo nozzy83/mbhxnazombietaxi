@@ -81,6 +81,7 @@ namespace ZombieTaxi.Behaviours
         private PathFind.SetDestinationMessage mSetDestinationMsg;
         private PathFind.SetSourceMessage mSetSourceMsg;
         private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
+        private PathFind.ClearDestinationMessage mClearDestinationMsg;
         private Explosive.DetonateMessage mDetonateMsg;
         private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
@@ -126,6 +127,7 @@ namespace ZombieTaxi.Behaviours
             mSetDestinationMsg = new PathFind.SetDestinationMessage();
             mSetSourceMsg = new PathFind.SetSourceMessage();
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
+            mClearDestinationMsg = new PathFind.ClearDestinationMessage();
             mDetonateMsg = new Explosive.DetonateMessage();
             mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
@@ -138,6 +140,15 @@ namespace ZombieTaxi.Behaviours
         ~Kamikaze()
         {
             StopWatchManager.pInstance.RecycleStopWatch(mBLineTimer);
+        }
+
+        /// <summary>
+        /// Called at the end of the frame on which this Behaviour's mParentGOH was removed from
+        /// the GameObjectManager.
+        /// </summary>
+        public override void OnRemove()
+        {
+            mParentGOH.OnMessage(mClearDestinationMsg);
         }
 
         /// <summary>
