@@ -121,6 +121,12 @@ namespace MBHEngine.GameObject
         private Int32 mNumCells;
 
         /// <summary>
+        /// The one and only Effect this game uses. Right now this is all very hard coded, and there
+        /// should be some way to control it from Game side.
+        /// </summary>
+        Effect mDefaultEffect;
+
+        /// <summary>
         /// We make the constructor private so that no one accidentally creates
         /// an instance of the class.
         /// </summary>
@@ -161,6 +167,9 @@ namespace MBHEngine.GameObject
             mMultiply = new BlendState();
             mMultiply.ColorSourceBlend = Blend.Zero;
             mMultiply.ColorDestinationBlend = Blend.SourceColor;
+
+            // For now just hard code it. Eventually this should be driven by the Game side.
+            mDefaultEffect = content.Load<Effect>("Shaders\\Default");
 
             mCurrentUpdatePass = BehaviourDefinition.Passes.DEFAULT;
 
@@ -500,7 +509,15 @@ namespace MBHEngine.GameObject
 
                             if (blend == GameObjectDefinition.BlendMode.STANDARD)
                             {
-                                batch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, null, null, CameraManager.pInstance.pFinalTransform);
+                                batch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, mDefaultEffect, CameraManager.pInstance.pFinalTransform);
+
+                                // Keep the sprites looking crisp.
+                                batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
+                                batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                            }
+                            else if (blend == GameObjectDefinition.BlendMode.TEST)
+                            {
+                                batch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, mDefaultEffect, CameraManager.pInstance.pFinalTransform);
 
                                 // Keep the sprites looking crisp.
                                 batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
@@ -508,7 +525,7 @@ namespace MBHEngine.GameObject
                             }
                             else if (blend == GameObjectDefinition.BlendMode.MULTIPLY)
                             {
-                                batch.Begin(SpriteSortMode.Immediate, mMultiply, null, null, null, null, CameraManager.pInstance.pFinalTransform);
+                                batch.Begin(SpriteSortMode.Immediate, mMultiply, null, null, null, mDefaultEffect, CameraManager.pInstance.pFinalTransform);
 
                                 // Keep the sprites looking crisp.
                                 batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
@@ -518,7 +535,7 @@ namespace MBHEngine.GameObject
                             {
                                 // Use the Multiply blend mode but ignore the camera, so that it renders in screen
                                 // space.
-                                batch.Begin(SpriteSortMode.Immediate, mMultiply);
+                                batch.Begin(SpriteSortMode.Immediate, mMultiply, null, null, null, mDefaultEffect);
 
                                 // Keep the sprites looking crisp.
                                 batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
@@ -528,8 +545,8 @@ namespace MBHEngine.GameObject
                             {
                                 batch.Begin(
                                     SpriteSortMode.Immediate,
-                                    BlendState.AlphaBlend,
-                                    null, null, null, null,
+                                    BlendState.NonPremultiplied,
+                                    null, null, null, mDefaultEffect,
                                     CameraManager.pInstance.pFinalTransformUI);
 
                                 // Keep the sprites looking crisp.
@@ -542,7 +559,7 @@ namespace MBHEngine.GameObject
                             }
                         }
 
-                        obj.Render(batch);
+                        obj.Render(batch, mDefaultEffect);
 
                         objectsRender++;
 

@@ -45,7 +45,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
-        private SpriteRender.SetColorMessage mSetColorMsg;
+        private SpriteRender.SetTintMessage mSetTintMsg;
         private Health.GetHealthMessage mGetHealthMsg;
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace ZombieTaxi.Behaviours
             mColors = def.mColors;
             mCurrentColor = 0;
 
-            mSetColorMsg = new SpriteRender.SetColorMessage();
+            mSetTintMsg = new SpriteRender.SetTintMessage();
             mGetHealthMsg = new Health.GetHealthMessage();
         }
 
@@ -115,8 +115,9 @@ namespace ZombieTaxi.Behaviours
                 if (mDamageCooldown.IsExpired())
                 {
                     // TODO: This should not assume the original colour was white.
-                    mSetColorMsg.mColor = Color.White;
-                    mParentGOH.OnMessage(mSetColorMsg);
+                    mSetTintMsg.mColor = Color.White;
+                    mSetTintMsg.mColor.A = 0;
+                    mParentGOH.OnMessage(mSetTintMsg);
 
                     // Next time through the Update function, this will tell it that the
                     // effect has already expired.
@@ -143,8 +144,8 @@ namespace ZombieTaxi.Behaviours
                         }
 
                         // Update sprite to use the new color.
-                        mSetColorMsg.mColor = mColors[mCurrentColor];
-                        mParentGOH.OnMessage(mSetColorMsg);
+                        mSetTintMsg.mColor = mColors[mCurrentColor];
+                        mParentGOH.OnMessage(mSetTintMsg);
                     }
                 }
 

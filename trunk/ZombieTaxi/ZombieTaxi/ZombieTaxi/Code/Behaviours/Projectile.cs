@@ -86,13 +86,5 @@ namespace ZombieTaxi.Behaviours
                 GameObjectManager.pInstance.Remove(mParentGOH);
             }
         }
-
-        /// <summary>
-        /// Called once render cycle by the game object manager.
-        /// </summary>
-        /// <param name="batch">The sprite batch to render to.</param>
-        public override void Render(SpriteBatch batch)
-        {
-        }
     }
 }

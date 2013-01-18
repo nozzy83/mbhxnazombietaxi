@@ -327,7 +327,8 @@ namespace MBHEngine.GameObject
         /// Called once render cycle by the game object manager.
         /// </summary>
         /// <param name="batch">The sprite batch to render to.</param>
-        public virtual void Render(SpriteBatch batch)
+        /// <param name="effect">The currently set shader.</param>
+        public virtual void Render(SpriteBatch batch, Effect effect)
         {
             BehaviourDefinition.Passes curPass = GameObjectManager.pInstance.pCurUpdatePass;
 
@@ -336,7 +337,7 @@ namespace MBHEngine.GameObject
                 if (null == mBehaviours[i].pRenderPassExclusions ||
                     !(mBehaviours[i].pRenderPassExclusions.Contains(curPass)))
                 {
-                    mBehaviours[i].Render(batch);
+                    mBehaviours[i].Render(batch, effect);
                 }
             }
         }

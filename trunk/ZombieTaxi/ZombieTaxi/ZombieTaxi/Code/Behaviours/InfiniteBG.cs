@@ -86,7 +86,8 @@ namespace ZombieTaxi.Behaviours
         /// Called once render cycle by the game object manager.
         /// </summary>
         /// <param name="batch">The sprite batch to render to.</param>
-        public override void Render(SpriteBatch batch)
+        /// <param name="effect">The currently set shader.</param>
+        public override void Render(SpriteBatch batch, Effect effect)
         {
             // This is slightly odd because the camera can support tweening to target positions, but it is
             // currently disabled, so this works.  We really want to use the actual position of the camera,

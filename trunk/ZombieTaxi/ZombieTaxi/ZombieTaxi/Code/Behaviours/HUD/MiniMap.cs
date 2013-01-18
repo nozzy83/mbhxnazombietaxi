@@ -230,7 +230,8 @@ namespace ZombieTaxi.Behaviours.HUD
         /// Called once render cycle by the game object manager.
         /// </summary>
         /// <param name="batch">The sprite batch to render to.</param>
-        public override void Render(SpriteBatch batch)
+        /// <param name="effect">The currently set shader.</param>
+        public override void Render(SpriteBatch batch, Effect effect)
         {
             batch.Draw(
                 mMapTexture,
