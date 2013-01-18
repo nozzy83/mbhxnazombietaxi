@@ -32,6 +32,7 @@ namespace MBHEngineContentDefs
             MULTIPLY,
             STANDARD_UI,
             MULTIPLY_UI,
+            TEST
         };
 
         /// <summary>

@@ -325,14 +325,6 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
-        /// Called once render cycle by the game object manager.
-        /// </summary>
-        /// <param name="batch">The sprite batch to render to.</param>
-        public override void Render(SpriteBatch batch)
-        {
-        }
-
-        /// <summary>
         /// The main interface for communicating between behaviours.  Using polymorphism, we
         /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
         /// can then check for particular upcasted messahe types, and either grab some data 

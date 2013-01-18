@@ -75,9 +75,17 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
-        /// Update the color that the sprite is tinted with when rendering.
+        /// Update the color that the sprite is multiplied with when rendering.
         /// </summary>
         public class SetColorMessage : BehaviourMessage
+        {
+            public Color mColor;
+        }
+
+        /// <summary>
+        /// Update the color that the sprite it tinted with when rendering.
+        /// </summary>
+        public class SetTintMessage : BehaviourMessage
         {
             public Color mColor;
         }
@@ -200,10 +208,16 @@ namespace MBHEngine.Behaviour
         private OnAnimationCompleteMessage mOnAnimationCompleteMsg;
 
         /// <summary>
-        /// Color used to tint the sprite when rendering.  White means render as it appears
+        /// Color multiplied by the color of the texture.  White means render as it appears
         /// outside the game.
         /// </summary>
         private Color mColor;
+
+        /// <summary>
+        /// Tints the sprite a certain color. Different than mColor in that this is additive, so
+        /// you can actually add and remove color. The alpha channel controls strength.
+        /// </summary>
+        private Color mTint;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -282,6 +296,7 @@ namespace MBHEngine.Behaviour
             mCurrentFrame = 0;
             mActiveAnimation = 0;
             mColor = Color.White;
+            mTint = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
             mOnAnimationCompleteMsg = new OnAnimationCompleteMessage();
         }
@@ -337,8 +352,11 @@ namespace MBHEngine.Behaviour
         /// Called once render cycle by the game object manager.
         /// </summary>
         /// <param name="batch">The sprite batch to render to.</param>
-        public override void Render(SpriteBatch batch)
+        /// <param name="effect">The currently set shader.</param>
+        public override void Render(SpriteBatch batch, Effect effect)
         {
+            effect.Parameters["tint"].SetValue(mTint.ToVector4());
+
             if (mIsAnimated)
             {
                 Int32 baseIndex = (mAnimations[mActiveAnimation].mStartingFrame + mCurrentFrame) * mFrameHeight;
@@ -526,6 +544,11 @@ namespace MBHEngine.Behaviour
             {
                 SetColorMessage temp = (SetColorMessage)msg;
                 mColor = temp.mColor;
+            }
+            else if (msg is SetTintMessage)
+            {
+                SetTintMessage temp = (SetTintMessage)msg;
+                mTint = temp.mColor;
             }
             else if (msg is GetTexture2DMessage)
             {

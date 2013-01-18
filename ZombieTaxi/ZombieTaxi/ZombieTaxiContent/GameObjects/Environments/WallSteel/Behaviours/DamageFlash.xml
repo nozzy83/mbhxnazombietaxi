@@ -2,12 +2,10 @@
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.DamageFlashDefinition">
     <mFramesToReset>5</mFramesToReset>
-    <mFramesBetweenColorChange>1</mFramesBetweenColorChange>
+    <mFramesBetweenColorChange>2</mFramesBetweenColorChange>
     <mColors>
       FFFF0000 <!-- Red -->
-      FFFF6666 <!-- Lighter Red-->
-      FFFFAAAA <!-- Lighter Red-->
-      FFFF6666 <!-- Lighter Red-->
+      FFFFFFFF <!-- White -->
     </mColors>
   </Asset>
 </XnaContent>
