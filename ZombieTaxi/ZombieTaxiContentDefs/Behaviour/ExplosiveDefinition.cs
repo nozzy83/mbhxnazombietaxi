@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MBHEngineContentDefs;
+using Microsoft.Xna.Framework.Content;
 
 namespace ZombieTaxiContentDefs
 {
@@ -33,5 +34,13 @@ namespace ZombieTaxiContentDefs
         /// A list of the types of objects that this does damage to when exploding.
         /// </summary>
         public List<GameObjectDefinition.Classifications> mDamageAppliedTo;
+
+        /// <summary>
+        /// The number of frames that need to pass before the object detonates (if it is not
+        /// a manual detonation).
+        /// </summary>
+        /// 
+        [ContentSerializer(Optional = true)]
+        public Single mDetonationTimerDuration;
     }
 }

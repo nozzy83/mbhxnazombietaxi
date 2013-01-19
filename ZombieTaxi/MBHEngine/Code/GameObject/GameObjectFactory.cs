@@ -150,8 +150,15 @@ namespace MBHEngine.GameObject
                 // And make sure that Stack is not currently empty.
                 if (hasRemaining)
                 {
+                    GameObject go = mObjects[fileName].Pop();
+
+                    // Reset all Behaviours so that the next client gets a "fresh" GameObject.
+                    // We do this right before returning using it again because there may be time
+                    // specific behaviours.
+                    go.ResetBehaviours();
+                        
                     // Pop one off the stack and return it to the client for use.
-                    return mObjects[fileName].Pop();
+                    return go;
                 }
             }
 
@@ -177,9 +184,6 @@ namespace MBHEngine.GameObject
             // Sanity check to make sure this object isn't added more than once.
             CheckForDupes(go.pFactoryInfo.pTemplateName);
 #endif // DEBUG
-
-            // Reset all Behaviours so that the next client gets a "fresh" GameObject.
-            go.ResetBehaviours();
 
             // Push it back onto the appropriate list.
             mObjects[go.pFactoryInfo.pTemplateName].Push(go);

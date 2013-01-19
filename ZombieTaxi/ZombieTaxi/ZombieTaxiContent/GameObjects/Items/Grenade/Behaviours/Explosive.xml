@@ -11,6 +11,7 @@
       <Item>ENEMY</Item>
       <Item>WALL</Item>
     </mDamageAppliedTo>
+    <mDetonationTimerDuration>300</mDetonationTimerDuration>
   </Asset>
 </XnaContent>
 

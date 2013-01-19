@@ -62,6 +62,12 @@ namespace ZombieTaxi.Behaviours
         private List<GameObjectDefinition.Classifications> mDamageAppliedTo;
 
         /// <summary>
+        /// In some cases the Explosive detonates after a set amount of frames. This stop watch
+        /// tracks if that time has passed.
+        /// </summary>
+        private StopWatch mDetonationTimer;
+
+        /// <summary>
         /// Preallocate our messages so that we don't trigger the garbage collector later.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
@@ -106,6 +112,13 @@ namespace ZombieTaxi.Behaviours
 
             mObjectsInRange = new List<GameObject>(16);
 
+            if (def.mDetonationTimerDuration != 0)
+            {
+                mDetonationTimer = StopWatchManager.pInstance.GetNewStopWatch();
+
+                mDetonationTimer.pLifeTime = def.mDetonationTimerDuration;
+            }
+
             mSetActiveAnimationMessage = new SpriteRender.SetActiveAnimationMessage();
             mOnApplyDamageMsg = new Health.OnApplyDamage(mDamagedCaused);
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
@@ -119,12 +132,25 @@ namespace ZombieTaxi.Behaviours
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
-            if (!mManualExplosion && mDamageAppliedTo.Count > 0)
+            if (!mManualExplosion)
             {
-                // Find all the objects near by and apply some damage to them.
-                mObjectsInRange.Clear();
-                GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH, ref mObjectsInRange, mDamageAppliedTo);
-                if (mObjectsInRange.Count > 0)
+                if (mDamageAppliedTo.Count > 0)
+                {
+                    // Find all the objects near by and apply some damage to them.
+                    /// <todo>
+                    /// This is a little odd since this check is just to cause the explosive to detonate.
+                    /// The same query is done again in Detonate(). It seems like here we might be able to 
+                    /// do something a little more generic or something. Or maybe save the results.
+                    /// </todo>
+                    mObjectsInRange.Clear();
+                    GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH, ref mObjectsInRange, mDamageAppliedTo);
+                    if (mObjectsInRange.Count > 0)
+                    {
+                        Detonate();
+                    }
+                }
+
+                if (null != mDetonationTimer && mDetonationTimer.IsExpired())
                 {
                     Detonate();
                 }
@@ -137,6 +163,11 @@ namespace ZombieTaxi.Behaviours
         public override void Reset()
         {
             mExploded = false;
+
+            if (null != mDetonationTimer)
+            {
+                mDetonationTimer.Restart();
+            }
         }
 
         /// <summary>
@@ -151,8 +182,7 @@ namespace ZombieTaxi.Behaviours
             if (!mExploded)
             {
                 // Which type of message was sent to us?
-                if (!mManualExplosion &&
-                    (msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage || msg is MBHEngine.Behaviour.Timer.OnTimerCompleteMessage))
+                if (!mManualExplosion && msg is MBHEngine.Behaviour.TileCollision.OnTileCollisionMessage)
                 {
                     Detonate();
                 }

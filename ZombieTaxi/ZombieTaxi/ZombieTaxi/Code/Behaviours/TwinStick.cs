@@ -53,7 +53,6 @@ namespace ZombieTaxi.Behaviours
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
         private SpriteRender.GetSpriteEffectsMessage mGetSpriteFxMsg;
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
-        private Timer.ToggleTimerMessage mToggleTimerMsg;
         private ExtractionPoint.SetExtractionPointActivateMessage mSetExtractionPointActivateMsg;
         private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
 
@@ -106,7 +105,6 @@ namespace ZombieTaxi.Behaviours
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
-            mToggleTimerMsg = new Timer.ToggleTimerMessage();
             mSetExtractionPointActivateMsg = new ExtractionPoint.SetExtractionPointActivateMessage();
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
         }
@@ -247,10 +245,6 @@ namespace ZombieTaxi.Behaviours
                         // up for the grenade afterwards.
                         Vector2 bulletDir = finalDir;
 
-                        mToggleTimerMsg.mActivate = true;
-                        mToggleTimerMsg.mReset = true;
-                        bullet.OnMessage(mToggleTimerMsg);
-
                         bullet.pDirection.mSpeed = 1.75f;
 
                         // Update the game object with all the new data.
@@ -287,9 +281,6 @@ namespace ZombieTaxi.Behaviours
                         go.pDirection.mForward = grenadeDir;
                         go.pDirection.mSpeed = 0.25f;
                         GameObjectManager.pInstance.Add(go);
-                        mToggleTimerMsg.mActivate = true;
-                        mToggleTimerMsg.mReset = true;
-                        go.OnMessage(mToggleTimerMsg);
                     }
                 }
             }
