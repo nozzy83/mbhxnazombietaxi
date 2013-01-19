@@ -451,10 +451,6 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.TileCollision(this, fileName);
                     }
-                case "MBHEngine.Behaviour.Timer":
-                    {
-                        return new MBHEngine.Behaviour.Timer(this, fileName);
-                    }
                 case "MBHEngine.Behaviour.PathFind":
                     {
                         return new MBHEngine.Behaviour.PathFind(this, fileName);

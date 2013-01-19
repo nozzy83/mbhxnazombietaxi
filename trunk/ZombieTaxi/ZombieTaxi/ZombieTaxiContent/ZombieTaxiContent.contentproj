@@ -264,13 +264,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameObjects\Items\Grenade\Behaviours\Timer.xml">
-      <Name>Timer</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Sprites\Effects\Explosion.png">
       <Name>Explosion</Name>
       <Importer>TextureImporter</Importer>
@@ -357,13 +350,6 @@
   <ItemGroup>
     <Compile Include="GameObjects\Characters\Kamikaze\Behaviours\Health.xml">
       <Name>Health</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="GameObjects\Items\Bullet\Behaviours\Timer.xml">
-      <Name>Timer</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>

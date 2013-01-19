@@ -126,7 +126,6 @@
     <Compile Include="Behaviour\SpriteRenderDefinition.cs" />
     <Compile Include="Behaviour\TileCollisionDefinition.cs" />
     <Compile Include="Behaviour\TileMapRenderDefinition.cs" />
-    <Compile Include="Behaviour\TimerDefinition.cs" />
     <Compile Include="GameObject\GameObjectDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
