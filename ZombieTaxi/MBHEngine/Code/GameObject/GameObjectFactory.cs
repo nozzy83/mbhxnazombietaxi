@@ -147,19 +147,22 @@ namespace MBHEngine.GameObject
                 System.Diagnostics.Debug.Assert(hasRemaining, "Ran out of templates of type: " + fileName);
 #endif //ALLOW_GARBAGE
 
-                // And make sure that Stack is not currently empty.
-                if (hasRemaining)
+                // Ideally this will never happen in shipped code, but leaving it here as a fail safe since
+                // a lot of clients depend on this function not returning null.
+                if (!hasRemaining)
                 {
-                    GameObject go = mObjects[fileName].Pop();
-
-                    // Reset all Behaviours so that the next client gets a "fresh" GameObject.
-                    // We do this right before returning using it again because there may be time
-                    // specific behaviours.
-                    go.ResetBehaviours();
-                        
-                    // Pop one off the stack and return it to the client for use.
-                    return go;
+                    AddTemplate(fileName, 100);
                 }
+
+                GameObject go = mObjects[fileName].Pop();
+
+                // Reset all Behaviours so that the next client gets a "fresh" GameObject.
+                // We do this right before returning using it again because there may be time
+                // specific behaviours.
+                go.ResetBehaviours();
+                        
+                // Pop one off the stack and return it to the client for use.
+                return go;
             }
 
             return null;
