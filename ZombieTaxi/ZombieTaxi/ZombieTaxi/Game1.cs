@@ -115,6 +115,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallWood\\WallWood", 600);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallStone\\WallStone", 600);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallSteel\\WallSteel", 600);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\FloorSafeHouse\\FloorSafeHouse", 400);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Bullet\\Bullet", 100);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Grenade\\Grenade", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Flare\\Flare", 10);
@@ -153,7 +154,7 @@ namespace ZombieTaxi
             if (CommandLineManager.pInstance["CheatFillInventory"] != null)
             {
                 Inventory.AddObjectMessage addObj = new Inventory.AddObjectMessage();
-                for (Int32 i = 0; i < 10; i++)
+                for (Int32 i = 0; i < 25; i++)
                 {
                     addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
                     player.OnMessage(addObj);

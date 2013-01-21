@@ -417,7 +417,7 @@ namespace MBHEngine.Behaviour
                         //  [+]/
                         //    /[+]
                         //   /
-                        if (IsAttemptingInvalidDiagonalMove((Level.Tile.AdjacentTileDir)i, mCurBest.mTile))
+                        if (Level.IsAttemptingInvalidDiagonalMove((Level.Tile.AdjacentTileDir)i, mCurBest.mTile))
                         {
                             continue;
                         }
@@ -696,74 +696,6 @@ namespace MBHEngine.Behaviour
             // The path is now solved.  This will tell the main update loop to stop trying to
             // solve it until it becomes invalidated again.
             mSolved = true;
-        }
-
-        /// <summary>
-        /// Checks in an adjecent tile is solid.  Safely avoids cases where their is no adjecent tile.
-        /// </summary>
-        /// <param name="dir">The direction to check in.</param>
-        /// <param name="rootTile">The tile to move from.</param>
-        /// <returns>True if the adjecent tile exists and is solid.</returns>
-        private Boolean IsTileInDirectionSolid(Level.Tile.AdjacentTileDir dir, Level.Tile rootTile)
-        {
-            return (rootTile.mAdjecentTiles[(Int32)dir] != null && rootTile.mAdjecentTiles[(Int32)dir].mType != Level.Tile.TileTypes.Empty);
-        }
-
-        /// <summary>
-        /// When choosing a path we want to avoid clipping the edges of solid tiles. For example if you are
-        /// going LEFT_DOWN, there should be no solid tile LEFT or DOWN or else the character would clip
-        /// into them.
-        /// It also avoids the problem where the path slips between kitty-cornered tiles.
-        /// </summary>
-        /// <param name="dir">The direction we want to move.</param>
-        /// <param name="rootTile">The tile we are moving from.</param>
-        /// <returns>True if this is an invalid move.</returns>
-        private Boolean IsAttemptingInvalidDiagonalMove(Level.Tile.AdjacentTileDir dir, Level.Tile rootTile)
-        {
-            switch( (Int32)dir )
-            {
-                // The path wants to move down and to the left...
-                case (Int32)Level.Tile.AdjacentTileDir.LEFT_DOWN:
-                    {
-                        // But it should only do so if their are no solid tiles to the left and
-                        // no solid tiles below.  If there are, it needs to find another way round.
-                        if( IsTileInDirectionSolid( Level.Tile.AdjacentTileDir.LEFT, rootTile ) ||
-                            IsTileInDirectionSolid( Level.Tile.AdjacentTileDir.DOWN, rootTile ) )
-                        {
-                            return true;
-                        }
-                        break;
-                    }
-                case (Int32)Level.Tile.AdjacentTileDir.LEFT_UP:
-                    {
-                        if (IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.LEFT, rootTile) ||
-                            IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.UP, rootTile))
-                        {
-                            return true;
-                        }
-                        break;
-                    }
-                case (Int32)Level.Tile.AdjacentTileDir.RIGHT_DOWN:
-                    {
-                        if (IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.RIGHT, rootTile) ||
-                            IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.DOWN, rootTile))
-                        {
-                            return true;
-                        }
-                        break;
-                    }
-                case (Int32)Level.Tile.AdjacentTileDir.RIGHT_UP:
-                    {
-                        if (IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.RIGHT, rootTile) ||
-                            IsTileInDirectionSolid(Level.Tile.AdjacentTileDir.UP, rootTile))
-                        {
-                            return true;
-                        }
-                        break;
-                    }
-            };
-
-            return false;
         }
 
         /// <summary>

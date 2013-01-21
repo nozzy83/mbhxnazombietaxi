@@ -48,6 +48,11 @@ namespace ZombieTaxi.Behaviours
         private Boolean mSafeHousePlaced;
 
         /// <summary>
+        /// Used to fill a structure with SafeHouseFloor objects.
+        /// </summary>
+        GameObjectFloodFill mGOFloodFill;
+
+        /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
@@ -55,6 +60,7 @@ namespace ZombieTaxi.Behaviours
         private SpriteRender.SetActiveAnimationMessage mSpriteActiveAnimMsg;
         private ExtractionPoint.SetExtractionPointActivateMessage mSetExtractionPointActivateMsg;
         private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
+        private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -102,11 +108,14 @@ namespace ZombieTaxi.Behaviours
 
             mSafeHousePlaced = false;
 
+            mGOFloodFill = new GameObjectFloodFill();
+
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
             mSpriteActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
             mSetExtractionPointActivateMsg = new ExtractionPoint.SetExtractionPointActivateMessage();
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
+            mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
         }
 
         /// <summary>
@@ -291,12 +300,18 @@ namespace ZombieTaxi.Behaviours
                 // flares.
                 if (!mSafeHousePlaced)
                 {
-                    // The place where the player must bring back recused characters to.
-                    GameObject safeHouse = new GameObject("GameObjects\\Environments\\SafeHouse\\SafeHouse");
-                    safeHouse.pPosition = mParentGOH.pPosition;
-                    GameObjectManager.pInstance.Add(safeHouse);
+                    // Get the tile where mParentGOH is standing, so that we can start a Flood Fill
+                    // at that position.
+                    mGetTileAtObjectMsg.mObject = mParentGOH;
+                    mGetTileAtObjectMsg.mTile = null;
 
-                    mSafeHousePlaced = true;
+                    WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtObjectMsg);
+
+                    // Attempting to fill the world will SafeHouseFloors.
+                    mSafeHousePlaced = mGOFloodFill.FloodFill(
+                                                        mGetTileAtObjectMsg.mTile, 
+                                                        10 * 10, 
+                                                        "GameObjects\\Environments\\FloorSafeHouse\\FloorSafeHouse");
                 }
                 else
                 {
