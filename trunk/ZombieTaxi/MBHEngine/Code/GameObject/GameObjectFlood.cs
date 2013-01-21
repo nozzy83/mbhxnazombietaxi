@@ -112,6 +112,9 @@ namespace MBHEngine.GameObject
         /// <returns>True if at least one room was filled.</returns>
         public Boolean FloodFill(Level.Tile firstTile, UInt32 maxFillCount, String gameObjectTemplateName)
         {
+            // Tracks whether or not any rooms were filled.
+            Boolean success = false;
+
             // This algorithm works by breaking the world into rooms. A room is an area surrounded
             // by wall, with the one cavet that spaces 1 pixel wide are allowed when moving from
             // one room to another, but are considered a wall when exiting the entire structure.
@@ -194,6 +197,9 @@ namespace MBHEngine.GameObject
                 // completed, and we can start actually changing tiles and adding the connected rooms.
                 if (mTilesToCheck.Count <= 0)
                 {
+                    // Once any room gets filled it is considered a success.
+                    success = true;
+
                     // This is a legit change now, so count it towards to total fill count.
                     curFillCount += mTilesToChange.Count;
 
@@ -217,13 +223,6 @@ namespace MBHEngine.GameObject
                         mRoomStarters.Enqueue(mRoomStartersToAdd[i]);
                     }
                 }
-            }
-
-            Boolean success = false;
-
-            if (mRoomStarters.Count > 0 || mTilesToCheck.Count > 0)
-            {
-                success = true;
             }
 
             // Don't want to be hanging onto this data.
