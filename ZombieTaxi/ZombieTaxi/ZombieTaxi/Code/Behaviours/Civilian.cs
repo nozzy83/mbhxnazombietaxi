@@ -88,7 +88,6 @@ namespace ZombieTaxi.Behaviours
             private PathFind.SetSourceMessage mSetSourceMsg;
             private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
             private PathFind.ClearDestinationMessage mClearDestinationMsg;
-            private SetSafeHouseMessage mSetSafeHouseMsg;
             private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
 
             /// <summary>
@@ -109,7 +108,6 @@ namespace ZombieTaxi.Behaviours
                 mSetSourceMsg = new PathFind.SetSourceMessage();
                 mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
                 mClearDestinationMsg = new PathFind.ClearDestinationMessage();
-                mSetSafeHouseMsg = new SetSafeHouseMessage();
                 mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
                 mIncrementScoreMsg.mAmount = 100;
             }
@@ -146,11 +144,6 @@ namespace ZombieTaxi.Behaviours
 #if ALLOW_GARBAGE
                     DebugMessageDisplay.pInstance.AddConstantMessage("Reached SafeHouse.");
 #endif
-
-                    // If there are multiple safehouses overlapping we just take the first one we find.
-                    mSetSafeHouseMsg.mSafeHouse = mSafeHouseInRange[0];
-                    pParentGOH.OnMessage(mSetSafeHouseMsg);
-
                     // For every civilian we save, increment the score a little.
                     GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, pParentGOH);
 
@@ -388,7 +381,6 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
             private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
-            private GetSafeHouseMessage mGetSafeHouseMsg;
 
             /// <summary>
             /// Constructor.
@@ -397,7 +389,6 @@ namespace ZombieTaxi.Behaviours
             {
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
                 mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
-                mGetSafeHouseMsg = new GetSafeHouseMessage();
             }
 
             /// <summary>
@@ -455,16 +446,20 @@ namespace ZombieTaxi.Behaviours
                 // Only try to move to a tile if it is empty.
                 if ((newTarget.mType & Level.Tile.TileTypes.Solid) != Level.Tile.TileTypes.Solid)
                 {
-                    pParentGOH.OnMessage(mGetSafeHouseMsg);
+                    List<GameObject> mSafeHouseInRange = GameObjectManager.pInstance.GetGameObjectsOfClassification(GameObjectDefinition.Classifications.SAFE_HOUSE);
 
-                    // And make sure we aren't leaving the safe house.
-                    if (mGetSafeHouseMsg.mSafeHouse != null &&
-                        mGetSafeHouseMsg.mSafeHouse.pCollisionRect.Intersects(newTarget.mCollisionRect.pCenterPoint))
+                    for (Int32 i = 0; i < mSafeHouseInRange.Count; i++)
                     {
-                        mSetActiveAnimationMsg.mAnimationSetName = "Walk";
-                        pParentGOH.OnMessage(mSetActiveAnimationMsg);
+                        GameObject safeHouse = mSafeHouseInRange[i];
+                        // And make sure we aren't leaving the safe house.
+                        if (safeHouse != null &&
+                            safeHouse.pCollisionRect.Intersects(newTarget.mCollisionRect.pCenterPoint))
+                        {
+                            mSetActiveAnimationMsg.mAnimationSetName = "Walk";
+                            pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
-                        SetNewTarget(mGetTileAtObjectMsg.mTile.mAdjecentTiles[dir]);
+                            SetNewTarget(mGetTileAtObjectMsg.mTile.mAdjecentTiles[dir]);
+                        }
                     }
                 }
             }
@@ -700,35 +695,12 @@ namespace ZombieTaxi.Behaviours
         #endregion // FSMStates
 
         /// <summary>
-        /// Message to store a safehouse when a state arrives at one.
-        /// </summary>
-        public class GetSafeHouseMessage : BehaviourMessage
-        {
-            public GameObject mSafeHouse;
-        }
-
-        /// <summary>
-        /// Retrives the safe house previous set with GetSafeHouseMessage. 
-        /// </summary>
-        public class SetSafeHouseMessage : BehaviourMessage
-        {
-            public GameObject mSafeHouse;
-        }
-
-        /// <summary>
         /// Get the GameObject representing the current extraction point.
         /// </summary>
         public class GetExtractionPointMessage : BehaviourMessage
         {
             public GameObject mExtractionPoint;
         }
-
-        /// <summary>
-        /// Once the civilian reaches a safehouse they need to stay there.  To do so they will need
-        /// access to the safehouse game object.  We hold on to it at the statemachine level so that
-        /// multiple states can all access it.
-        /// </summary>
-        private GameObject mSafeHouse;
 
         /// <summary>
         /// The currently active extraction point.
@@ -806,17 +778,7 @@ namespace ZombieTaxi.Behaviours
         {
             base.OnMessage(ref msg);
 
-            if (msg is GetSafeHouseMessage)
-            {
-                GetSafeHouseMessage temp = (GetSafeHouseMessage)msg;
-                temp.mSafeHouse = mSafeHouse;
-            }
-            else if (msg is SetSafeHouseMessage)
-            {
-                SetSafeHouseMessage temp = (SetSafeHouseMessage)msg;
-                mSafeHouse = temp.mSafeHouse;
-            }
-            else if (msg is Health.OnZeroHealth)
+            if (msg is Health.OnZeroHealth)
             {
                 AdvanceToState("Dead");
             }
