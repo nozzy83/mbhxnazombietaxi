@@ -216,6 +216,10 @@ namespace ZombieTaxi.Behaviours
                     // Give him a special animation to show that he is pissed!
                     mSetActiveAnimMsg.mAnimationSetName = "RunMad";
                     mParentGOH.OnMessage(mSetActiveAnimMsg);
+
+                    // If the path finder is running we need to stop it so it doesn't keep running 
+                    // during the BLine and bog things down.
+                    mParentGOH.OnMessage(mClearDestinationMsg);
                 }
 
                 // After a certain number of frames just explode.
