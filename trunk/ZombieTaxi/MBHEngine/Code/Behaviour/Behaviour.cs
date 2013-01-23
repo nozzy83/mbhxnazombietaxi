@@ -13,7 +13,7 @@ namespace MBHEngine.Behaviour
     /// Base class from which all behaviours should derive from.
     /// A behaviour is a collection of logic which can be attached to a game object.
     /// </summary>
-    public class Behaviour
+    public abstract class Behaviour
     {
         /// <summary>
         /// The game object that this behaviour is attached to.
@@ -29,6 +29,12 @@ namespace MBHEngine.Behaviour
         /// Do not render when the current GameObject pass is in this list.
         /// </summary>
         protected List<BehaviourDefinition.Passes> mRenderPassExclusions;
+
+        /// <summary>
+        /// If false, this behaviour will enter a state where it no longer receives 
+        /// Updates, Render calls, or Messages.
+        /// </summary>
+        protected Boolean mIsEnabled;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -51,6 +57,10 @@ namespace MBHEngine.Behaviour
         /// <param name="fileName">The file to load from.</param>
         public virtual void LoadContent(String fileName)
         {
+            // Default values for the cases where there is no template file.
+            //
+            mIsEnabled = true;
+
             if (null != fileName)
             {
                 // No data stored here right now, so leaving it commented out for the time being.
@@ -59,6 +69,8 @@ namespace MBHEngine.Behaviour
                 mUpdatePasses = def.mUpdatePasses;
 
                 mRenderPassExclusions = def.mRenderPassExclusions;
+
+                mIsEnabled = def.mIsEnabled;
             }
 
             if (null == mUpdatePasses)
@@ -168,6 +180,21 @@ namespace MBHEngine.Behaviour
             get
             {
                 return mRenderPassExclusions;
+            }
+        }
+
+        /// <summary>
+        /// Is this behaviour enabled right now.
+        /// </summary>
+        public Boolean pIsEnabled
+        {
+            get
+            {
+                return mIsEnabled;
+            }
+            set
+            {
+                mIsEnabled = value;
             }
         }
     }

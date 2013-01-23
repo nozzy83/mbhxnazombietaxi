@@ -17,6 +17,7 @@
       <Item>Sprite</Item>
       <Item>Civilian</Item>
       <Item>PathFind</Item>
+      <Item>PathFollow</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
       <Item>SimpleMomentum</Item>
@@ -25,6 +26,7 @@
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>ZombieTaxi.Behaviours.Civilian</Item>
       <Item>MBHEngine.Behaviour.PathFind</Item>
+      <Item>MBHEngine.Behaviour.PathFollow</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>

@@ -150,6 +150,15 @@
     <Compile Include="Code\Behaviours\RandomEnemyGenerator.cs" />
     <Compile Include="Code\Behaviours\TilePlacement.cs" />
     <Compile Include="Code\Behaviours\TwinStick.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateCower.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateDead.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateFollowTarget.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateGoToExtraction.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateGoToStandingPosition.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateStay.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateWaitAtStandingPosition.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateWaitInSafeHouse.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateWanderInSafeHouse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />

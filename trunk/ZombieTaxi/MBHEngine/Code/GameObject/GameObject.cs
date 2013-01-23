@@ -246,6 +246,9 @@ namespace MBHEngine.GameObject
         {
             for (int i = 0; i < mBehaviours.Count; i++)
             {
+                // Note that we still call this even for Behaviour that have pIsEnabled
+                // set to false. I am not totally sure about that, but the logic is that
+                // it may need to still do some basic initialization and clean up.
                 mBehaviours[i].OnAdd();
             }
         }
@@ -257,6 +260,9 @@ namespace MBHEngine.GameObject
         {
             for (int i = 0; i < mBehaviours.Count; i++)
             {
+                // Note that we still call this even for Behaviour that have pIsEnabled
+                // set to false. I am not totally sure about that, but the logic is that
+                // it may need to still do some basic initialization and clean up.
                 mBehaviours[i].OnRemove();
             }
         }
@@ -272,8 +278,9 @@ namespace MBHEngine.GameObject
 
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                if (0 == mBehaviours[i].pUpdatePasses.Count ||
-                    mBehaviours[i].pUpdatePasses.Contains(curPass))
+                if (mBehaviours[i].pIsEnabled &&
+                    (0 == mBehaviours[i].pUpdatePasses.Count ||
+                    mBehaviours[i].pUpdatePasses.Contains(curPass)))
                 {
                     mBehaviours[i].PreUpdate(gameTime);
                 }
@@ -290,8 +297,9 @@ namespace MBHEngine.GameObject
 
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                if (0 == mBehaviours[i].pUpdatePasses.Count ||
-                    mBehaviours[i].pUpdatePasses.Contains(curPass))
+                if (mBehaviours[i].pIsEnabled &&
+                    (0 == mBehaviours[i].pUpdatePasses.Count ||
+                    mBehaviours[i].pUpdatePasses.Contains(curPass)))
                 {
                     mBehaviours[i].Update(gameTime);
                 }
@@ -309,8 +317,9 @@ namespace MBHEngine.GameObject
 
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                if (0 == mBehaviours[i].pUpdatePasses.Count ||
-                    mBehaviours[i].pUpdatePasses.Contains(curPass))
+                if (mBehaviours[i].pIsEnabled &&
+                    (0 == mBehaviours[i].pUpdatePasses.Count ||
+                    mBehaviours[i].pUpdatePasses.Contains(curPass)))
                 {
                     mBehaviours[i].PostUpdate(gameTime);
                 }
@@ -334,8 +343,9 @@ namespace MBHEngine.GameObject
 
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                if (null == mBehaviours[i].pRenderPassExclusions ||
-                    !(mBehaviours[i].pRenderPassExclusions.Contains(curPass)))
+                if (mBehaviours[i].pIsEnabled &&
+                    (null == mBehaviours[i].pRenderPassExclusions ||
+                    !(mBehaviours[i].pRenderPassExclusions.Contains(curPass))))
                 {
                     mBehaviours[i].Render(batch, effect);
                 }
@@ -373,7 +383,10 @@ namespace MBHEngine.GameObject
 
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                mBehaviours[i].OnMessage(ref msg);
+                if (mBehaviours[i].pIsEnabled)
+                {
+                    mBehaviours[i].OnMessage(ref msg);
+                }
             }
 
             return msg;
@@ -402,6 +415,24 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// Enables and disables behaviours of a specific type.
+        /// </summary>
+        /// <typeparam name="BehaviourType">The type of Behaviour to enable/disable.</typeparam>
+        /// <param name="isEnabled">Whether or not is should be enabled.</param>
+        public virtual void SetBehaviourEnabled<BehaviourType>(Boolean isEnabled)
+        {
+            // Loop through all the Behaviour on the GameObject, and any that match
+            // the Type passed in get toggled.
+            for (int i = 0; i < mBehaviours.Count; i++)
+            {
+                if (mBehaviours[i] is BehaviourType)
+                {
+                    mBehaviours[i].pIsEnabled = isEnabled;
+                }
+            }
+        }
+
+        /// <summary>
         /// Helper function for creating behaviours based on strings of matching names.
         /// </summary>
         /// <param name="behaviourType">The name of the behaviour class we are creating.</param>
@@ -423,10 +454,6 @@ namespace MBHEngine.GameObject
 
             switch (behaviourType)
             {
-                case "MBHEngine.Behaviour.Behaviour":
-                    {
-                        return new MBHEngine.Behaviour.Behaviour(this, fileName);
-                    }
                 case "MBHEngine.Behaviour.SpriteRender":
                     {
                         return new MBHEngine.Behaviour.SpriteRender(this, fileName);
@@ -454,6 +481,10 @@ namespace MBHEngine.GameObject
                 case "MBHEngine.Behaviour.PathFind":
                     {
                         return new MBHEngine.Behaviour.PathFind(this, fileName);
+                    }
+                case "MBHEngine.Behaviour.PathFollow":
+                    {
+                        return new MBHEngine.Behaviour.PathFollow(this, fileName);
                     }
                 case "MBHEngine.Behaviour.RemoveTileOnDeath":
                     {
