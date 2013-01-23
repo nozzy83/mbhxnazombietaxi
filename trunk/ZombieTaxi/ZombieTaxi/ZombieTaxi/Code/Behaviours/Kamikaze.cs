@@ -202,7 +202,7 @@ namespace ZombieTaxi.Behaviours
                     mCurrentFollowType = FollowType.BLine;
 
                     // Give him a special animation to show that he is pissed!
-                    mSetActiveAnimMsg.mAnimationSetName = "RunMad";
+                    mSetActiveAnimMsg.mAnimationSetName_In = "RunMad";
                     mParentGOH.OnMessage(mSetActiveAnimMsg);
 
                     // If the path finder is running we need to stop it so it doesn't keep running 
@@ -254,10 +254,10 @@ namespace ZombieTaxi.Behaviours
 
                 // If we have a best node chosen (again maybe not a complete path, but the best so far), start
                 // moving towards the next point on the path.
-                if (mGetCurrentBestNodeMsg.mBest != null && mCurrentFollowType == FollowType.PathFinding)
+                if (mGetCurrentBestNodeMsg.mBest_Out != null && mCurrentFollowType == FollowType.PathFinding)
                 {
                     // This is the node closest to the destination that we have found.
-                    PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest;
+                    PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
                     // Traverse back towards the source node until the previous one has already been reached.
                     // That means the current one is the next one that has not been reached yet.
@@ -290,9 +290,9 @@ namespace ZombieTaxi.Behaviours
                         {
                             //DebugMessageDisplay.pInstance.AddConstantMessage("Reached target.  Setting new destination.");
 
-                            mSetSourceMsg.mSource = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
+                            mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
                             mParentGOH.OnMessage(mSetSourceMsg);
-                            mSetDestinationMsg.mDestination = player.pPosition + mParentGOH.pCollisionRoot;
+                            mSetDestinationMsg.mDestination_In = player.pPosition + mParentGOH.pCollisionRoot;
                             mParentGOH.OnMessage(mSetDestinationMsg);
                         }
                     }
@@ -327,21 +327,21 @@ namespace ZombieTaxi.Behaviours
                     //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
 
                     // If we don't have a destination set yet, set it up now.
-                    mSetSourceMsg.mSource = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
+                    mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
                     mParentGOH.OnMessage(mSetSourceMsg);
-                    mSetDestinationMsg.mDestination = player.pPosition + mParentGOH.pCollisionRoot;
+                    mSetDestinationMsg.mDestination_In = player.pPosition + mParentGOH.pCollisionRoot;
                     mParentGOH.OnMessage(mSetDestinationMsg);
                 }
             }
 
             if (mParentGOH.pDirection.mForward.X < 0)
             {
-                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipHorizontally;
                 mParentGOH.OnMessage( mSetSpriteFxMsg );
             }
             else if (mParentGOH.pDirection.mForward.X > 0)
             {
-                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
                 mParentGOH.OnMessage(mSetSpriteFxMsg);
             }
         }
@@ -357,9 +357,9 @@ namespace ZombieTaxi.Behaviours
         public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
-            if (msg is Health.OnZeroHealth)
+            if (msg is Health.OnZeroHealthMessage)
             {
-                mIncrementScoreMsg.mAmount = 10;
+                mIncrementScoreMsg.mAmount_In = 10;
                 GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, mParentGOH);
             }
             else if (msg is PathFind.OnPathFindFailedMessage)

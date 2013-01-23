@@ -69,7 +69,7 @@ namespace ZombieTaxi.Behaviours.HUD
             GameObjectManager.pInstance.pPlayer.OnMessage(mGetHealthMsg);
 
             // Convert the player's health data into a percent full.
-            Single percent = Math.Max(mGetHealthMsg.mCurrentHealth / mGetHealthMsg.mMaxHealth, 0.0f);
+            Single percent = Math.Max(mGetHealthMsg.mCurrentHealth_Out / mGetHealthMsg.mMaxHealth_Out, 0.0f);
 
             // Use that percent to define a source rectangle for the fill texture.
             mFillRect.Width = (Int32)(mTextureFill.Width * percent);

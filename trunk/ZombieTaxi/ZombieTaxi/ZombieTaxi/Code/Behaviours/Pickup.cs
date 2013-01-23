@@ -72,7 +72,7 @@ namespace ZombieTaxi.Behaviours
                 GameObject obj = GameObjectFactory.pInstance.GetTemplate(mInventoryTemplateFileName);
 
                 // Add the object to the player's inventory.
-                mAddObjectMsg.mObj = obj;
+                mAddObjectMsg.mObj_In = obj;
                 player.OnMessage(mAddObjectMsg);
 
                 // Stop updating and rendering the object. Also prevent things like collision checks finding it.

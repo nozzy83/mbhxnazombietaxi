@@ -41,7 +41,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Preallocate our messages so that we don't trigger the garbage collector later.
         /// </summary>
-        private Health.OnApplyDamage mOnApplyDamageMsg;
+        private Health.ApplyDamageMessage mApplyDamageMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -76,7 +76,8 @@ namespace ZombieTaxi.Behaviours
             mObjectsInRange = new List<GameObject>(16);
             mObjectsDamaged = new List<GameObject>(64);
 
-            mOnApplyDamageMsg = new Health.OnApplyDamage(mDamagedCaused);
+            mApplyDamageMsg = new Health.ApplyDamageMessage();
+            mApplyDamageMsg.mDamageAmount_In = mDamagedCaused;
 
             Reset();
         }
@@ -95,7 +96,7 @@ namespace ZombieTaxi.Behaviours
                 if( !mObjectsDamaged.Contains( mObjectsInRange[i] ) )
                 {
                     mObjectsDamaged.Add(mObjectsInRange[i]);
-                    mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);
+                    mObjectsInRange[i].OnMessage(mApplyDamageMsg);
                 }
             }
         }

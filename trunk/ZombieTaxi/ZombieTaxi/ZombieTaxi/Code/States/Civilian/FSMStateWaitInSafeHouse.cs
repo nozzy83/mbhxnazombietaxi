@@ -46,7 +46,7 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName = "Idle";
+            mSetActiveAnimationMsg.mAnimationSetName_In = "Idle";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
             mWatch.Restart();

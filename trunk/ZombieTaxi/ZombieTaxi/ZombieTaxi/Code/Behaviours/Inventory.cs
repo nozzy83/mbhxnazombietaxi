@@ -22,20 +22,20 @@ namespace ZombieTaxi.Behaviours
             /// <summary>
             /// The GameObject that should be added to this inventory.
             /// </summary>
-            public GameObject mObj;
+            public GameObject mObj_In;
 
             /// <summary>
             /// Set to true if the object being added should become the selected object.
             /// </summary>
-            public Boolean mDoSelectObj;
+            public Boolean mDoSelectObj_In;
 
             /// <summary>
             /// Put the message back into its default state.
             /// </summary>
-            public void Reset()
+            public override void Reset()
             {
-                mObj = null;
-                mDoSelectObj = false;
+                mObj_In = null;
+                mDoSelectObj_In = false;
             }
         };
 
@@ -48,14 +48,14 @@ namespace ZombieTaxi.Behaviours
             /// The object at the front of the Inventory Queue.
             /// null if the Queue is empty.
             /// </summary>
-            public GameObject mOutObj;
+            public GameObject mObj_Out;
 
             /// <summary>
             /// Put the message back into its default state.
             /// </summary>
-            public void Reset()
+            public override void Reset()
             {
-                mOutObj = null;
+                mObj_Out = null;
             }
         }
 
@@ -68,20 +68,20 @@ namespace ZombieTaxi.Behaviours
             /// The object at the front of the Inventory Queue.
             /// null if the Queue is empty.
             /// </summary>
-            public GameObject mOutObj;
+            public GameObject mObj_Out;
 
             /// <summary>
             /// The number of instances of this object type stored in the Inventory.
             /// </summary>
-            public UInt32 mOutCount;
+            public UInt32 mCount_Out;
 
             /// <summary>
             /// Put the message back into its default state.
             /// </summary>
-            public void Reset()
+            public override void Reset()
             {
-                mOutObj = null;
-                mOutCount = 0;
+                mObj_Out = null;
+                mCount_Out = 0;
             }
         }
 
@@ -90,6 +90,10 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         public class SelectNextItemMessage : MBHEngine.Behaviour.BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -149,7 +153,7 @@ namespace ZombieTaxi.Behaviours
                 AddObjectMessage temp = (AddObjectMessage)msg;
 
                 // The template name is how we will categorize items.
-                String newType = temp.mObj.pTemplateFileName;
+                String newType = temp.mObj_In.pTemplateFileName;
 
                 // Assume that the object was not added to the list.
                 Boolean added = false;
@@ -169,7 +173,7 @@ namespace ZombieTaxi.Behaviours
                         // be at the front, but it is the quickest/easiest. We may at some point
                         // want it to go at the end of the list, but that won't work in the case
                         // where temp.mDoSelectObj is true.
-                        mObjects.Insert(index, temp.mObj);
+                        mObjects.Insert(index, temp.mObj_In);
 
                         // The object has been added so the special handling below can be skipped.
                         added = true;
@@ -183,7 +187,7 @@ namespace ZombieTaxi.Behaviours
                 // to the end of the list.
                 if (!added)
                 {
-                    mObjects.Add(temp.mObj);
+                    mObjects.Add(temp.mObj_In);
                 }
 
                 // If at this point there was no selected object, this new object becomes selected by default.
@@ -191,7 +195,7 @@ namespace ZombieTaxi.Behaviours
                 {
                     mCurrentObject = 0;
                 }
-                else if (true == temp.mDoSelectObj)
+                else if (true == temp.mDoSelectObj_In)
                 {
                     // The message can specifically request that the object added be selected. Since it was inserted
                     // at the front of its group, we just need to update mCurrentObject to be the current index.
@@ -214,7 +218,7 @@ namespace ZombieTaxi.Behaviours
                     GetCurrentObjectMessage temp = (GetCurrentObjectMessage)msg;
 
                     // Grab the currently selected object.
-                    temp.mOutObj = mObjects[mCurrentObject];
+                    temp.mObj_Out = mObjects[mCurrentObject];
                     mObjects.RemoveAt(mCurrentObject);
 
                     // No need to change mCurrentObject as we just removed the object at its index and
@@ -246,7 +250,7 @@ namespace ZombieTaxi.Behaviours
 
                     if (-1 != mCurrentObject)
                     {
-                        temp.mOutObj = mObjects[mCurrentObject];
+                        temp.mObj_Out = mObjects[mCurrentObject];
 
                         String type = mObjects[mCurrentObject].pTemplateFileName;
 
@@ -258,7 +262,7 @@ namespace ZombieTaxi.Behaviours
                             // If its the same type, increase the count.
                             if (mObjects[i].pTemplateFileName == type)
                             {
-                                temp.mOutCount++;
+                                temp.mCount_Out++;
                             }
                             else
                             {

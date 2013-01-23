@@ -55,7 +55,7 @@ namespace ZombieTaxi.States.Civilian
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
-            mIncrementScoreMsg.mAmount = 100;
+            mIncrementScoreMsg.mAmount_In = 100;
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
         }
 
@@ -64,17 +64,17 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName = "Run";
+            mSetActiveAnimationMsg.mAnimationSetName_In = "Run";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
-            mSetSourceMsg.mSource = pParentGOH.pCollisionRect.pCenterPoint;
+            mSetSourceMsg.mSource_In = pParentGOH.pCollisionRect.pCenterPoint;
             pParentGOH.OnMessage(mSetSourceMsg);
-            mSetDestinationMsg.mDestination = GameObjectManager.pInstance.pPlayer.pPosition;
+            mSetDestinationMsg.mDestination_In = GameObjectManager.pInstance.pPlayer.pPosition;
             pParentGOH.OnMessage(mSetDestinationMsg);
 
             pParentGOH.SetBehaviourEnabled<PathFollow>(true);
 
-            mSetTargetObjectMsg.mTarget = GameObjectManager.pInstance.pPlayer;
+            mSetTargetObjectMsg.mTarget_In = GameObjectManager.pInstance.pPlayer;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
         }
 
@@ -146,10 +146,10 @@ namespace ZombieTaxi.States.Civilian
 
             // If we have a best node chosen (again maybe not a complete path, but the best so far), start
             // moving towards the next point on the path.
-            if (mGetCurrentBestNodeMsg.mBest != null)
+            if (mGetCurrentBestNodeMsg.mBest_Out != null)
             {
                 // This is the node closest to the destination that we have found.
-                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest;
+                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
                 // Traverse back towards the source node until the previous one has already been reached.
                 // That means the current one is the next one that has not been reached yet.
@@ -177,9 +177,9 @@ namespace ZombieTaxi.States.Civilian
                     // the target moving.
                     //DebugMessageDisplay.pInstance.AddConstantMessage("Reached target.  Setting new destination.");
 
-                    mSetSourceMsg.mSource = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
+                    mSetSourceMsg.mSource_In = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
                     pParentGOH.OnMessage(mSetSourceMsg);
-                    mSetDestinationMsg.mDestination = player.pPosition + pParentGOH.pCollisionRoot;
+                    mSetDestinationMsg.mDestination_In = player.pPosition + pParentGOH.pCollisionRoot;
                     pParentGOH.OnMessage(mSetDestinationMsg);
                 }
 
@@ -198,9 +198,9 @@ namespace ZombieTaxi.States.Civilian
                 //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
 
                 // If we don't have a destination set yet, set it up now.
-                mSetSourceMsg.mSource = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
+                mSetSourceMsg.mSource_In = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
                 pParentGOH.OnMessage(mSetSourceMsg);
-                mSetDestinationMsg.mDestination = player.pPosition + pParentGOH.pCollisionRoot;
+                mSetDestinationMsg.mDestination_In = player.pPosition + pParentGOH.pCollisionRoot;
                 pParentGOH.OnMessage(mSetDestinationMsg);
             }
         }

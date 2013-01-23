@@ -24,7 +24,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
-        private Health.OnApplyDamage mOnApplyDamageMsg;
+        private Health.ApplyDamageMessage mApplyDamageMsg;
 
         /// <summary>
         /// A list of the types of objects that this does damage to when exploding.
@@ -60,7 +60,8 @@ namespace ZombieTaxi.Behaviours
             }
 
             mObjectsInRange = new List<GameObject>(16);
-            mOnApplyDamageMsg = new Health.OnApplyDamage(def.mDamageCaused);
+            mApplyDamageMsg = new Health.ApplyDamageMessage();
+            mApplyDamageMsg.mDamageAmount_In = def.mDamageCaused;
 
         }
 
@@ -79,7 +80,7 @@ namespace ZombieTaxi.Behaviours
             {
                 for (Int32 i = 0; i < mObjectsInRange.Count; i++)
                 {
-                    mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);
+                    mObjectsInRange[i].OnMessage(mApplyDamageMsg);
                 }
 
                 // After it hits something it should disappear.

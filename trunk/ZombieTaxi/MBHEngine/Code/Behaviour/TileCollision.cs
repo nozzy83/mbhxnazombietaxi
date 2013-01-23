@@ -13,8 +13,15 @@ namespace MBHEngine.Behaviour
 {
     public class TileCollision : MBHEngine.Behaviour.Behaviour
     {
+        /// <summary>
+        /// Sent out when mParentGOH collides with a tile.
+        /// </summary>
         public class OnTileCollisionMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -25,7 +32,7 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// Messages.  Preallocated to avoid triggering the garbage collector.
         /// </summary>
-        private Level.CheckForCollisionMessage mLevelCollisionMsg;
+        private Level.GetCollisionInfoMessage mLevelCollisionMsg;
         private OnTileCollisionMessage mOnTileCollisionMsg;
 
         /// <summary>
@@ -55,11 +62,11 @@ namespace MBHEngine.Behaviour
             mPreviousPos = mParentGOH.pPosition;
 
             // Preallocate messages to avoid garbage collection.
-            mLevelCollisionMsg = new Level.CheckForCollisionMessage();
+            mLevelCollisionMsg = new Level.GetCollisionInfoMessage();
             mOnTileCollisionMsg = new OnTileCollisionMessage();
 
-            mLevelCollisionMsg.mDesiredRect = new Math.Rectangle();
-            mLevelCollisionMsg.mOriginalRect = new Math.Rectangle();
+            mLevelCollisionMsg.mDesiredRect_In = new Math.Rectangle();
+            mLevelCollisionMsg.mOriginalRect_In = new Math.Rectangle();
         }
 
         /// <summary>
@@ -80,22 +87,22 @@ namespace MBHEngine.Behaviour
         public override void PostUpdate(GameTime gameTime)
         {
             // Copy the current data into the message used for checking collision against the level.
-            mLevelCollisionMsg.mDesiredRect.Copy(mParentGOH.pCollisionRect);
-            mLevelCollisionMsg.mOriginalRect.Copy(mParentGOH.pCollisionRect);
-            mLevelCollisionMsg.mOriginalRect.pCenterPoint = mParentGOH.pPrevPos + mParentGOH.pCollisionRoot;
+            mLevelCollisionMsg.mDesiredRect_In.Copy(mParentGOH.pCollisionRect);
+            mLevelCollisionMsg.mOriginalRect_In.Copy(mParentGOH.pCollisionRect);
+            mLevelCollisionMsg.mOriginalRect_In.pCenterPoint = mParentGOH.pPrevPos + mParentGOH.pCollisionRoot;
 
             // Check for collision against the current level.
             WorldManager.pInstance.pCurrentLevel.OnMessage(mLevelCollisionMsg);
 
             // Once we detect a collision, we need to repsond to it.
-            if (mLevelCollisionMsg.mCollisionDetected)
+            if (mLevelCollisionMsg.mCollisionDetected_Out)
             {
 #if ALLOW_GARBAGE
                 //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected");
 #endif
 
                 // Seperate X and Y collision so that they can react seperatly.
-                if (mLevelCollisionMsg.mCollisionDetectedX)
+                if (mLevelCollisionMsg.mCollisionDetectedX_Out)
                 {
 #if ALLOW_GARBAGE
                     //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected X");
@@ -104,14 +111,14 @@ namespace MBHEngine.Behaviour
                     // If we collided along the x-axis, but the object directly against that collision point.
                     if (mParentGOH.pPosition.X > mPreviousPos.X)
                     {
-                        mParentGOH.pPosX = mLevelCollisionMsg.mCollisionPointX - mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
+                        mParentGOH.pPosX = mLevelCollisionMsg.mCollisionPointX_Out - mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
                     }
                     else if (mParentGOH.pPosition.X < mPreviousPos.X)
                     {
-                        mParentGOH.pPosX = mLevelCollisionMsg.mCollisionPointX + mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
+                        mParentGOH.pPosX = mLevelCollisionMsg.mCollisionPointX_Out + mParentGOH.pCollisionRect.pDimensionsHalved.X - mParentGOH.pCollisionRoot.X;// mPreviousPos.X;
                     }
                 }
-                if (mLevelCollisionMsg.mCollisionDetectedY)
+                if (mLevelCollisionMsg.mCollisionDetectedY_Out)
                 {
 #if ALLOW_GARBAGE
                     //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected Y");
@@ -119,11 +126,11 @@ namespace MBHEngine.Behaviour
 
                     if (mParentGOH.pPosY > mPreviousPos.Y)
                     {
-                        mParentGOH.pPosY = mLevelCollisionMsg.mCollisionPointY - mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
+                        mParentGOH.pPosY = mLevelCollisionMsg.mCollisionPointY_Out - mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
                     }
                     else if (mParentGOH.pPosition.Y < mPreviousPos.Y)
                     {
-                        mParentGOH.pPosY = mLevelCollisionMsg.mCollisionPointY + mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
+                        mParentGOH.pPosY = mLevelCollisionMsg.mCollisionPointY_Out + mParentGOH.pCollisionRect.pDimensionsHalved.Y - mParentGOH.pCollisionRoot.Y;// mPreviousPos.X;
                     }
                 }
 

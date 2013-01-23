@@ -19,8 +19,15 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// ExtractionPoint objects don't activate until being told to.
         /// </summary>
+        /// <todo>
+        /// This could probably use the SetBehaviourIsEnabled functionality instead.
+        /// </todo>
         public class SetExtractionPointActivateMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -29,6 +36,10 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         public class OnExtractionPointActivatedMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -58,14 +69,6 @@ namespace ZombieTaxi.Behaviours
             ExtractionPointDefinition def = GameObjectManager.pInstance.pContentManager.Load<ExtractionPointDefinition>(fileName);
 
             mOnExtractionPointActivatedMsg = new OnExtractionPointActivatedMessage();
-        }
-
-        /// <summary>
-        /// Called once per frame by the game object.
-        /// </summary>
-        /// <param name="gameTime">The amount of time that has passed this frame.</param>
-        public override void Update(GameTime gameTime)
-        {
         }
 
         /// <summary>

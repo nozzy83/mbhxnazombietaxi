@@ -27,7 +27,7 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName = "Dead";
+            mSetActiveAnimationMsg.mAnimationSetName_In = "Dead";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
         }
     }

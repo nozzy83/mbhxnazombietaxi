@@ -25,22 +25,21 @@ namespace ZombieTaxi.Behaviours
             /// <summary>
             /// The position they wish to place it at.
             /// </summary>
-            public Vector2 mPosition;
+            public Vector2 mPosition_In;
 
             /// <summary>
             /// Set to true of the object was successfully placed. If set to false, the 
             /// object will be returned to the Player's Inventory.
             /// </summary>
-            public Boolean mOutObjectPlaced;
+            public Boolean mObjectPlaced_Out;
 
             /// <summary>
             /// Return the Message to a default state.
             /// </summary>
-            public void Reset()
+            public override void Reset()
             {
-                mPosition = Vector2.Zero;
-
-                mOutObjectPlaced = false;
+                mPosition_In = Vector2.Zero;
+                mObjectPlaced_Out = false;
             }
         }
 
@@ -187,7 +186,7 @@ namespace ZombieTaxi.Behaviours
 
             // The the tile which the player is currently standing on. This will be our
             // starting point.
-            mGetTileAtPositionMsg.mPosition = mParentGOH.pPosition;
+            mGetTileAtPositionMsg.mPosition_In = mParentGOH.pPosition;
             lvl.OnMessage(mGetTileAtPositionMsg);
 
             // We jump by tiles in terms of offsets (rather than pixels or something), so
@@ -197,35 +196,35 @@ namespace ZombieTaxi.Behaviours
             // The final offset of the cursor is the cursor offset we are tracking times the 
             // size of a single tile, so that we are always jumping one tile at a time.
             Vector2 offsetPx = new Vector2();
-            offsetPx.X = mGetMapInfoMsg.mInfo.mTileWidth * mCursorOffset.X;
-            offsetPx.Y = mGetMapInfoMsg.mInfo.mTileHeight * mCursorOffset.Y;
+            offsetPx.X = mGetMapInfoMsg.mInfo_Out.mTileWidth * mCursorOffset.X;
+            offsetPx.Y = mGetMapInfoMsg.mInfo_Out.mTileHeight * mCursorOffset.Y;
 
             // Reposition the cursor.
-            mCursor.pPosition = mGetTileAtPositionMsg.mTile.mCollisionRect.pCenterPoint + offsetPx;
+            mCursor.pPosition = mGetTileAtPositionMsg.mTile_Out.mCollisionRect.pCenterPoint + offsetPx;
 
             // Place and remove tiles.
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
             {
                 // Remove the Object at the top of the Inventory.
-                mGetCurrentObjectMsg.mOutObj = null;
+                mGetCurrentObjectMsg.mObj_Out = null;
                 mParentGOH.OnMessage(mGetCurrentObjectMsg);
 
                 // We only want to attempt to place an object if we have something in the inventory to place.
-                if (null != mGetCurrentObjectMsg.mOutObj)
+                if (null != mGetCurrentObjectMsg.mObj_Out)
                 {
                     mOnPlaceObjectMsg.Reset();
 
                     // Tell the object to place itself.
-                    mOnPlaceObjectMsg.mPosition = mCursor.pPosition;
-                    mGetCurrentObjectMsg.mOutObj.OnMessage(mOnPlaceObjectMsg);
+                    mOnPlaceObjectMsg.mPosition_In = mCursor.pPosition;
+                    mGetCurrentObjectMsg.mObj_Out.OnMessage(mOnPlaceObjectMsg);
 
                     // It is possible that someone caught this event as decide this object should not
                     // be placed.
-                    if (mOnPlaceObjectMsg.mOutObjectPlaced)
+                    if (mOnPlaceObjectMsg.mObjectPlaced_Out)
                     {
                         // The object has been placed in the world, so the GameObjectManager needs to
                         // start managing it.
-                        GameObjectManager.pInstance.Add(mGetCurrentObjectMsg.mOutObj);
+                        GameObjectManager.pInstance.Add(mGetCurrentObjectMsg.mObj_Out);
                     }
                     else
                     {
@@ -233,16 +232,16 @@ namespace ZombieTaxi.Behaviours
 
                         // The object was removed from the inventory with the GerCurrentObjectMessage, so
                         // since it wasn't placed, it needs to be added back.
-                        mAddObjectMsg.mObj = mGetCurrentObjectMsg.mOutObj;
-                        mAddObjectMsg.mDoSelectObj = true;
+                        mAddObjectMsg.mObj_In = mGetCurrentObjectMsg.mObj_Out;
+                        mAddObjectMsg.mDoSelectObj_In = true;
                         mParentGOH.OnMessage(mAddObjectMsg);
                     }
                 }
             }
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
             {
-                mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Empty;
-                mSetTileTypeAtPositionMsg.mPosition = mCursor.pPosition;
+                mSetTileTypeAtPositionMsg.mType_In = Level.Tile.TileTypes.Empty;
+                mSetTileTypeAtPositionMsg.mPosition_In = mCursor.pPosition;
                 MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
 
                 // Clear any objects that might still be stored from the previous frame.
@@ -269,13 +268,13 @@ namespace ZombieTaxi.Behaviours
             GameObjectManager.pInstance.pPlayer.OnMessage(mPeekCurrentObjectMsg);
 
             // Check if their is any object currently active.
-            if (null != mPeekCurrentObjectMsg.mOutObj)
+            if (null != mPeekCurrentObjectMsg.mObj_Out)
             {
                 // Now check what texture is used to render that item.
-                mPeekCurrentObjectMsg.mOutObj.OnMessage(mGetTexture2DMsg);
+                mPeekCurrentObjectMsg.mObj_Out.OnMessage(mGetTexture2DMsg);
 
                 // Store it for Render to use.
-                mTextureItem = mGetTexture2DMsg.mOutTexture;
+                mTextureItem = mGetTexture2DMsg.mTexture_Out;
             }
             else
             {

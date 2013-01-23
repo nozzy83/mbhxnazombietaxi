@@ -19,17 +19,26 @@ namespace ZombieTaxi.Behaviours.HUD
         /// <summary>
         /// Tell the MiniMap an Object that should be marked.
         /// </summary>
-        public class MarkObjectMessage : BehaviourMessage
+        public class AddObjectToMarkMessage : BehaviourMessage
         {
             /// <summary>
             /// The MarkerProfileDefinition to use when marking this object.
             /// </summary>
-            public String mMarkerProfile;
+            public String mMarkerProfile_In;
 
             /// <summary>
             /// The GameObject to mark. It will dynamically following the object.
             /// </summary>
-            public GameObject mObjectToMark;
+            public GameObject mObjectToMark_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() 
+            {
+                mMarkerProfile_In = String.Empty;
+                mObjectToMark_In = null;
+            }
         }
 
         /// <summary>
@@ -153,11 +162,11 @@ namespace ZombieTaxi.Behaviours.HUD
 
             // Since tile width drives the size of the map, it also drives how
             // we convert from world position to pixel index on the map.
-            mWorldToMapScale = new Vector2(mTileToMapScale.X / mGetMapInfoMsg.mInfo.mTileWidth, mTileToMapScale.Y / mGetMapInfoMsg.mInfo.mTileHeight);
+            mWorldToMapScale = new Vector2(mTileToMapScale.X / mGetMapInfoMsg.mInfo_Out.mTileWidth, mTileToMapScale.Y / mGetMapInfoMsg.mInfo_Out.mTileHeight);
 
             // The map dimensions are used throughout this class.
-            Int32 mapWidth = (Int32)((Single)mGetMapInfoMsg.mInfo.mMapWidth * mTileToMapScale.X);
-            Int32 mapHeight = (Int32)((Single)mGetMapInfoMsg.mInfo.mMapHeight * mTileToMapScale.Y);
+            Int32 mapWidth = (Int32)((Single)mGetMapInfoMsg.mInfo_Out.mMapWidth * mTileToMapScale.X);
+            Int32 mapHeight = (Int32)((Single)mGetMapInfoMsg.mInfo_Out.mMapHeight * mTileToMapScale.Y);
             mMiniMapSize = new Point(mapWidth, mapHeight);
 
             // Create a new texture to use as our MiniMap.
@@ -248,11 +257,11 @@ namespace ZombieTaxi.Behaviours.HUD
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
-            if (msg is MarkObjectMessage)
+            if (msg is AddObjectToMarkMessage)
             {
-                MarkObjectMessage tmp = (MarkObjectMessage)msg;
+                AddObjectToMarkMessage tmp = (AddObjectToMarkMessage)msg;
 
-                MarkObjects(tmp.mMarkerProfile, tmp.mObjectToMark);
+                MarkObjects(tmp.mMarkerProfile_In, tmp.mObjectToMark_In);
             }
         }
 

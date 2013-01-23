@@ -28,7 +28,7 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName = "Hide";
+            mSetActiveAnimationMsg.mAnimationSetName_In = "Hide";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
         }
 

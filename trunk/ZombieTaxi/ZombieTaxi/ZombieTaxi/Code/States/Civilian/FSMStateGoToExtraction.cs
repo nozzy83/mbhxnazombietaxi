@@ -33,7 +33,7 @@ namespace ZombieTaxi.States.Civilian
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
             mGetExtractionPointMsg = new ZombieTaxi.Behaviours.Civilian.GetExtractionPointMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
-            mIncrementScoreMsg.mAmount = 500;
+            mIncrementScoreMsg.mAmount_In = 500;
         }
 
         /// <summary>
@@ -41,14 +41,14 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName = "Run";
+            mSetActiveAnimationMsg.mAnimationSetName_In = "Run";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
             pParentGOH.OnMessage(mGetExtractionPointMsg);
 
-            mSetSourceMsg.mSource = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
+            mSetSourceMsg.mSource_In = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
             pParentGOH.OnMessage(mSetSourceMsg);
-            mSetDestinationMsg.mDestination = mGetExtractionPointMsg.mExtractionPoint.pPosition + pParentGOH.pCollisionRoot;
+            mSetDestinationMsg.mDestination_In = mGetExtractionPointMsg.mExtractionPoint_Out.pPosition + pParentGOH.pCollisionRoot;
             pParentGOH.OnMessage(mSetDestinationMsg);
 
         }
@@ -97,10 +97,10 @@ namespace ZombieTaxi.States.Civilian
 
             // If we have a best node chosen (again maybe not a complete path, but the best so far), start
             // moving towards the next point on the path.
-            if (mGetCurrentBestNodeMsg.mBest != null)
+            if (mGetCurrentBestNodeMsg.mBest_Out != null)
             {
                 // This is the node closest to the destination that we have found.
-                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest;
+                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
                 // Traverse back towards the source node until the previous one has already been reached.
                 // That means the current one is the next one that has not been reached yet.
@@ -124,7 +124,7 @@ namespace ZombieTaxi.States.Civilian
                     // This node has been reached, so next update it will start moving towards the next node.
                     p.mReached = true;
 
-                    if (p == mGetCurrentBestNodeMsg.mBest)
+                    if (p == mGetCurrentBestNodeMsg.mBest_Out)
                     {
                         return true;
                     }

@@ -13,7 +13,6 @@ namespace MBHEngine.Behaviour
     /// </summary>
     public class RemoveTileOnDeath : Behaviour
     {
-
         /// <summary>
         /// Preallocated messages to avoid garbage collection.
         /// </summary>
@@ -50,10 +49,10 @@ namespace MBHEngine.Behaviour
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
-            if (msg is Health.OnZeroHealth)
+            if (msg is Health.OnZeroHealthMessage)
             {
-                mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Empty;
-                mSetTileTypeAtPositionMsg.mPosition = mParentGOH.pPosition;
+                mSetTileTypeAtPositionMsg.mType_In = Level.Tile.TileTypes.Empty;
+                mSetTileTypeAtPositionMsg.mPosition_In = mParentGOH.pPosition;
                 MBHEngine.World.WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
             }
         }

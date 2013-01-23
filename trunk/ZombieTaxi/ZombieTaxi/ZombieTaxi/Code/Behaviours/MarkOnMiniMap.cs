@@ -52,9 +52,9 @@ namespace ZombieTaxi.Behaviours
             // frame and BroadcastMessage won't work right away.
             //
 
-            MiniMap.MarkObjectMessage addMarkerMsg = new MiniMap.MarkObjectMessage();
-            addMarkerMsg.mMarkerProfile = mDef.mMarkerProfile;
-            addMarkerMsg.mObjectToMark = mParentGOH;
+            MiniMap.AddObjectToMarkMessage addMarkerMsg = new MiniMap.AddObjectToMarkMessage();
+            addMarkerMsg.mMarkerProfile_In = mDef.mMarkerProfile;
+            addMarkerMsg.mObjectToMark_In = mParentGOH;
             GameObjectManager.pInstance.BroadcastMessage(addMarkerMsg, null);
         }
     }

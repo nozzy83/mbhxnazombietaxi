@@ -61,19 +61,19 @@ namespace ZombieTaxi.Behaviours
                 ObjectPlacement.OnPlaceObjectMessage temp = (ObjectPlacement.OnPlaceObjectMessage)msg;
 
                 // By default assume the object could not be placed.
-                temp.mOutObjectPlaced = false;
+                temp.mObjectPlaced_Out = false;
 
                 // The level needs to have this tile set to be Solid.
-                mSetTileTypeAtPositionMsg.mType = Level.Tile.TileTypes.Solid;
-                mSetTileTypeAtPositionMsg.mPosition = temp.mPosition;
+                mSetTileTypeAtPositionMsg.mType_In = Level.Tile.TileTypes.Solid;
+                mSetTileTypeAtPositionMsg.mPosition_In = temp.mPosition_In;
                 WorldManager.pInstance.pCurrentLevel.OnMessage(mSetTileTypeAtPositionMsg, mParentGOH);
 
                 // Only spawn a tile if we actually changed the tile type.
-                if (mSetTileTypeAtPositionMsg.mType != mSetTileTypeAtPositionMsg.mOutPreviousType)
+                if (mSetTileTypeAtPositionMsg.mType_In != mSetTileTypeAtPositionMsg.mPreviousType_Out)
                 {
-                    mParentGOH.pPosition = temp.mPosition;
+                    mParentGOH.pPosition = temp.mPosition_In;
 
-                    temp.mOutObjectPlaced = true;
+                    temp.mObjectPlaced_Out = true;
 
                     // Note: We don't need to add this object to the GameObjectManager; the default
                     //       ObjectPlacement will handle that when it sees that mOutObjectPlaced is

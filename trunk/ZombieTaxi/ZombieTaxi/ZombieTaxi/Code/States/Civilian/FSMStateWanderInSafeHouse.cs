@@ -50,7 +50,7 @@ namespace ZombieTaxi.States.Civilian
             GameObject curLvl = WorldManager.pInstance.pCurrentLevel;
 
             // Grab the tile at the source position.
-            mGetTileAtObjectMsg.mObject = pParentGOH;
+            mGetTileAtObjectMsg.mObject_In = pParentGOH;
             curLvl.OnMessage(mGetTileAtObjectMsg);
 
             // Pick a random direction to move in.  Don't do diagonals because that can cause 
@@ -92,7 +92,7 @@ namespace ZombieTaxi.States.Civilian
             mTarget = null;
 
             // The tile we are thinking about moving to.
-            Level.Tile newTarget = mGetTileAtObjectMsg.mTile.mAdjecentTiles[dir];
+            Level.Tile newTarget = mGetTileAtObjectMsg.mTile_Out.mAdjecentTiles[dir];
 
             // Only try to move to a tile if it is empty.
             if ((newTarget.mType & Level.Tile.TileTypes.Solid) != Level.Tile.TileTypes.Solid)
@@ -106,10 +106,10 @@ namespace ZombieTaxi.States.Civilian
                     if (safeHouse != null &&
                         safeHouse.pCollisionRect.Intersects(newTarget.mCollisionRect.pCenterPoint))
                     {
-                        mSetActiveAnimationMsg.mAnimationSetName = "Walk";
+                        mSetActiveAnimationMsg.mAnimationSetName_In = "Walk";
                         pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
-                        SetNewTarget(mGetTileAtObjectMsg.mTile.mAdjecentTiles[dir]);
+                        SetNewTarget(mGetTileAtObjectMsg.mTile_Out.mAdjecentTiles[dir]);
                     }
                 }
             }

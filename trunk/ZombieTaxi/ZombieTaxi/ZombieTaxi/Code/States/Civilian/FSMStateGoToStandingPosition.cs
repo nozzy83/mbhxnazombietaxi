@@ -43,25 +43,25 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName = "Run";
+            mSetActiveAnimationMsg.mAnimationSetName_In = "Run";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
             // Use the collision center point since the position root is at the
             // bottom of the image and can result in off by 1 errors when finding
             // which tile this guy is standing in.
-            mSetSourceMsg.mSource = pParentGOH.pCollisionRect.pCenterPoint;
+            mSetSourceMsg.mSource_In = pParentGOH.pCollisionRect.pCenterPoint;
             pParentGOH.OnMessage(mSetSourceMsg);
 
             List<GameObject> safeHouses = GameObjectManager.pInstance.GetGameObjectsOfClassification(GameObjectDefinition.Classifications.SAFE_HOUSE);
 
             Int32 index = RandomManager.pInstance.RandomNumber() % safeHouses.Count;
 
-            mSetDestinationMsg.mDestination = safeHouses[index].pPosition;
+            mSetDestinationMsg.mDestination_In = safeHouses[index].pPosition;
             pParentGOH.OnMessage(mSetDestinationMsg);
 
             pParentGOH.SetBehaviourEnabled<PathFollow>(true);
 
-            mSetTargetObjectMsg.mTarget = null;
+            mSetTargetObjectMsg.mTarget_In = null;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
         }
 
@@ -109,10 +109,10 @@ namespace ZombieTaxi.States.Civilian
 
             // If we have a best node chosen (again maybe not a complete path, but the best so far), start
             // moving towards the next point on the path.
-            if (mGetCurrentBestNodeMsg.mBest != null)
+            if (mGetCurrentBestNodeMsg.mBest_Out != null)
             {
                 // This is the node closest to the destination that we have found.
-                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest;
+                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
                 // Traverse back towards the source node until the previous one has already been reached.
                 // That means the current one is the next one that has not been reached yet.

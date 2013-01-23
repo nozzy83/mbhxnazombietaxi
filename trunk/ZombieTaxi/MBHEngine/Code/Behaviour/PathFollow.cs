@@ -20,6 +20,10 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class OnReachedPathEndMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -34,7 +38,15 @@ namespace MBHEngine.Behaviour
             /// if that object is moving. In fact, this should not be set unless the object can be
             /// moving.
             /// </summary>
-            public GameObject.GameObject mTarget;
+            public GameObject.GameObject mTarget_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mTarget_In = null;
+            }
         }
 
         /// <summary>
@@ -96,10 +108,10 @@ namespace MBHEngine.Behaviour
 
             // If we have a best node chosen (again maybe not a complete path, but the best so far), start
             // moving towards the next point on the path.
-            if (mGetCurrentBestNodeMsg.mBest != null)
+            if (mGetCurrentBestNodeMsg.mBest_Out != null)
             {
                 // This is the node closest to the destination that we have found.
-                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest;
+                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
                 // Traverse back towards the source node until the previous one has already been reached.
                 // That means the current one is the next one that has not been reached yet.
@@ -144,9 +156,9 @@ namespace MBHEngine.Behaviour
                     // that object has moved since we original found this path.
                     if (null != mTarget)
                     {
-                        mSetSourceMsg.mSource = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
+                        mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
                         mParentGOH.OnMessage(mSetSourceMsg);
-                        mSetDestinationMsg.mDestination = mTarget.pPosition + mParentGOH.pCollisionRoot;
+                        mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
                         mParentGOH.OnMessage(mSetDestinationMsg);
                     }
                 }
@@ -166,9 +178,9 @@ namespace MBHEngine.Behaviour
                 //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
 
                 // If we don't have a destination set yet, set it up now.
-                mSetSourceMsg.mSource = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
+                mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
                 mParentGOH.OnMessage(mSetSourceMsg);
-                mSetDestinationMsg.mDestination = mTarget.pPosition + mParentGOH.pCollisionRoot;
+                mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
                 mParentGOH.OnMessage(mSetDestinationMsg);
             }
         }
@@ -186,7 +198,7 @@ namespace MBHEngine.Behaviour
             {
                 SetTargetObjectMessage temp = (SetTargetObjectMessage)msg;
 
-                mTarget = temp.mTarget;
+                mTarget = temp.mTarget_In;
             }
         }
     }

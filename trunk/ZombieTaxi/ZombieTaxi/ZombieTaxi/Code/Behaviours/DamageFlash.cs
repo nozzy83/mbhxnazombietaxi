@@ -115,8 +115,8 @@ namespace ZombieTaxi.Behaviours
                 if (mDamageCooldown.IsExpired())
                 {
                     // TODO: This should not assume the original colour was white.
-                    mSetTintMsg.mColor = Color.White;
-                    mSetTintMsg.mColor.A = 0;
+                    mSetTintMsg.mColor_In = Color.White;
+                    mSetTintMsg.mColor_In.A = 0;
                     mParentGOH.OnMessage(mSetTintMsg);
 
                     // Next time through the Update function, this will tell it that the
@@ -144,7 +144,7 @@ namespace ZombieTaxi.Behaviours
                         }
 
                         // Update sprite to use the new color.
-                        mSetTintMsg.mColor = mColors[mCurrentColor];
+                        mSetTintMsg.mColor_In = mColors[mCurrentColor];
                         mParentGOH.OnMessage(mSetTintMsg);
                     }
                 }
@@ -162,11 +162,11 @@ namespace ZombieTaxi.Behaviours
         public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
-            if (msg is Health.OnApplyDamage)
+            if (msg is Health.ApplyDamageMessage)
             {
                 // We only want to flash if the object is still alive.
                 mParentGOH.OnMessage(mGetHealthMsg);
-                if (mGetHealthMsg.mCurrentHealth > 0)
+                if (mGetHealthMsg.mCurrentHealth_Out > 0)
                 {
                     // The only thing we need to do is set this to zero.
                     // If it was previous expired, this will trigger it to start again.

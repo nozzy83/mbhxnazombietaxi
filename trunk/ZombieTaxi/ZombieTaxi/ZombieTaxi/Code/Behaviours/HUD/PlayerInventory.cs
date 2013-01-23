@@ -128,13 +128,13 @@ namespace ZombieTaxi.Behaviours.HUD
             GameObjectManager.pInstance.pPlayer.OnMessage(mPeekCurrentObjectMsg);
 
             // Check if their is any object currently active.
-            if (null != mPeekCurrentObjectMsg.mOutObj)
+            if (null != mPeekCurrentObjectMsg.mObj_Out)
             {
                 // Now check what texture is used to render that item.
-                mPeekCurrentObjectMsg.mOutObj.OnMessage(mGetTexture2DMsg);
+                mPeekCurrentObjectMsg.mObj_Out.OnMessage(mGetTexture2DMsg);
 
                 // Store it for Render to use.
-                mTextureItem = mGetTexture2DMsg.mOutTexture;
+                mTextureItem = mGetTexture2DMsg.mTexture_Out;
             }
             else
             {
@@ -163,13 +163,13 @@ namespace ZombieTaxi.Behaviours.HUD
 
             batch.DrawString(
                 mFont,
-                mPeekCurrentObjectMsg.mOutCount.ToString(),
+                mPeekCurrentObjectMsg.mCount_Out.ToString(),
                 mParentGOH.pPosition + mCountOffsetShadow,
                 mDropColor);
 
             batch.DrawString(
                 mFont, 
-                mPeekCurrentObjectMsg.mOutCount.ToString(),
+                mPeekCurrentObjectMsg.mCount_Out.ToString(),
                 mParentGOH.pPosition + mCountOffset, 
                 Color.White);
 
