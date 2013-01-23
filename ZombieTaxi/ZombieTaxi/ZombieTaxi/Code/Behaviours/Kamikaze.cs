@@ -162,18 +162,6 @@ namespace ZombieTaxi.Behaviours
             // Don't try anything until the player has actually been loaded.
             if (player == null) return;
 
-            /*
-            if (!InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
-            {
-                mParentGOH.pDirection.mForward = Vector2.Zero;
-                return;
-            }
-            else
-            {
-                DebugMessageDisplay.pInstance.AddConstantMessage("Updated!");
-            }
-            */
-
             mParentGOH.pDoRender = true;
 
             // Once the Kamikaze gets close to the player it stops trying to path find, and starts charging at the player.

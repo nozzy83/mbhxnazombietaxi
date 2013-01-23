@@ -124,6 +124,7 @@
     <Compile Include="Code\Behaviour\Magnetic.cs" />
     <Compile Include="Code\Behaviour\OgmoRender.cs" />
     <Compile Include="Code\Behaviour\PathFind.cs" />
+    <Compile Include="Code\Behaviour\PathFollow.cs" />
     <Compile Include="Code\Behaviour\RemoveTileOnDeath.cs" />
     <Compile Include="Code\Behaviour\SimpleMomentum.cs" />
     <Compile Include="Code\Behaviour\SimulatedPhysics.cs" />

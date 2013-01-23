@@ -35,7 +35,15 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// Called at the end of the frame where mParentGOH was added to the GameObjectManager.
         /// </summary>
-        public override void PostInitialization()
+        public override void OnAdd()
+        {
+        }
+
+        /// <summary>
+        /// Called at the end of the frame on which this Behaviour's mParentGOH was removed from
+        /// the GameObjectManager.
+        /// </summary>
+        public override void OnRemove()
         {
         }
 
@@ -61,7 +69,7 @@ namespace MBHEngine.Behaviour
         /// caled Update.
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
-        public virtual void PostUpdate(GameTime gameTime)
+        public override void PostUpdate(GameTime gameTime)
         {
         }
 
@@ -69,7 +77,7 @@ namespace MBHEngine.Behaviour
         /// Called once render cycle by the game object manager.
         /// </summary>
         /// <param name="batch">The sprite batch to render to.</param>
-        public virtual void Render(SpriteBatch batch)
+        public override void Render(SpriteBatch batch, Effect effect)
         {
         }
 

@@ -29,5 +29,11 @@ namespace MBHEngineContentDefs
         /// </summary>
         [ContentSerializer(Optional = true)]
         public List<Passes> mRenderPassExclusions;
+
+        /// <summary>
+        /// When true the behaviour is updated and rendered every frame.
+        /// </summary>
+        [ContentSerializer(Optional = true)]
+        public Boolean mIsEnabled = true;
     }
 }

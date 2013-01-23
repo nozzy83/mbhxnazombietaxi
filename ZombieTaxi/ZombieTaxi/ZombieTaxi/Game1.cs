@@ -154,7 +154,7 @@ namespace ZombieTaxi
             if (CommandLineManager.pInstance["CheatFillInventory"] != null)
             {
                 Inventory.AddObjectMessage addObj = new Inventory.AddObjectMessage();
-                for (Int32 i = 0; i < 25; i++)
+                for (Int32 i = 0; i < 15; i++)
                 {
                     addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
                     player.OnMessage(addObj);
@@ -174,8 +174,13 @@ namespace ZombieTaxi
             go.pPosition = new Vector2(50, 50);
             GameObjectManager.pInstance.Add(go);
 
-            GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
-            GameObjectManager.pInstance.Add(chef);
+            for (Int32 i = 0; i < 16; i++)
+            {
+                GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
+                chef.pPosX = 64;
+                chef.pPosY = 64;
+                GameObjectManager.pInstance.Add(chef);
+            }
             
             //GameObject enemy = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
             //enemy.pPosition.X = 50;
@@ -235,6 +240,14 @@ namespace ZombieTaxi
                 // When debug draw is enabled, turn on the hardware mouse so that things like the
                 // GameObjectPicker work better.
                 IsMouseVisible = mDebugDrawEnabled;
+            }
+
+            if (InputManager.pInstance.CheckAction(InputManager.InputActions.Y, true))
+            {
+                GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
+                chef.pPosition = GameObjectManager.pInstance.pPlayer.pPosition;
+                chef.pPosX += 16;
+                GameObjectManager.pInstance.Add(chef);
             }
 
 #if DEBUG && false // Temporarily disable this feature while working on tile placement mode.
