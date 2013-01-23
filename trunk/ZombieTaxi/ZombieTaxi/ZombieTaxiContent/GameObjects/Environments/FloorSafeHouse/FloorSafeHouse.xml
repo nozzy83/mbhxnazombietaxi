@@ -15,9 +15,11 @@
     </mClassifications>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
+      <Item>MarkOnMiniMap</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
+      <Item>ZombieTaxi.Behaviours.MarkOnMiniMap</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
