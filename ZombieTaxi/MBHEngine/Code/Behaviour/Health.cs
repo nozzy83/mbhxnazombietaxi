@@ -19,28 +19,31 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// Applies a specified amount of damage to the current health.
         /// </summary>
-        public class OnApplyDamage : BehaviourMessage
+        public class ApplyDamageMessage : BehaviourMessage
         {
-            /// <summary>
-            /// Constructor
-            /// </summary>
-            /// <param name="damageAmount">The amount of damage to subtract from the current health.</param>
-            public OnApplyDamage(Single damageAmount)
-            {
-                mDamagaAmount = damageAmount;
-            }
-
             /// <summary>
             /// The amount of damage to subtract from the current health.
             /// </summary>
-            public Single mDamagaAmount;
+            public Single mDamageAmount_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mDamageAmount_In = 0.0f;
+            }
         }
 
         /// <summary>
         /// Sent when the health reaches zero.
         /// </summary>
-        public class OnZeroHealth : BehaviourMessage
+        public class OnZeroHealthMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -51,12 +54,20 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// The amount of health the GO currently has.
             /// </summary>
-            public Single mCurrentHealth;
+            public Single mCurrentHealth_Out;
 
             /// <summary>
             /// The max amount of health this GO can have.
             /// </summary>
-            public Single mMaxHealth;
+            public Single mMaxHealth_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mCurrentHealth_Out = mMaxHealth_Out = 0.0f;
+            }
         }
 
         /// <summary>
@@ -77,7 +88,7 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// Preallocated messages so that we don't trigger garbage collection during gameplay.
         /// </summary>
-        private OnZeroHealth mOnZeroHealthMsg;
+        private OnZeroHealthMessage mOnZeroHealthMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -111,7 +122,7 @@ namespace MBHEngine.Behaviour
             mCurrentHealth = def.mCurrentHealth;
             mRemoveOnDeath = def.mRemoveOnDeath;
 
-            mOnZeroHealthMsg = new OnZeroHealth();
+            mOnZeroHealthMsg = new OnZeroHealthMessage();
         }
 
         /// <summary>
@@ -135,18 +146,18 @@ namespace MBHEngine.Behaviour
         public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
-            if (msg is OnApplyDamage)
+            if (msg is ApplyDamageMessage)
             {
-                OnApplyDamage temp = (OnApplyDamage)msg;
+                ApplyDamageMessage temp = (ApplyDamageMessage)msg;
 
-                ApplyDamage(temp.mDamagaAmount);
+                ApplyDamage(temp.mDamageAmount_In);
             }
             else if (msg is GetHealthMessage)
             {
                 GetHealthMessage temp = (GetHealthMessage)msg;
 
-                temp.mCurrentHealth = mCurrentHealth;
-                temp.mMaxHealth = mMaxHealth;
+                temp.mCurrentHealth_Out = mCurrentHealth;
+                temp.mMaxHealth_Out = mMaxHealth;
             }
         }
 

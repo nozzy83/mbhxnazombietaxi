@@ -137,9 +137,9 @@ namespace ZombieTaxi.Behaviours
 
             // The position the Gun gets attached to is configured via an AttachPoint in the 
             // Player template.
-            mGetAttachmentPointMsg.mName = "Gun";
+            mGetAttachmentPointMsg.mName_In = "Gun";
             mParentGOH.OnMessage(mGetAttachmentPointMsg);
-            Vector2 mGunAttachPos = mGetAttachmentPointMsg.mPoisitionInWorld;
+            Vector2 mGunAttachPos = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
 
             // Position the gun at the attachment point.
             mGun.pPosition = mGunAttachPos;
@@ -147,21 +147,21 @@ namespace ZombieTaxi.Behaviours
             // Flip the sprite to face the direction that we are moving.
             if (padState.Left.X > 0)
             {
-                mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
                 mParentGOH.OnMessage(mSpriteFxMsg);
 
                 // Initially the gun is positioned assuming the R-Stick is not pressed.  Just point straight
                 // in the direction the player is walking.
-                mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
                 mGun.OnMessage(mSpriteFxMsg);
                 mGun.pRotation = 0.0f;
             }
             else if (padState.Left.X < 0)
             {
-                mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipHorizontally;
                 mParentGOH.OnMessage(mSpriteFxMsg);
 
-                mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
+                mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipVertically;
                 mGun.OnMessage(mSpriteFxMsg);
                 mGun.pRotation = MathHelper.ToRadians(180.0f);
             }
@@ -169,12 +169,12 @@ namespace ZombieTaxi.Behaviours
             // If the player is moving in any direction play the walking animation.
             if (padState.Left != Vector2.Zero)
             {
-                mSpriteActiveAnimMsg.mAnimationSetName = "Run";
+                mSpriteActiveAnimMsg.mAnimationSetName_In = "Run";
                 mParentGOH.OnMessage(mSpriteActiveAnimMsg);
             }
             else
             {
-                mSpriteActiveAnimMsg.mAnimationSetName = "Idle";
+                mSpriteActiveAnimMsg.mAnimationSetName_In = "Idle";
                 mParentGOH.OnMessage(mSpriteActiveAnimMsg);
             }
 
@@ -205,20 +205,20 @@ namespace ZombieTaxi.Behaviours
                 // Use dir, not finalDir, so that the direction does not include the spread randomization.
                 if (dir.X > 0)
                 {
-                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                    mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
                     mParentGOH.OnMessage(mSpriteFxMsg);
 
                     // To start the gun would be set to point in the direction we are walking.  We have turned to face the direction
                     // the player is shooting, so the gun needs to be updated as well.
-                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                    mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
                     mGun.OnMessage(mSpriteFxMsg);
                 }
                 else if (dir.X < 0)
                 {
-                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                    mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipHorizontally;
                     mParentGOH.OnMessage(mSpriteFxMsg);
 
-                    mSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipVertically;
+                    mSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipVertically;
                     mGun.OnMessage(mSpriteFxMsg);
                 }
 
@@ -302,14 +302,14 @@ namespace ZombieTaxi.Behaviours
                 {
                     // Get the tile where mParentGOH is standing, so that we can start a Flood Fill
                     // at that position.
-                    mGetTileAtObjectMsg.mObject = mParentGOH;
-                    mGetTileAtObjectMsg.mTile = null;
+                    mGetTileAtObjectMsg.mObject_In = mParentGOH;
+                    mGetTileAtObjectMsg.mTile_Out = null;
 
                     WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtObjectMsg);
 
                     // Attempting to fill the world will SafeHouseFloors.
                     mSafeHousePlaced = mGOFloodFill.FloodFill(
-                                                        mGetTileAtObjectMsg.mTile, 
+                                                        mGetTileAtObjectMsg.mTile_Out, 
                                                         10 * 10, 
                                                         "GameObjects\\Environments\\FloorSafeHouse\\FloorSafeHouse");
                 }
@@ -341,15 +341,15 @@ namespace ZombieTaxi.Behaviours
         {
 #if ALLOW_GARBAGE            
             // Which type of message was sent to us?
-            if (msg is Health.OnZeroHealth)
+            if (msg is Health.OnZeroHealthMessage)
             {
                 DebugMessageDisplay.pInstance.AddConstantMessage("Player Died");
             }
-            else if (msg is Health.OnApplyDamage)
+            else if (msg is Health.ApplyDamageMessage)
             {
-                Health.OnApplyDamage temp = (Health.OnApplyDamage)msg;
+                Health.ApplyDamageMessage temp = (Health.ApplyDamageMessage)msg;
 
-                DebugMessageDisplay.pInstance.AddConstantMessage("Player took damage: " + temp.mDamagaAmount);
+                DebugMessageDisplay.pInstance.AddConstantMessage("Player took damage: " + temp.mDamageAmount_In);
             }
 #endif        
         }

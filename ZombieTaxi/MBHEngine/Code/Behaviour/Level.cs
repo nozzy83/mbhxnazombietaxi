@@ -22,42 +22,59 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// Overrides the current sprite effect being applied to this sprite.
         /// </summary>
-        public class CheckForCollisionMessage : BehaviourMessage
+        public class GetCollisionInfoMessage : BehaviourMessage
         {
             /// <summary>
             /// Was a collision detected at all.
             /// </summary>
-            public Boolean mCollisionDetected;
+            public Boolean mCollisionDetected_Out;
 
             /// <summary>
             /// Was a collision detected n the X direction specifically.
             /// </summary>
-            public Boolean mCollisionDetectedX;
+            public Boolean mCollisionDetectedX_Out;
 
             /// <summary>
             /// Was a collision detect in the Y direction specifically.
             /// </summary>
-            public Boolean mCollisionDetectedY;
+            public Boolean mCollisionDetectedY_Out;
 
             /// <summary>
             /// At what point did the collision occur in the X (if one did occur).
             /// </summary>
-            public Single mCollisionPointX;
+            public Single mCollisionPointX_Out;
 
             /// <summary>
             /// At what point did the collision occur in the Y (if one did occur).
             /// </summary>
-            public Single mCollisionPointY;
+            public Single mCollisionPointY_Out;
 
             /// <summary>
             /// The collision volume representing when the object started at the begining of this movement.
             /// </summary>
-            public MBHEngine.Math.Rectangle mOriginalRect;
+            public MBHEngine.Math.Rectangle mOriginalRect_In;
 
             /// <summary>
             /// The collision volume representing where the object is trying to reach.
             /// </summary>
-            public MBHEngine.Math.Rectangle mDesiredRect;
+            public MBHEngine.Math.Rectangle mDesiredRect_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mCollisionDetected_Out = mCollisionDetectedX_Out = mCollisionDetectedY_Out = false;
+                mCollisionPointX_Out = mCollisionPointY_Out = 0.0f;
+                if (null != mOriginalRect_In)
+                {
+                    mOriginalRect_In.pCenterPoint = Vector2.Zero;
+                }
+                if (null != mDesiredRect_In)
+                {
+                    mDesiredRect_In.pCenterPoint = Vector2.Zero;
+                }
+            }
         };
 
         /// <summary>
@@ -68,12 +85,21 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// A position in world space to check against.
             /// </summary>
-            public Vector2 mPosition;
+            public Vector2 mPosition_In;
 
             /// <summary>
             /// The tile which the position intersects, or null if there is not one.
             /// </summary>
-            public Tile mTile;
+            public Tile mTile_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mPosition_In = Vector2.Zero;
+                mTile_Out = null;
+            }
         }
 
         /// <summary>
@@ -85,12 +111,21 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// The object which we want to know which tile it is standing it.
             /// </summary>
-            public GameObject.GameObject mObject;
+            public GameObject.GameObject mObject_In;
 
             /// <summary>
             /// The tile which mObject is standing it.
             /// </summary>
-            public Tile mTile;
+            public Tile mTile_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mObject_In = null;
+                mTile_Out = null;
+            }
         }
 
         /// <summary>
@@ -102,17 +137,27 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// A position in world space to check against.
             /// </summary>
-            public Vector2 mPosition;
+            public Vector2 mPosition_In;
 
             /// <summary>
             /// The type of tile to place here.
             /// </summary>
-            public Tile.TileTypes mType;
+            public Tile.TileTypes mType_In;
 
             /// <summary>
             /// Upon return, this member will store the previous type of tile that was stored here.
             /// </summary>
-            public Tile.TileTypes mOutPreviousType;
+            public Tile.TileTypes mPreviousType_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mPosition_In = Vector2.Zero;
+                mType_In = Tile.TileTypes.Empty;
+                mPreviousType_Out = Tile.TileTypes.Empty;
+            }
         }
 
         /// <summary>
@@ -123,7 +168,15 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// Contains various pieces of information about this map.
             /// </summary>
-            public MapInfo mInfo;
+            public MapInfo mInfo_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mInfo_Out = null;
+            }
         }
 
         /// <summary>
@@ -641,22 +694,22 @@ namespace MBHEngine.Behaviour
         public override void OnMessage(ref BehaviourMessage msg)
         {
             // Which type of message was sent to us?
-            if (msg is Level.CheckForCollisionMessage)
+            if (msg is Level.GetCollisionInfoMessage)
             {
-                Level.CheckForCollisionMessage temp = (Level.CheckForCollisionMessage)msg;
-                temp.mCollisionDetected = CheckForCollision(temp.mOriginalRect,
-                                                            temp.mDesiredRect,
-                                                            out temp.mCollisionDetectedX,
-                                                            out temp.mCollisionDetectedY,
-                                                            out temp.mCollisionPointX,
-                                                            out temp.mCollisionPointY);
+                Level.GetCollisionInfoMessage temp = (Level.GetCollisionInfoMessage)msg;
+                temp.mCollisionDetected_Out = CheckForCollision(temp.mOriginalRect_In,
+                                                            temp.mDesiredRect_In,
+                                                            out temp.mCollisionDetectedX_Out,
+                                                            out temp.mCollisionDetectedY_Out,
+                                                            out temp.mCollisionPointX_Out,
+                                                            out temp.mCollisionPointY_Out);
                 msg = temp;
             }
             else if (msg is GetTileAtPositionMessage)
             {
                 GetTileAtPositionMessage temp = (GetTileAtPositionMessage)msg;
 
-                temp.mTile = GetTileAtPosition(temp.mPosition.X, temp.mPosition.Y);
+                temp.mTile_Out = GetTileAtPosition(temp.mPosition_In.X, temp.mPosition_In.Y);
 
                 msg = temp;
             }
@@ -664,7 +717,7 @@ namespace MBHEngine.Behaviour
             {
                 GetTileAtObjectMessage temp = (GetTileAtObjectMessage)msg;
 
-                temp.mTile = GetTileAtObject(temp.mObject);
+                temp.mTile_Out = GetTileAtObject(temp.mObject_In);
 
                 msg = temp;
             }
@@ -672,13 +725,13 @@ namespace MBHEngine.Behaviour
             {
                 SetTileTypeAtPositionMessage temp = (SetTileTypeAtPositionMessage)msg;
 
-                Tile t = GetTileAtPosition(temp.mPosition.X, temp.mPosition.Y);
+                Tile t = GetTileAtPosition(temp.mPosition_In.X, temp.mPosition_In.Y);
 
-                temp.mOutPreviousType = t.mType;
+                temp.mPreviousType_Out = t.mType;
 
-                if (t.mType != temp.mType)
+                if (t.mType != temp.mType_In)
                 {
-                    t.mType = temp.mType;
+                    t.mType = temp.mType_In;
 
                     DetermineAndSetImage(t);
 
@@ -689,7 +742,7 @@ namespace MBHEngine.Behaviour
             {
                 GetMapInfoMessage temp = (GetMapInfoMessage)msg;
 
-                temp.mInfo = mMapInfo;
+                temp.mInfo_Out = mMapInfo;
 
                 msg = temp;
             }

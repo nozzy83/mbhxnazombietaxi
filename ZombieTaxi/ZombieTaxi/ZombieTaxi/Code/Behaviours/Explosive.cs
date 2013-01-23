@@ -21,6 +21,10 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         public class DetonateMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -71,7 +75,7 @@ namespace ZombieTaxi.Behaviours
         /// Preallocate our messages so that we don't trigger the garbage collector later.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMessage;
-        private Health.OnApplyDamage mOnApplyDamageMsg;
+        private Health.ApplyDamageMessage mApplyDamageMsg;
         private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
 
         /// <summary>
@@ -120,7 +124,8 @@ namespace ZombieTaxi.Behaviours
             }
 
             mSetActiveAnimationMessage = new SpriteRender.SetActiveAnimationMessage();
-            mOnApplyDamageMsg = new Health.OnApplyDamage(mDamagedCaused);
+            mApplyDamageMsg = new Health.ApplyDamageMessage();
+            mApplyDamageMsg.mDamageAmount_In = mDamagedCaused;
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
 
             Reset();
@@ -186,7 +191,7 @@ namespace ZombieTaxi.Behaviours
                 {
                     Detonate();
                 }
-                else if (msg is DetonateMessage || msg is Health.OnZeroHealth)
+                else if (msg is DetonateMessage || msg is Health.OnZeroHealthMessage)
                 {
                     Detonate();
                 }
@@ -204,14 +209,13 @@ namespace ZombieTaxi.Behaviours
 
             // Pick a random animation to play.
             Int32 index = RandomManager.pInstance.RandomNumber() % mExplosionAnimationNames.Count;
-            mSetActiveAnimationMessage.mAnimationSetName = mExplosionAnimationNames[index];
-            mSetActiveAnimationMessage.mReset = true;
+            mSetActiveAnimationMessage.mAnimationSetName_In = mExplosionAnimationNames[index];
 
             GameObject fx = GameObjectFactory.pInstance.GetTemplate(mExplosionEffect);
-            mGetAttachmentPointMsg.mName = "Ground";
-            mGetAttachmentPointMsg.mPoisitionInWorld = mParentGOH.pPosition; // Set a default incase it doesn't have a Ground attachment point.
+            mGetAttachmentPointMsg.mName_In = "Ground";
+            mGetAttachmentPointMsg.mPoisitionInWorld_Out = mParentGOH.pPosition; // Set a default incase it doesn't have a Ground attachment point.
             mParentGOH.OnMessage(mGetAttachmentPointMsg);
-            fx.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld;
+            fx.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
             fx.OnMessage(mSetActiveAnimationMessage);
             GameObjectManager.pInstance.Add(fx);
 
@@ -220,7 +224,7 @@ namespace ZombieTaxi.Behaviours
             GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH, ref mObjectsInRange, mDamageAppliedTo);
             for (Int32 i = 0; i < mObjectsInRange.Count; i++)
             {
-                mObjectsInRange[i].OnMessage(mOnApplyDamageMsg);
+                mObjectsInRange[i].OnMessage(mApplyDamageMsg);
             }
 
             // This guy is exploded so he should be cleaned up.

@@ -64,7 +64,7 @@ namespace MBHEngine.Behaviour
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
-            if (msg is Health.OnZeroHealth)
+            if (msg is Health.OnZeroHealthMessage)
             {
                 // By default just spawn the object where this object is.
                 GameObject.GameObject go = GameObjectFactory.pInstance.GetTemplate(mTemplateFileName);
@@ -74,9 +74,9 @@ namespace MBHEngine.Behaviour
                 if (null != mAttachmentPoint)
                 {
                     // Grab that attachment point and position the new object there.
-                    mGetAttachmentPointMsg.mName = mAttachmentPoint;
+                    mGetAttachmentPointMsg.mName_In = mAttachmentPoint;
                     mParentGOH.OnMessage(mGetAttachmentPointMsg);
-                    spawnPos = mGetAttachmentPointMsg.mPoisitionInWorld;
+                    spawnPos = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
                 }
 
                 go.pPosition = spawnPos;

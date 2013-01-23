@@ -21,7 +21,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class GetSpriteEffectsMessage : BehaviourMessage
         {
-            public SpriteEffects mSpriteEffects;
+            /// <summary>
+            /// The currently set sprite effect.
+            /// </summary>
+            public SpriteEffects mSpriteEffects_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mSpriteEffects_Out = SpriteEffects.None;
+            }
         };
 
         /// <summary>
@@ -29,7 +40,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class SetSpriteEffectsMessage : BehaviourMessage
         {
-            public SpriteEffects mSpriteEffects;
+            /// <summary>
+            /// The desired sprite effect.
+            /// </summary>
+            public SpriteEffects mSpriteEffects_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mSpriteEffects_In = SpriteEffects.None;
+            }
         };
 
         /// <summary>
@@ -37,7 +59,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class GetActiveAnimationMessage : BehaviourMessage
         {
-            public String mAnimationSetName;
+            /// <summary>
+            /// The name of the animation currently playing.
+            /// </summary>
+            public String mAnimationSetName_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mAnimationSetName_Out = String.Empty;
+            }
         }
 
         /// <summary>
@@ -45,8 +78,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class SetActiveAnimationMessage : BehaviourMessage
         {
-            public String mAnimationSetName;
-            public Boolean mReset;
+            /// <summary>
+            /// The animation to start playing.
+            /// </summary>
+            public String mAnimationSetName_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mAnimationSetName_In = String.Empty;
+            }
         }
 
         /// <summary>
@@ -54,7 +97,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class OnAnimationCompleteMessage : BehaviourMessage
         {
-            public String mAnimationSetName;
+            /// <summary>
+            /// The name of the animation that completed.
+            /// </summary>
+            public String mAnimationSetName_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mAnimationSetName_In = String.Empty;
+            }
         }
 
         /// <summary>
@@ -65,13 +119,22 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// Set this to the name of the attachment point you wish to get.
             /// </summary>
-            public String mName;
+            public String mName_In;
 
             /// <summary>
             /// The attachment position gets stored here.  Note that it is
             /// in world space.
             /// </summary>
-            public Vector2 mPoisitionInWorld;
+            public Vector2 mPoisitionInWorld_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mName_In = String.Empty;
+                mPoisitionInWorld_Out = Vector2.Zero;
+            }
         }
 
         /// <summary>
@@ -79,7 +142,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class SetColorMessage : BehaviourMessage
         {
-            public Color mColor;
+            /// <summary>
+            /// The color to change to.
+            /// </summary>
+            public Color mColor_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mColor_In = Color.Black;
+            }
         }
 
         /// <summary>
@@ -87,7 +161,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class SetTintMessage : BehaviourMessage
         {
-            public Color mColor;
+            /// <summary>
+            /// The color to tint the sprite with.
+            /// </summary>
+            public Color mColor_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mColor_In = Color.Black;
+            }
         }
 
         /// <summary>
@@ -95,11 +180,17 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class GetTexture2DMessage : BehaviourMessage
         {
-            public Texture2D mOutTexture;
+            /// <summary>
+            /// The texture used to render this Sprite.
+            /// </summary>
+            public Texture2D mTexture_Out;
 
-            public void Reset()
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
             {
-                mOutTexture = null;
+                mTexture_Out = null;
             }
         }
 
@@ -329,7 +420,7 @@ namespace MBHEngine.Behaviour
                             mAnimations[mActiveAnimation].mAnimationComplete = true;
 
                             // Set up and send the animation complete message so that people can react to it.
-                            mOnAnimationCompleteMsg.mAnimationSetName = mAnimations[mActiveAnimation].mName;
+                            mOnAnimationCompleteMsg.mAnimationSetName_In = mAnimations[mActiveAnimation].mName;
                             mParentGOH.OnMessage(mOnAnimationCompleteMsg);
                         }
                         else
@@ -464,18 +555,18 @@ namespace MBHEngine.Behaviour
             if (msg is SpriteRender.GetSpriteEffectsMessage)
             {
                 SpriteRender.GetSpriteEffectsMessage temp = (SpriteRender.GetSpriteEffectsMessage)msg;
-                temp.mSpriteEffects = mSpriteEffects;
+                temp.mSpriteEffects_Out = mSpriteEffects;
                 msg = temp;
             }
             else if (msg is SpriteRender.SetSpriteEffectsMessage)
             {
                 SpriteRender.SetSpriteEffectsMessage temp = (SpriteRender.SetSpriteEffectsMessage)msg;
-                mSpriteEffects = temp.mSpriteEffects;
+                mSpriteEffects = temp.mSpriteEffects_In;
             }
             else if (msg is GetActiveAnimationMessage)
             {
                 SpriteRender.GetActiveAnimationMessage temp = (SpriteRender.GetActiveAnimationMessage)msg;
-                temp.mAnimationSetName = mAnimations[mActiveAnimation].mName;
+                temp.mAnimationSetName_Out = mAnimations[mActiveAnimation].mName;
                 msg = temp;
             }
             else if (msg is SetActiveAnimationMessage)
@@ -483,14 +574,14 @@ namespace MBHEngine.Behaviour
                 SpriteRender.SetActiveAnimationMessage temp = (SpriteRender.SetActiveAnimationMessage)msg;
 
                 // If the animation is not currently playing we need to find it.
-                if (mAnimations[mActiveAnimation].mName != temp.mAnimationSetName)
+                if (mAnimations[mActiveAnimation].mName != temp.mAnimationSetName_In)
                 {
 #if DEBUG
                     Boolean animationFound = false;
 #endif
                     for (int i = 0; i < mAnimations.Count; i++)
                     {
-                        if (mAnimations[i].mName == temp.mAnimationSetName)
+                        if (mAnimations[i].mName == temp.mAnimationSetName_In)
                         {
                             mActiveAnimation = i;
                             mCurrentFrame = 0;
@@ -502,7 +593,7 @@ namespace MBHEngine.Behaviour
                         }
                     }
 #if DEBUG
-                    System.Diagnostics.Debug.Assert(animationFound, "Attempting to set unknown Animation: " + temp.mAnimationSetName);
+                    System.Diagnostics.Debug.Assert(animationFound, "Attempting to set unknown Animation: " + temp.mAnimationSetName_In);
 #endif
                 }
                 // In the case where it is a non-looping animation which has completed, we need to reset the 
@@ -521,10 +612,10 @@ namespace MBHEngine.Behaviour
             {
                 GetAttachmentPointMessage temp = (GetAttachmentPointMessage)msg;
 
-                if (mAttachmentPoints.ContainsKey(temp.mName))
+                if (mAttachmentPoints.ContainsKey(temp.mName_In))
                 {
-                    Single attachX = mAttachmentPoints[temp.mName].X;
-                    Single attachY = mAttachmentPoints[temp.mName].Y;
+                    Single attachX = mAttachmentPoints[temp.mName_In].X;
+                    Single attachY = mAttachmentPoints[temp.mName_In].Y;
 
                     if ((mSpriteEffects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally)
                     {
@@ -536,24 +627,24 @@ namespace MBHEngine.Behaviour
                         attachY *= -1;
                     }
 
-                    temp.mPoisitionInWorld.X = attachX + mParentGOH.pPosition.X;
-                    temp.mPoisitionInWorld.Y = attachY + mParentGOH.pPosition.Y;
+                    temp.mPoisitionInWorld_Out.X = attachX + mParentGOH.pPosition.X;
+                    temp.mPoisitionInWorld_Out.Y = attachY + mParentGOH.pPosition.Y;
                 }
             }
             else if (msg is SetColorMessage)
             {
                 SetColorMessage temp = (SetColorMessage)msg;
-                mColor = temp.mColor;
+                mColor = temp.mColor_In;
             }
             else if (msg is SetTintMessage)
             {
                 SetTintMessage temp = (SetTintMessage)msg;
-                mTint = temp.mColor;
+                mTint = temp.mColor_In;
             }
             else if (msg is GetTexture2DMessage)
             {
                 GetTexture2DMessage temp = (GetTexture2DMessage)msg;
-                temp.mOutTexture = mTexture;
+                temp.mTexture_Out = mTexture;
             }
         }
 

@@ -27,7 +27,18 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         public class GetExtractionPointMessage : BehaviourMessage
         {
-            public GameObject mExtractionPoint;
+            /// <summary>
+            /// The current extraction point GOH.
+            /// </summary>
+            public GameObject mExtractionPoint_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mExtractionPoint_Out = null;
+            }
         }
 
         /// <summary>
@@ -87,12 +98,12 @@ namespace ZombieTaxi.Behaviours
 
             if (mParentGOH.pDirection.mForward.X < 0)
             {
-                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.FlipHorizontally;
+                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipHorizontally;
                 mParentGOH.OnMessage(mSetSpriteFxMsg);
             }
             else if (mParentGOH.pDirection.mForward.X > 0)
             {
-                mSetSpriteFxMsg.mSpriteEffects = SpriteEffects.None;
+                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
                 mParentGOH.OnMessage(mSetSpriteFxMsg);
             }
         }
@@ -108,7 +119,7 @@ namespace ZombieTaxi.Behaviours
         {
             base.OnMessage(ref msg);
 
-            if (msg is Health.OnZeroHealth)
+            if (msg is Health.OnZeroHealthMessage)
             {
                 AdvanceToState("Dead");
             }
@@ -132,7 +143,7 @@ namespace ZombieTaxi.Behaviours
             else if (msg is GetExtractionPointMessage)
             {
                 GetExtractionPointMessage temp = (GetExtractionPointMessage)msg;
-                temp.mExtractionPoint = mExtractionPoint;
+                temp.mExtractionPoint_Out = mExtractionPoint;
             }
         }
     }

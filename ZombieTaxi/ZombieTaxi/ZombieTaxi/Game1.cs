@@ -156,13 +156,13 @@ namespace ZombieTaxi
                 Inventory.AddObjectMessage addObj = new Inventory.AddObjectMessage();
                 for (Int32 i = 0; i < 15; i++)
                 {
-                    addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
+                    addObj.mObj_In = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
                     player.OnMessage(addObj);
 
-                    addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallStone\\WallStone");
+                    addObj.mObj_In = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallStone\\WallStone");
                     player.OnMessage(addObj);
 
-                    addObj.mObj = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallSteel\\WallSteel");
+                    addObj.mObj_In = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallSteel\\WallSteel");
                     player.OnMessage(addObj);
                 }
             }

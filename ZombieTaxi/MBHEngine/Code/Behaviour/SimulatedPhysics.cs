@@ -27,12 +27,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class GetBodyMessage : BehaviourMessage
         {
-            public GetBodyMessage() { }
-
             /// <summary>
             /// A reference to the instance of the Physics Body that this class uses.
             /// </summary>
-            public Body mBody;
+            public Body mBody_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mBody_Out = null;
+            }
         };
 
 
@@ -165,7 +171,7 @@ namespace MBHEngine.Behaviour
             if (msg is SimulatedPhysics.GetBodyMessage)
             {
                 SimulatedPhysics.GetBodyMessage temp = (SimulatedPhysics.GetBodyMessage)msg;
-                temp.mBody = mBody;
+                temp.mBody_Out = mBody;
                 msg = temp;
             }
         }

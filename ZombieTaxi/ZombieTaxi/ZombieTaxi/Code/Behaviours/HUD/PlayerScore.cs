@@ -17,7 +17,15 @@ namespace ZombieTaxi.Behaviours.HUD
         {
             // The amount to increment the score by.
             //
-            public Int32 mAmount;
+            public Int32 mAmount_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mAmount_In = 0;
+            }
         }
 
         /// <summary>
@@ -103,7 +111,7 @@ namespace ZombieTaxi.Behaviours.HUD
             if (msg is IncrementScoreMessage)
             {
                 IncrementScoreMessage temp = (IncrementScoreMessage)msg;
-                pScore += temp.mAmount;
+                pScore += temp.mAmount_In;
             }
         }
 

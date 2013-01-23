@@ -20,7 +20,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class SetDestinationMessage : BehaviourMessage
         {
-            public Vector2 mDestination;
+            /// <summary>
+            /// The location we want to get to.
+            /// </summary>
+            public Vector2 mDestination_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mDestination_In = Vector2.Zero;
+            }
         }
 
         /// <summary>
@@ -28,6 +39,10 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class ClearDestinationMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -36,7 +51,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class SetSourceMessage : BehaviourMessage
         {
-            public Vector2 mSource;
+            /// <summary>
+            /// The new position to start the search from.
+            /// </summary>
+            public Vector2 mSource_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mSource_In = Vector2.Zero;
+            }
         }
 
         /// <summary>
@@ -45,7 +71,18 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class GetCurrentBestNodeMessage : BehaviourMessage
         {
-            public PathNode mBest;
+            /// <summary>
+            /// The current best node. Use pPrev to trace your way back to mSource.
+            /// </summary>
+            public PathNode mBest_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mBest_Out = null;
+            }
         }
 
         /// <summary>
@@ -53,6 +90,10 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class OnPathFindFailedMessage : BehaviourMessage
         {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() { }
         }
 
         /// <summary>
@@ -280,14 +321,14 @@ namespace MBHEngine.Behaviour
                 mSource = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
 
                 // Grab the tile at the source position.
-                mGetTileAtPositionMsg.mPosition = mSource;
+                mGetTileAtPositionMsg.mPosition_In = mSource;
                 curLvl.OnMessage(mGetTileAtPositionMsg);
 
                 // We only care if they moved enough to make it onto a new tile.
-                if (mSourceTile != mGetTileAtPositionMsg.mTile)
+                if (mSourceTile != mGetTileAtPositionMsg.mTile_Out)
                 {
                     // Update the source tile with the tile the GO has moved to.
-                    mSourceTile = mGetTileAtPositionMsg.mTile;
+                    mSourceTile = mGetTileAtPositionMsg.mTile_Out;
 
                     // Let the algorithm know that it needs to recalculate.
                     // TODO: With only moving one tile at a time, could this be optimized to
@@ -576,18 +617,18 @@ namespace MBHEngine.Behaviour
             {
                 SetDestinationMessage tmp = (SetDestinationMessage)msg;
 
-                mGetTileAtPositionMsg.mPosition = tmp.mDestination;
+                mGetTileAtPositionMsg.mPosition_In = tmp.mDestination_In;
                 World.WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
-                if (mDestinationTile != mGetTileAtPositionMsg.mTile)
+                if (mDestinationTile != mGetTileAtPositionMsg.mTile_Out)
                 {
-                    mDestination = tmp.mDestination;
+                    mDestination = tmp.mDestination_In;
                     mPathInvalidated = true;
                     mSolved = false;
 
                     // We will need to do a couple checks to see if we have found the destination tile, so cache that
                     // now.
-                    mDestinationTile = mGetTileAtPositionMsg.mTile;
+                    mDestinationTile = mGetTileAtPositionMsg.mTile_Out;
                 }
             }
             else if (msg is ClearDestinationMessage)
@@ -604,17 +645,17 @@ namespace MBHEngine.Behaviour
                 SetSourceMessage tmp = (SetSourceMessage)msg;
 
                 // Grab the tile at the source position.
-                mGetTileAtPositionMsg.mPosition = tmp.mSource;
+                mGetTileAtPositionMsg.mPosition_In = tmp.mSource_In;
                 World.WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
                 // We only care if they moved enough to make it onto a new tile.
-                if (mSourceTile != mGetTileAtPositionMsg.mTile)
+                if (mSourceTile != mGetTileAtPositionMsg.mTile_Out)
                 {
                     // Update the source incase the GO has moved since the last update.
-                    mSource = tmp.mSource;
+                    mSource = tmp.mSource_In;
 
                     // Update the source tile with the tile the GO has moved to.
-                    mSourceTile = mGetTileAtPositionMsg.mTile;
+                    mSourceTile = mGetTileAtPositionMsg.mTile_Out;
 
                     // Let the algorithm know that it needs to recalculate.
                     // TODO: With only moving one tile at a time, could this be optimized to
@@ -629,7 +670,7 @@ namespace MBHEngine.Behaviour
             else if (msg is GetCurrentBestNodeMessage)
             {
                 GetCurrentBestNodeMessage tmp = (GetCurrentBestNodeMessage)msg;
-                tmp.mBest = mCurBest;
+                tmp.mBest_Out = mCurBest;
             }
         }
 
