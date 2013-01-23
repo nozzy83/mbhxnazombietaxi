@@ -17,10 +17,12 @@ namespace MBHEngine.GameObject
         /// </summary>
         static private GameObjectPicker mInstance;
 
+#if DEBUG
         /// <summary>
         /// The game object last selected with a mouse click.
         /// </summary>
         private GameObject mSelectedGameObject = null;
+#endif // DEBUG
 
         /// <summary>
         /// A rectangle roughly defining the area the mouse takes up. This should probably 
