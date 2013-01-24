@@ -86,6 +86,7 @@ namespace ZombieTaxi.Behaviours
         private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimMsg;
+        private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -132,6 +133,7 @@ namespace ZombieTaxi.Behaviours
             mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
             mSetActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
+            mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
         }
 
         /// <summary>
@@ -174,6 +176,8 @@ namespace ZombieTaxi.Behaviours
 
                 mParentGOH.OnMessage(mDetonateMsg);
                 GameObjectManager.pInstance.Remove(mParentGOH);
+
+                mParentGOH.SetBehaviourEnabled<PathFollow>(false);
             }
             else if (distToPlayer < mBLineDistanceSqr || mForceBLine)
             {
@@ -208,6 +212,8 @@ namespace ZombieTaxi.Behaviours
                     // If the path finder is running we need to stop it so it doesn't keep running 
                     // during the BLine and bog things down.
                     mParentGOH.OnMessage(mClearDestinationMsg);
+
+                    mParentGOH.SetBehaviourEnabled<PathFollow>(false);
                 }
 
                 // After a certain number of frames just explode.
@@ -223,9 +229,13 @@ namespace ZombieTaxi.Behaviours
             {
                 //DebugMessageDisplay.pInstance.AddConstantMessage("In Frozen Distance.");
 
-                mCurrentFollowType = FollowType.Frozen;
-                mParentGOH.pDirection.mSpeed = 0.0f;
-                mParentGOH.pDoRender = false;
+                if (mCurrentFollowType != FollowType.Frozen)
+                {
+                    mCurrentFollowType = FollowType.Frozen;
+                    mParentGOH.pDirection.mSpeed = 0.0f;
+                    mParentGOH.pDoRender = false;
+                    mParentGOH.SetBehaviourEnabled<PathFollow>(false);
+                }
             }
             // They are close enough to want to attack the player, but far enoguh away that smart path finding
             // isn't needed.
@@ -241,6 +251,7 @@ namespace ZombieTaxi.Behaviours
                 if (mCurrentFollowType != FollowType.DirectApproach)
                 {
                     mParentGOH.pDirection.mSpeed = mMoveSpeedDirectApproach;
+                    mParentGOH.SetBehaviourEnabled<PathFollow>(false);
                     mCurrentFollowType = FollowType.DirectApproach;
                 }
             }
@@ -248,89 +259,17 @@ namespace ZombieTaxi.Behaviours
             // to get to the player.
             else
             {
-                // Get the curent path to the player. It may not be complete at this point, but should include enough
-                // information to start moving.
-                mParentGOH.OnMessage(mGetCurrentBestNodeMsg);
-
-                // If we have a best node chosen (again maybe not a complete path, but the best so far), start
-                // moving towards the next point on the path.
-                if (mGetCurrentBestNodeMsg.mBest_Out != null && mCurrentFollowType == FollowType.PathFinding)
+                if (mCurrentFollowType != FollowType.PathFinding)
                 {
-                    // This is the node closest to the destination that we have found.
-                    PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
+                    //DebugMessageDisplay.pInstance.AddConstantMessage("Starting Path Finding.");
 
-                    // Traverse back towards the source node until the previous one has already been reached.
-                    // That means the current one is the next one that has not been reached yet.
-                    // We also want to make sure we don't try to get to the starting node since we should be 
-                    // standing on top of it already (hence the check for prev.prev).
-                    while (p.mPrev != null && p.mPrev.mPrev != null && !p.mPrev.mReached)
-                    {
-                        p = p.mPrev;
-                    }
+                    mParentGOH.pDirection.mSpeed = mMoveSpeedPathFinding;
 
-                    // The distance to check agaist is based on the move speed, since that is the amount
-                    // we will move this frame, and we want to avoid trying to hit the center point directly, since
-                    // that will only happen if moving in 1 pixel increments.
-                    // Also, we check double move speed because we are going to move this frame no matter what,
-                    // so what we are really checking is, are we going to be ther NEXT update.
-                    Single minDist = mParentGOH.pDirection.mSpeed * 2.0f;
+                    mParentGOH.SetBehaviourEnabled<PathFollow>(true);
+                    mSetTargetObjectMsg.mTarget_In = GameObjectManager.pInstance.pPlayer;
+                    mParentGOH.OnMessage(mSetTargetObjectMsg);
 
-                    // Once we are within one unit of the target consider it reached.
-                    if (Vector2.Distance(p.mTile.mCollisionRect.pCenterBottom, mParentGOH.pPosition) <= minDist)
-                    {
-                        // This node has been reached, so next update it will start moving towards the next node.
-                        p.mReached = true;
-
-                        // However, if this is the destination node (or the closest we have found so far), then
-                        // recalculate a path starting here.
-                        //if (mGetCurrentBestNodeMsg.mBest == p)
-
-                        // Recalculate the path every time we reach a node in the path.  This accounts for things like
-                        // the target moving.
-                        {
-                            //DebugMessageDisplay.pInstance.AddConstantMessage("Reached target.  Setting new destination.");
-
-                            mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
-                            mParentGOH.OnMessage(mSetSourceMsg);
-                            mSetDestinationMsg.mDestination_In = player.pPosition + mParentGOH.pCollisionRoot;
-                            mParentGOH.OnMessage(mSetDestinationMsg);
-                        }
-                    }
-                    //else
-
-                    // Regardless of whether or not we are going to do a recalculation next update, move towards the 
-                    // current target now.
-                    {
-                        //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
-
-                        // Move towards the nodes center point.
-                        Vector2 d = p.mTile.mCollisionRect.pCenterBottom - mParentGOH.pPosition;
-
-                        // If the player hasn't moved this frame our vector has a length of 0, resulting in
-                        // a NaN result from Normalize.
-                        if (d != Vector2.Zero)
-                        {
-                            d = Vector2.Normalize(d);
-                        }
-                        mParentGOH.pDirection.mForward = d;
-                    }
-                }
-                else
-                {
-                    if (mCurrentFollowType != FollowType.PathFinding)
-                    {
-                        //DebugMessageDisplay.pInstance.AddConstantMessage("Starting Path Finding.");
-                        mParentGOH.pDirection.mSpeed = mMoveSpeedPathFinding;
-                        mCurrentFollowType = FollowType.PathFinding;
-                    }
-
-                    //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
-
-                    // If we don't have a destination set yet, set it up now.
-                    mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
-                    mParentGOH.OnMessage(mSetSourceMsg);
-                    mSetDestinationMsg.mDestination_In = player.pPosition + mParentGOH.pCollisionRoot;
-                    mParentGOH.OnMessage(mSetDestinationMsg);
+                    mCurrentFollowType = FollowType.PathFinding;
                 }
             }
 
