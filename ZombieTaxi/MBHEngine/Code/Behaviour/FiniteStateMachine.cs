@@ -17,6 +17,25 @@ namespace MBHEngine.Behaviour
     public class FiniteStateMachine : Behaviour
     {
         /// <summary>
+        /// Triggers the state machine to advance to a specified state.
+        /// This will still go through the standard OnEnd/Begin flow.
+        /// </summary>
+        public class SetStateMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The name of the state to transition to.
+            /// </summary>
+            public String mNextState_In;
+            
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+            }
+        }
+
+        /// <summary>
         /// Every state machine goes through 3 distict phases during its lifetime.
         /// </summary>
         private enum FlowStates
@@ -153,6 +172,13 @@ namespace MBHEngine.Behaviour
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
+            if (msg is SetStateMessage)
+            {
+                SetStateMessage temp = (SetStateMessage)msg;
+
+                AdvanceToState(temp.mNextState_In);
+            }
+
             // Pass the message down to the currently running state.
             mCurrentState.OnMessage(ref msg);
         }
@@ -206,7 +232,9 @@ namespace MBHEngine.Behaviour
                 }
                 else
                 {
+#if ALLOW_GARBAGE
                     System.Diagnostics.Debug.Assert(false, "FSMState returned a new state which is not managed by this state machine: " + nextState);
+#endif // ALLOW_GARBAGE
                 }
             }
         }

@@ -16,13 +16,6 @@ namespace ZombieTaxi.States.Civilian
     class FSMStateGoToStandingPosition : FSMState
     {
         /// <summary>
-        /// We find out that we have reached the destination though a message, but we change
-        /// states through the return value of Update(). This bool lets the Update function 
-        /// know when we get the message.
-        /// </summary>
-        private Boolean mDestinationReached;
-
-        /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
@@ -31,6 +24,7 @@ namespace ZombieTaxi.States.Civilian
         private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
         private PathFind.ClearDestinationMessage mClearDestinationMsg;
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
+        private FiniteStateMachine.SetStateMessage mSetStateMsg;
 
         /// <summary>
         /// Constructor.
@@ -43,6 +37,7 @@ namespace ZombieTaxi.States.Civilian
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
+            mSetStateMsg = new FiniteStateMachine.SetStateMessage();
         }
 
         /// <summary>
@@ -70,8 +65,6 @@ namespace ZombieTaxi.States.Civilian
 
             mSetTargetObjectMsg.mTarget_In = null;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
-
-            mDestinationReached = false;
         }
 
         /// <summary>
@@ -80,11 +73,6 @@ namespace ZombieTaxi.States.Civilian
         /// <returns>Identifier of a state to transition to.</returns>
         public override string OnUpdate()
         {
-            if (mDestinationReached)
-            {
-                return "WaitAtStandingPosition";
-            }
-
             return null;
         }
 
@@ -113,7 +101,13 @@ namespace ZombieTaxi.States.Civilian
         {
             if (msg is PathFollow.OnReachedPathEndMessage)
             {
-                mDestinationReached = true;
+                mSetStateMsg.mNextState_In = "WaitAtStandingPosition";
+                pParentGOH.OnMessage(mSetStateMsg);
+            }
+            else if (msg is PathFind.OnPathFindFailedMessage)
+            {
+                mSetStateMsg.mNextState_In = "GoToStandingPosition";
+                pParentGOH.OnMessage(mSetStateMsg);
             }
         }
     }

@@ -342,9 +342,17 @@ namespace MBHEngine.Behaviour
             }
 
             // If there is no tile at the destination then there is no path finding to do.
-            // If the destination is a solid tile then we will never be able to solve the path.
-            if( mDestinationTile == null || mDestinationTile.mType != Level.Tile.TileTypes.Empty)
+            if( mDestinationTile == null)
             {
+                return;
+            }
+
+            // If the destination is a solid tile then we will never be able to solve the path.
+            if (mDestinationTile != null && mDestinationTile.mType != Level.Tile.TileTypes.Empty)
+            {
+                // We consider this a failure, similar to if a destination was surrounded by solid.
+                mParentGOH.OnMessage(mOnPathFindFailedMsg);
+
                 return;
             }
 
