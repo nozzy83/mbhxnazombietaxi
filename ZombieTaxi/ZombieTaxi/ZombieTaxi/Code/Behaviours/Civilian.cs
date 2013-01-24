@@ -50,6 +50,7 @@ namespace ZombieTaxi.Behaviours
         /// Preallocate messages to avoid GC.
         /// </summary>
         private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
+        private PathFind.ClearDestinationMessage mClearDestinationMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -86,6 +87,16 @@ namespace ZombieTaxi.Behaviours
             mParentGOH.pDirection.mSpeed = 0.5f;
 
             mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
+            mClearDestinationMsg = new PathFind.ClearDestinationMessage();
+        }
+
+        /// <summary>
+        /// Called at the end of the frame on which this Behaviour's mParentGOH was removed from
+        /// the GameObjectManager.
+        /// </summary>
+        public override void OnRemove()
+        {
+            mParentGOH.OnMessage(mClearDestinationMsg);
         }
 
         /// <summary>
