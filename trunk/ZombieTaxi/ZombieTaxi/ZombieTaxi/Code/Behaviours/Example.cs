@@ -36,7 +36,15 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Called at the end of the frame where mParentGOH was added to the GameObjectManager.
         /// </summary>
-        public override void PostInitialization()
+        public override void OnAdd()
+        {
+        }
+
+        /// <summary>
+        /// Called at the end of the frame on which this Behaviour's mParentGOH was removed from
+        /// the GameObjectManager.
+        /// </summary>
+        public override void OnRemove()
         {
         }
 
