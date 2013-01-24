@@ -44,7 +44,7 @@ namespace MBHEngine.StateMachine
         /// from it (set message) or store some data in it (get message).
         /// </summary>
         /// <param name="msg">The message being communicated to the behaviour.</param>
-        public void OnMessage(ref BehaviourMessage msg) { }
+        public virtual void OnMessage(ref BehaviourMessage msg) { }
         
         /// <summary>
         /// The Parent GameObject of the FiniteStateMachine which is running this state.

@@ -16,6 +16,7 @@
     <mBehaviourFileNames>
       <Item>Sprite</Item>
       <Item>PathFind</Item>
+      <Item>PathFollow</Item>
       <Item>Explosive</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
@@ -26,6 +27,7 @@
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
       <Item>MBHEngine.Behaviour.PathFind</Item>
+      <Item>MBHEngine.Behaviour.PathFollow</Item>
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>

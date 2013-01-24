@@ -84,8 +84,6 @@ namespace ZombieTaxi.States.Civilian
         /// <returns>Identifier of a state to transition to.</returns>
         public override String OnUpdate()
         {
-            //Follow();
-
             // After moving this frame, check if we are within rangle of a SafeHouse.
             mSafeHouseInRange.Clear();
             GameObjectManager.pInstance.GetGameObjectsInRange(pParentGOH, ref mSafeHouseInRange, mSafeHouseClassifications);
@@ -128,81 +126,6 @@ namespace ZombieTaxi.States.Civilian
             pParentGOH.pDirection.mForward = Vector2.Zero;
 
             pParentGOH.SetBehaviourEnabled<PathFollow>(false);
-        }
-
-        /// <summary>
-        /// Logic for basic follow behaviour.  Uses path find behaviour to follow the player.
-        /// </summary>
-        /// <remarks>
-        /// This is almost identicle to what is found in the Kamikaze Behaviour.  They should be combined.
-        /// </remarks>
-        private void Follow()
-        {
-            GameObject player = GameObjectManager.pInstance.pPlayer;
-
-            // Get the curent path to the player. It may not be complete at this point, but should include enough
-            // information to start moving.
-            pParentGOH.OnMessage(mGetCurrentBestNodeMsg);
-
-            // If we have a best node chosen (again maybe not a complete path, but the best so far), start
-            // moving towards the next point on the path.
-            if (mGetCurrentBestNodeMsg.mBest_Out != null)
-            {
-                // This is the node closest to the destination that we have found.
-                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
-
-                // Traverse back towards the source node until the previous one has already been reached.
-                // That means the current one is the next one that has not been reached yet.
-                // We also want to make sure we don't try to get to the starting node since we should be 
-                // standing on top of it already (hence the check for prev.prev).
-                while (p.mPrev != null && p.mPrev.mPrev != null && !p.mPrev.mReached)
-                {
-                    p = p.mPrev;
-                }
-
-                // The distance to check agaist is based on the move speed, since that is the amount
-                // we will move this frame, and we want to avoid trying to hit the center point directly, since
-                // that will only happen if moving in 1 pixel increments.
-                // Also, we check double move speed because we are going to move this frame no matter what,
-                // so what we are really checking is, are we going to be ther NEXT update.
-                Single minDist = pParentGOH.pDirection.mSpeed * 2.0f;
-
-                // Once we are within one unit of the target consider it reached.
-                if (Vector2.Distance(p.mTile.mCollisionRect.pCenterBottom, pParentGOH.pPosition) <= minDist)
-                {
-                    // This node has been reached, so next update it will start moving towards the next node.
-                    p.mReached = true;
-
-                    // Recalculate the path every time we reach a node in the path.  This accounts for things like
-                    // the target moving.
-                    //DebugMessageDisplay.pInstance.AddConstantMessage("Reached target.  Setting new destination.");
-
-                    mSetSourceMsg.mSource_In = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
-                    pParentGOH.OnMessage(mSetSourceMsg);
-                    mSetDestinationMsg.mDestination_In = player.pPosition + pParentGOH.pCollisionRoot;
-                    pParentGOH.OnMessage(mSetDestinationMsg);
-                }
-
-                //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
-
-                // Move towards the nodes center point.
-                Vector2 d = p.mTile.mCollisionRect.pCenterBottom - pParentGOH.pPosition;
-                if (d.Length() != 0.0f)
-                {
-                    d = Vector2.Normalize(d);
-                    pParentGOH.pDirection.mForward = d;
-                }
-            }
-            else
-            {
-                //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
-
-                // If we don't have a destination set yet, set it up now.
-                mSetSourceMsg.mSource_In = pParentGOH.pPosition + pParentGOH.pCollisionRoot;
-                pParentGOH.OnMessage(mSetSourceMsg);
-                mSetDestinationMsg.mDestination_In = player.pPosition + pParentGOH.pCollisionRoot;
-                pParentGOH.OnMessage(mSetDestinationMsg);
-            }
         }
     }
 }
