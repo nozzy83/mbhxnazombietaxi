@@ -187,13 +187,14 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// The different types of walls that a tile can have.  Basically the different sides.
             /// </summary>
+            [Flags]
             public enum WallTypes
             {
-                None = 0,
-                Top = 1,
-                Right = 2,
-                Bottom = 4,
-                Left = 8,
+                None    = 0,
+                Top     = 1 << 0,
+                Right   = 1 << 1,
+                Bottom  = 1 << 2,
+                Left    = 1 << 3,
             };
 
             /// <summary>
@@ -203,9 +204,39 @@ namespace MBHEngine.Behaviour
             {
                 Empty = 0,
                 Solid = 1,
-                Collision = 2,
-                CollisionChecked = 4,
             };
+
+            /// <summary>
+            /// Attributes that this Tile has. Can be extended by engine.
+            /// </summary>
+            [Flags]
+            public enum Attribute
+            {
+                None                = 0,
+                Occupied            = 1 << 0,
+                Collision           = 1 << 1,
+                CollisionChecked    = 1 << 2,
+            }
+
+            /// <summary>
+            /// Uses these enums to look up the adjecent tiles in mAdjecentTiles.
+            /// </summary>
+            public enum AdjacentTileDir
+            {
+                LEFT = 0,
+                LEFT_UP,
+                UP,
+                RIGHT_UP,
+                RIGHT,
+                RIGHT_DOWN,
+                DOWN,
+                LEFT_DOWN,
+
+                NUM_DIRECTIONS,
+
+                START_HORZ = LEFT,
+                START_DIAG = LEFT_UP,
+            }
 
             /// <summary>
             /// The type of tile this is.
@@ -230,29 +261,42 @@ namespace MBHEngine.Behaviour
             public Tile[] mAdjecentTiles;
 
             /// <summary>
-            /// Uses these enums to look up the adjecent tiles in mAdjecentTiles.
-            /// </summary>
-            public enum AdjacentTileDir
-            {
-                LEFT = 0,
-                LEFT_UP,
-                UP,
-                RIGHT_UP,
-                RIGHT,
-                RIGHT_DOWN,
-                DOWN,
-                LEFT_DOWN,
-
-                NUM_DIRECTIONS,
-
-                START_HORZ = LEFT,
-                START_DIAG = LEFT_UP,
-            }
-
-            /// <summary>
             /// The index into the tile map to use to render this tile.
             /// </summary>
             public Int32 mImageIndex;
+
+            /// <summary>
+            /// Bitfield discribing attributes for this tile.
+            /// </summary>
+            private Attribute mAttributes = Attribute.None;
+
+            /// <summary>
+            /// Check if a particular Attribute is set.
+            /// </summary>
+            /// <param name="att">The attribute the check.</param>
+            /// <returns>True if the attribute is set.</returns>
+            public Boolean HasAttribute(Attribute att)
+            {
+                return (mAttributes & att) != 0;
+            }
+
+            /// <summary>
+            /// Gives the Tile a particular Attribute.
+            /// </summary>
+            /// <param name="att">The Attribute to give this tile.</param>
+            public void SetAttribute(Attribute att)
+            {
+                mAttributes |= att;
+            }
+
+            /// <summary>
+            /// Removes a particular Attribute from this Tile. Ignored if not set.
+            /// </summary>
+            /// <param name="att"></param>
+            public void ClearAttribute(Attribute att)
+            {
+                mAttributes &= ~(att);
+            }
         }
 
         /// <summary>
@@ -425,39 +469,6 @@ namespace MBHEngine.Behaviour
                     DetermineAndSetImage(mCollisionGrid[x, y]);
                 }
             }
-
-            // TODO: The map data should be read in from the level def.
-            /*
-            mCollisionGrid[0, 1].mType = 1;
-            mCollisionGrid[1, 1].mType = 1;
-            mCollisionGrid[1, 0].mType = 1;
-            mCollisionGrid[2, 0].mType = 1;
-
-            mCollisionGrid[4, 5].mType = 1;
-            mCollisionGrid[4, 7].mType = 1;
-            mCollisionGrid[5, 5].mType = 1;
-            mCollisionGrid[6, 7].mType = 1;
-
-            mCollisionGrid[4, 10].mType = 1;
-            mCollisionGrid[6, 10].mType = 1;
-            mCollisionGrid[4, 11].mType = 1;
-            mCollisionGrid[6, 11].mType = 1;
-            mCollisionGrid[5, 12].mType = 1;
-
-            mCollisionGrid[0, 2].mType = 1;
-            mCollisionGrid[0, 3].mType = 1;
-            mCollisionGrid[0, 4].mType = 1;
-            mCollisionGrid[0, 5].mType = 1;
-            mCollisionGrid[0, 6].mType = 1;
-            mCollisionGrid[0, 7].mType = 1;
-            mCollisionGrid[0, 8].mType = 1;
-            mCollisionGrid[0, 9].mType = 1;
-            mCollisionGrid[0, 10].mType = 1;
-            mCollisionGrid[0, 11].mType = 1;
-            mCollisionGrid[0, 12].mType = 1;
-            mCollisionGrid[0, 13].mType = 1;
-            mCollisionGrid[0, 14].mType = 1;
-            */
             
             // Loop through all the tiles and calculate which sides need to have collision checks done on it.
             // For example if a tile has another tile directly above it, it does not need to check collision 
@@ -621,17 +632,17 @@ namespace MBHEngine.Behaviour
                     if (mCollisionGrid[x, y].mType != Level.Tile.TileTypes.Empty)
                     {
                         // If a collision was detected on it, render it red.
-                        if ((mCollisionGrid[x, y].mType & Level.Tile.TileTypes.Collision) == Tile.TileTypes.Collision)
+                        if(mCollisionGrid[x, y].HasAttribute(Tile.Attribute.Collision))
                             DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Red);
                         // If a collision was even checked for, render it Orange.
-                        else if ((mCollisionGrid[x, y].mType & Level.Tile.TileTypes.CollisionChecked) == Tile.TileTypes.CollisionChecked)
+                        else if (mCollisionGrid[x, y].HasAttribute(Tile.Attribute.CollisionChecked))
                             DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.OrangeRed);
                         else
                             DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Black);
 
                         // Clear the temp bits used for rendering collision info.
                         // TODO: This is not being cleared for tiles not on screen. Does that matter?
-                        mCollisionGrid[x, y].mType &= ~(Tile.TileTypes.Collision | Tile.TileTypes.CollisionChecked);
+                        mCollisionGrid[x, y].ClearAttribute(Tile.Attribute.Collision | Tile.Attribute.CollisionChecked);
 
                         // Render the tile image.
                         batch.Draw(
@@ -856,7 +867,7 @@ namespace MBHEngine.Behaviour
                     {
                         // This tile has been considered for a collision.  It will be changed to type 2 if there is a
                         // collision.
-                        mCollisionGrid[x, y].mType |= Level.Tile.TileTypes.CollisionChecked;
+                        mCollisionGrid[x, y].SetAttribute(Tile.Attribute.CollisionChecked);
 
                         // Calculate the center point of the tile.
                         Vector2 cent = new Vector2((x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f), (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f));
@@ -956,7 +967,7 @@ namespace MBHEngine.Behaviour
 #endif
 
                             // Set the collision type temporarily to 2, to signal that it collided.
-                            mCollisionGrid[x, y].mType |= Level.Tile.TileTypes.Collision;
+                            mCollisionGrid[x, y].SetAttribute(Tile.Attribute.Collision);
 
                             // If we make it to this point there was a collision of some type.
                             hit = true;

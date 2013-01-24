@@ -6,6 +6,7 @@ using MBHEngine.GameObject;
 using MBHEngineContentDefs;
 using Microsoft.Xna.Framework;
 using MBHEngine.Math;
+using MBHEngine.World;
 
 namespace ZombieTaxi.States.Civilian
 {
@@ -25,6 +26,7 @@ namespace ZombieTaxi.States.Civilian
         private PathFind.ClearDestinationMessage mClearDestinationMsg;
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
         private FiniteStateMachine.SetStateMessage mSetStateMsg;
+        private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
 
         /// <summary>
         /// Constructor.
@@ -38,6 +40,7 @@ namespace ZombieTaxi.States.Civilian
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
             mSetStateMsg = new FiniteStateMachine.SetStateMessage();
+            mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
         }
 
         /// <summary>
@@ -45,6 +48,50 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
+            // Grab a list of all the SafeHouse objects, so that we can pick one at 
+            // random to walk to.
+            List<GameObject> safeHouses = GameObjectManager.pInstance.GetGameObjectsOfClassification(GameObjectDefinition.Classifications.SAFE_HOUSE);
+
+            // We want to avoid standing on a tile that is already occupied by another Stranded.
+            // To do that, we just loop through the list of safeHouses and remove any that are
+            // already occupied.
+            for (Int32 i = safeHouses.Count - 1; i >= 0 ; i--)
+            {
+                // Get the tile at the position of this SafeHouse.
+                mGetTileAtObjectMsg.Reset();
+                mGetTileAtObjectMsg.mObject_In = safeHouses[i];
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtObjectMsg);
+
+                // If there is no Tile, there we should not be trying to go here at all.
+                if (null == mGetTileAtObjectMsg.mTile_Out)
+                {
+                    safeHouses.RemoveAt(i);
+
+                    continue;
+                }
+
+                // If the tile is occupied we should not try to go there.
+                if (mGetTileAtObjectMsg.mTile_Out.HasAttribute(Level.Tile.Attribute.Occupied))
+                {
+                    safeHouses.RemoveAt(i);
+
+                    continue;
+                }
+            }
+
+            // There is a chance that all safeHouse tiles are occupied.
+            if (safeHouses.Count <= 0)
+            {
+                /// <todo>
+                /// Go to a new state; maybe one where the dude just wanders a bit.
+                /// </todo>
+                /// 
+
+                // There are no spaces left in the SafeHouse so don't try to find a spot.
+                return;
+            }
+
+            // Show the player walking towards his destination.
             mSetActiveAnimationMsg.mAnimationSetName_In = "Run";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
@@ -54,15 +101,28 @@ namespace ZombieTaxi.States.Civilian
             mSetSourceMsg.mSource_In = pParentGOH.pCollisionRect.pCenterPoint;
             pParentGOH.OnMessage(mSetSourceMsg);
 
-            List<GameObject> safeHouses = GameObjectManager.pInstance.GetGameObjectsOfClassification(GameObjectDefinition.Classifications.SAFE_HOUSE);
-
-            Int32 index = RandomManager.pInstance.RandomNumber() % safeHouses.Count;
+            // Pick a random safeHouse location to move to.
+            Int32 index =  RandomManager.pInstance.RandomNumber() % safeHouses.Count;
 
             mSetDestinationMsg.mDestination_In = safeHouses[index].pPosition;
             pParentGOH.OnMessage(mSetDestinationMsg);
 
+            // Grab the tile at that location and update its Attributes to now be
+            // Occupied.
+            mGetTileAtObjectMsg.Reset();
+            mGetTileAtObjectMsg.mObject_In = safeHouses[index];
+            WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtObjectMsg);
+
+            if (null != mGetTileAtObjectMsg.mTile_Out)
+            {
+                mGetTileAtObjectMsg.mTile_Out.SetAttribute(Level.Tile.Attribute.Occupied);
+            }
+
+            // With the destination and source set on the PathFind Behaviour, turning on the PathFollow
+            // Behaviour will cause him to walk to the destination.
             pParentGOH.SetBehaviourEnabled<PathFollow>(true);
 
+            // The PathFollow style should not dynamically update the destination.
             mSetTargetObjectMsg.mTarget_In = null;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
         }
