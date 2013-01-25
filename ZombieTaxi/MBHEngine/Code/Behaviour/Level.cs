@@ -682,6 +682,11 @@ namespace MBHEngine.Behaviour
                     }
                     else
                     {
+                        if (mCollisionGrid[x, y].HasAttribute(Tile.Attribute.Occupied))
+                        {
+                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Pink);
+                        }
+
                         // Render the empty tile.
                         batch.Draw(
                             mMapInfo.mTileMap,
