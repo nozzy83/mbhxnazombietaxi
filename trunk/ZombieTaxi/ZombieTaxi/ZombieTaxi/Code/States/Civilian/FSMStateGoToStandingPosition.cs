@@ -17,6 +17,11 @@ namespace ZombieTaxi.States.Civilian
     class FSMStateGoToStandingPosition : FSMState
     {
         /// <summary>
+        /// A list of the SafeHouses which are valid choices to go to.
+        /// </summary>
+        List<GameObject> mValidSafeHouses;
+
+        /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
@@ -33,6 +38,8 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public FSMStateGoToStandingPosition()
         {
+            mValidSafeHouses = new List<GameObject>(100);
+
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
             mSetDestinationMsg = new PathFind.SetDestinationMessage();
             mSetSourceMsg = new PathFind.SetSourceMessage();
@@ -52,6 +59,8 @@ namespace ZombieTaxi.States.Civilian
             // random to walk to.
             List<GameObject> safeHouses = GameObjectManager.pInstance.GetGameObjectsOfClassification(GameObjectDefinition.Classifications.SAFE_HOUSE);
 
+            mValidSafeHouses.Clear();
+
             // We want to avoid standing on a tile that is already occupied by another Stranded.
             // To do that, we just loop through the list of safeHouses and remove any that are
             // already occupied.
@@ -65,22 +74,20 @@ namespace ZombieTaxi.States.Civilian
                 // If there is no Tile, there we should not be trying to go here at all.
                 if (null == mGetTileAtObjectMsg.mTile_Out)
                 {
-                    safeHouses.RemoveAt(i);
-
                     continue;
                 }
 
                 // If the tile is occupied we should not try to go there.
                 if (mGetTileAtObjectMsg.mTile_Out.HasAttribute(Level.Tile.Attribute.Occupied))
                 {
-                    safeHouses.RemoveAt(i);
-
                     continue;
                 }
+
+                mValidSafeHouses.Add(safeHouses[i]);
             }
 
             // There is a chance that all safeHouse tiles are occupied.
-            if (safeHouses.Count <= 0)
+            if (mValidSafeHouses.Count <= 0)
             {
                 /// <todo>
                 /// Go to a new state; maybe one where the dude just wanders a bit.
@@ -102,15 +109,15 @@ namespace ZombieTaxi.States.Civilian
             pParentGOH.OnMessage(mSetSourceMsg);
 
             // Pick a random safeHouse location to move to.
-            Int32 index =  RandomManager.pInstance.RandomNumber() % safeHouses.Count;
+            Int32 index =  RandomManager.pInstance.RandomNumber() % mValidSafeHouses.Count;
 
-            mSetDestinationMsg.mDestination_In = safeHouses[index].pPosition;
+            mSetDestinationMsg.mDestination_In = mValidSafeHouses[index].pPosition;
             pParentGOH.OnMessage(mSetDestinationMsg);
 
             // Grab the tile at that location and update its Attributes to now be
             // Occupied.
             mGetTileAtObjectMsg.Reset();
-            mGetTileAtObjectMsg.mObject_In = safeHouses[index];
+            mGetTileAtObjectMsg.mObject_In = mValidSafeHouses[index];
             WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtObjectMsg);
 
             if (null != mGetTileAtObjectMsg.mTile_Out)
@@ -142,6 +149,13 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnEnd()
         {
+            if (null != mGetTileAtObjectMsg.mTile_Out)
+            {
+                // This would have been set in OnBegin. It will be set again if we are transitioning
+                // to 
+                mGetTileAtObjectMsg.mTile_Out.ClearAttribute(Level.Tile.Attribute.Occupied);
+            }
+
             pParentGOH.OnMessage(mClearDestinationMsg);
 
             // Clear the forward direction of this object so that it doesn't keep moving.
