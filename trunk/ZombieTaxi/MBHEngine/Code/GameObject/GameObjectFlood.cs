@@ -152,7 +152,7 @@ namespace MBHEngine.GameObject
 
                 // Breath first search through the tile map stopping at walls and doors, or at a point
                 // where we have visiting more tiles than allowed by maxFillCount.
-                while ((mTilesToCheck.Count) > 0 && (mTilesToChange.Count <= maxFillCount))
+                while ((mTilesToCheck.Count) > 0 && (mTilesToChange.Count + curFillCount <= maxFillCount))
                 {
                     // Grab the next Tile, or in the case of the first interation it will be a roomStarter.
                     Level.Tile currentTile = mTilesToCheck.Dequeue();
