@@ -8,5 +8,6 @@ namespace ZombieTaxiContentDefs
 {
     public class CivilianDefinition : BehaviourDefinition
     {
+        public Int32 mSafeHouseScore;
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using MBHEngine.Behaviour;
 using MBHEngine.GameObject;
 using ZombieTaxi.Behaviours.HUD;
+using ZombieTaxi.StatBoost.Behaviours;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -95,6 +96,14 @@ namespace ZombieTaxi.Behaviours
                 case "ZombieTaxi.Behaviours.MarkOnMiniMap":
                     {
                         return new MarkOnMiniMap(go, fileName);
+                    }
+                case "ZombieTaxi.Behaviours.StatBoost.StatBoostResearch":
+                    {
+                        return new StatBoostResearch(go, fileName);
+                    }
+                case "ZombieTaxi.Behaviours.StatBoost.HealthStatBoostResearch":
+                    {
+                        return new HealthStatBoostResearch(go, fileName);
                     }
                 default:
                     {

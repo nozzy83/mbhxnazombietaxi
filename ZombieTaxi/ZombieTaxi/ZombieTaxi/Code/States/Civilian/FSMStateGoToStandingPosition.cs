@@ -7,6 +7,7 @@ using MBHEngineContentDefs;
 using Microsoft.Xna.Framework;
 using MBHEngine.Math;
 using MBHEngine.World;
+using ZombieTaxi.Behaviours.HUD;
 
 namespace ZombieTaxi.States.Civilian
 {
@@ -32,6 +33,8 @@ namespace ZombieTaxi.States.Civilian
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
         private FiniteStateMachine.SetStateMessage mSetStateMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
+        private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
+        private ZombieTaxi.Behaviours.Civilian.GetSafeHouseScoreMessage mGetSafeHouseScoreMessage;
 
         /// <summary>
         /// Constructor.
@@ -48,6 +51,8 @@ namespace ZombieTaxi.States.Civilian
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
             mSetStateMsg = new FiniteStateMachine.SetStateMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
+            mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
+            mGetSafeHouseScoreMessage = new Behaviours.Civilian.GetSafeHouseScoreMessage();
         }
 
         /// <summary>
@@ -95,6 +100,19 @@ namespace ZombieTaxi.States.Civilian
                 /// 
 
                 // There are no spaces left in the SafeHouse so don't try to find a spot.
+                mSetStateMsg.mNextState_In = "Follow";
+                pParentGOH.OnMessage(mSetStateMsg);
+
+                // This is used OnEnd()
+                mGetTileAtObjectMsg.Reset();
+
+                // The score will have been incremented before entering this state, but it
+                // should not have because in reality there is no space left. Reverse that
+                // change.
+                pParentGOH.OnMessage(mGetSafeHouseScoreMessage);
+                mIncrementScoreMsg.mAmount_In = -mGetSafeHouseScoreMessage.mSafeHouseScore_Out;
+                pParentGOH.OnMessage(mIncrementScoreMsg);
+
                 return;
             }
 
@@ -152,7 +170,7 @@ namespace ZombieTaxi.States.Civilian
             if (null != mGetTileAtObjectMsg.mTile_Out)
             {
                 // This would have been set in OnBegin. It will be set again if we are transitioning
-                // to 
+                // to WaitAtStandingPosition.
                 mGetTileAtObjectMsg.mTile_Out.ClearAttribute(Level.Tile.Attribute.Occupied);
             }
 

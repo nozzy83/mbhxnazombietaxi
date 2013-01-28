@@ -21,6 +21,7 @@
       <Item>Health</Item>
       <Item>DamageFlash</Item>
       <Item>SimpleMomentum</Item>
+      <Item>HealthStatBoostResearch</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
@@ -30,6 +31,7 @@
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
+      <Item>ZombieTaxi.Behaviours.StatBoost.HealthStatBoostResearch</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

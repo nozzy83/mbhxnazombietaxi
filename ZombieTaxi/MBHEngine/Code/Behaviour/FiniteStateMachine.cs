@@ -122,43 +122,45 @@ namespace MBHEngine.Behaviour
             //
             switch (mCurrentFlowState)
             {
-                case FlowStates.BEGIN:
-                    {
-                        mCurrentState.OnBegin();
+            case FlowStates.BEGIN:
+                {
+                    // Transition directly to the UPDATE pass. Do it before calling OnBegin incase
+                    // OnBegin actually sets the current state through a message, in which case we
+                    // don't want to go to UPDATE.
+                    mCurrentFlowState = FlowStates.UPDATE;
 
-                        // Transition directly to the UPDATE pass.
-                        mCurrentFlowState = FlowStates.UPDATE;
+                    mCurrentState.OnBegin();
 
-                        break;
-                    }
-                case FlowStates.UPDATE:
-                    {
-                        // Update the state which will potentially return a new state in which to transition to.
-                        String nextState = mCurrentState.OnUpdate();
+                    break;
+                }
+            case FlowStates.UPDATE:
+                {
+                    // Update the state which will potentially return a new state in which to transition to.
+                    String nextState = mCurrentState.OnUpdate();
 
-                        AdvanceToState(nextState);
+                    AdvanceToState(nextState);
 
-                        break;
-                    }
-                case FlowStates.END:
-                    {
-                        mCurrentState.OnEnd();
+                    break;
+                }
+            case FlowStates.END:
+                {
+                    mCurrentState.OnEnd();
 
-                        // Once the FlowStates.END has finished it is time to move onto the next FSMState.
-                        mCurrentState = mNextState;
+                    // Once the FlowStates.END has finished it is time to move onto the next FSMState.
+                    mCurrentState = mNextState;
 
-                        // On the next update pass we will be running a new FSMState, so we want to be sitting
-                        // in the BEGIN flow state.
-                        mCurrentFlowState = FlowStates.BEGIN;
+                    // On the next update pass we will be running a new FSMState, so we want to be sitting
+                    // in the BEGIN flow state.
+                    mCurrentFlowState = FlowStates.BEGIN;
 
-                        break;
-                    }
-                default:
-                    {
-                        System.Diagnostics.Debug.Assert(false, "Unhandled FSM Flow State.");
+                    break;
+                }
+            default:
+                {
+                    System.Diagnostics.Debug.Assert(false, "Unhandled FSM Flow State.");
 
-                        break;
-                    }
+                    break;
+                }
             }
 
         }

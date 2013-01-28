@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.StatBoost.HealthStatBoostResearchDefinition">
+    <mIsEnabled>false</mIsEnabled>
+    <mFramesToComplete>120</mFramesToComplete>
+    <mAmount>10000</mAmount>
+  </Asset>
+</XnaContent>
+
