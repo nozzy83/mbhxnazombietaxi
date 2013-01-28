@@ -71,8 +71,8 @@ namespace MBHEngine.GameObject
 
         /// <summary>
         /// As we find tiles which meet the requirements to be changed, they get added to 
-        // this list so that they can be changed once we determine that the room they were
-        // found in was actually small enough to fill.
+        /// this list so that they can be changed once we determine that the room they were
+        /// found in was actually small enough to fill.
         /// </summary>
         List<Level.Tile> mTilesToChange;
 
@@ -82,6 +82,17 @@ namespace MBHEngine.GameObject
         /// not able to be finished, then it should not be added to roomStarters.
         /// </summary>
         List<Level.Tile> mRoomStartersToAdd;
+
+        /// <summary>
+        /// The final list of tiles to change after calling FloodFill. This is the list used
+        /// in ProcessFill.
+        /// </summary>
+        List<Level.Tile> mTilesToChangeFinal;
+
+        /// <summary>
+        /// The name of the type of GameObject to spawn.
+        /// </summary>
+        String mGameObjectTemplateName;
 
         /// <summary>
         /// Constructor.
@@ -95,6 +106,7 @@ namespace MBHEngine.GameObject
             mTilesToCheck = new Queue<Level.Tile>();
             mTilesToChange = new List<Level.Tile>();
             mRoomStartersToAdd = new List<Level.Tile>();
+            mTilesToChangeFinal = new List<Level.Tile>();
         }
 
         /// <summary>
@@ -114,6 +126,12 @@ namespace MBHEngine.GameObject
         {
             // Tracks whether or not any rooms were filled.
             Boolean success = false;
+
+            // Store for use later.
+            mGameObjectTemplateName = gameObjectTemplateName;
+
+            // A new fill means any currently running should stop.
+            mTilesToChangeFinal.Clear();
 
             // This algorithm works by breaking the world into rooms. A room is an area surrounded
             // by wall, with the one cavet that spaces 1 pixel wide are allowed when moving from
@@ -203,18 +221,7 @@ namespace MBHEngine.GameObject
                     // This is a legit change now, so count it towards to total fill count.
                     curFillCount += mTilesToChange.Count;
 
-                    // Go through all the tiles that we determined as value tiles to change, and change them.
-                    for (Int32 i = 0; i < mTilesToChange.Count; i++)
-                    {
-                        Level.Tile tile = mTilesToChange[i];
-
-                        // Create a new game object and place it at the location of the tile.
-                        GameObject newFloor =  GameObjectFactory.pInstance.GetTemplate(gameObjectTemplateName);
-
-                        newFloor.pPosition = tile.mCollisionRect.pCenterPoint;
-
-                        GameObjectManager.pInstance.Add(newFloor);
-                    }
+                    mTilesToChangeFinal.AddRange(mTilesToChange);
 
                     // Any new rooms that were queued up can now be safely added as the room that
                     // linked to them was completed.
@@ -233,6 +240,28 @@ namespace MBHEngine.GameObject
             mRoomStartersToAdd.Clear();
 
             return success;
+        }
+
+        /// <summary>
+        /// Once the Flood Fill has been started with a call to FloodFill, calling this function 
+        /// will do the actual flooding.
+        /// </summary>
+        public void ProcessFill()
+        {
+            // Go through all the tiles that we determined as value tiles to change, and change them.
+            if(mTilesToChangeFinal.Count > 0)
+            {
+                Level.Tile tile = mTilesToChangeFinal[0];
+
+                // Create a new game object and place it at the location of the tile.
+                GameObject newFloor =  GameObjectFactory.pInstance.GetTemplate(mGameObjectTemplateName);
+
+                newFloor.pPosition = tile.mCollisionRect.pCenterPoint;
+
+                GameObjectManager.pInstance.Add(newFloor);
+
+                mTilesToChangeFinal.RemoveAt(0);
+            }
         }
 
         /// <summary>
