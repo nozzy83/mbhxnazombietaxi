@@ -323,6 +323,8 @@ namespace ZombieTaxi.Behaviours
                 }
             }
 
+            mGOFloodFill.ProcessFill();
+
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pPosition);
 #endif
