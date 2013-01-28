@@ -148,8 +148,11 @@
     <Compile Include="Code\Behaviours\HUD\PlayerHealthBar.cs" />
     <Compile Include="Code\Behaviours\Projectile.cs" />
     <Compile Include="Code\Behaviours\RandomEnemyGenerator.cs" />
+    <Compile Include="Code\Behaviours\StatBoost\HealthStatBoostResearch.cs" />
+    <Compile Include="Code\Behaviours\StatBoost\StatBoostResearch.cs" />
     <Compile Include="Code\Behaviours\TilePlacement.cs" />
     <Compile Include="Code\Behaviours\TwinStick.cs" />
+    <Compile Include="Code\States\Civilian\FSMStateResearchStatBoost.cs" />
     <Compile Include="Code\States\Civilian\FSMStateCower.cs" />
     <Compile Include="Code\States\Civilian\FSMStateDead.cs" />
     <Compile Include="Code\States\Civilian\FSMStateFollowTarget.cs" />

@@ -7,6 +7,7 @@ using MBHEngineContentDefs;
 using MBHEngine.Debug;
 using Microsoft.Xna.Framework;
 using ZombieTaxi.Behaviours.HUD;
+using MBHEngine.World;
 
 namespace ZombieTaxi.States.Civilian
 {
@@ -35,6 +36,8 @@ namespace ZombieTaxi.States.Civilian
         private PathFind.ClearDestinationMessage mClearDestinationMsg;
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
+        private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
+        private ZombieTaxi.Behaviours.Civilian.GetSafeHouseScoreMessage mGetSafeHouseScoreMessage;
 
         /// <summary>
         /// Constructor.
@@ -55,8 +58,9 @@ namespace ZombieTaxi.States.Civilian
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
-            mIncrementScoreMsg.mAmount_In = 100;
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
+            mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
+            mGetSafeHouseScoreMessage = new Behaviours.Civilian.GetSafeHouseScoreMessage();
         }
 
         /// <summary>
@@ -76,6 +80,9 @@ namespace ZombieTaxi.States.Civilian
 
             mSetTargetObjectMsg.mTarget_In = GameObjectManager.pInstance.pPlayer;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
+
+            pParentGOH.OnMessage(mGetSafeHouseScoreMessage);
+            mIncrementScoreMsg.mAmount_In = mGetSafeHouseScoreMessage.mSafeHouseScore_Out;
         }
 
         /// <summary>
@@ -91,14 +98,19 @@ namespace ZombieTaxi.States.Civilian
             // Are we intersecting with any safehouses?
             if (mSafeHouseInRange.Count != 0)
             {
+                // Don't even attempt to enter the SafeHouse unless there are spots available.
+                // This prevents getting points, and then
+                if (CheckForValidSafeHouseTiles())
+                {
 #if ALLOW_GARBAGE
-                DebugMessageDisplay.pInstance.AddConstantMessage("Reached SafeHouse.");
+                    DebugMessageDisplay.pInstance.AddConstantMessage("Reached SafeHouse.");
 #endif
-                // For every civilian we save, increment the score a little.
-                GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, pParentGOH);
+                    // For every civilian we save, increment the score a little.
+                    GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, pParentGOH);
 
-                // Now just stand around for a little bit.
-                return "GoToStandingPosition";
+                    // Now just stand around for a little bit.
+                    return "GoToStandingPosition";
+                }
             }
             // Has the Player run too far away causing us to get scared?
             else if (Vector2.DistanceSquared(GameObjectManager.pInstance.pPlayer.pPosition, pParentGOH.pPosition) > 64 * 64)
@@ -126,6 +138,42 @@ namespace ZombieTaxi.States.Civilian
             pParentGOH.pDirection.mForward = Vector2.Zero;
 
             pParentGOH.SetBehaviourEnabled<PathFollow>(false);
+        }
+
+        /// <summary>
+        /// Checks if there are currently any available SafeHouse tiles.
+        /// </summary>
+        /// <returns>True if there are 1 or more tiles available.</returns>
+        private Boolean CheckForValidSafeHouseTiles()
+        {
+            // Grab a list of all the SafeHouse objects, so that we can pick one at 
+            // random to walk to.
+            List<GameObject> safeHouses = GameObjectManager.pInstance.GetGameObjectsOfClassification(GameObjectDefinition.Classifications.SAFE_HOUSE);
+            
+            // We want to avoid standing on a tile that is already occupied by another Stranded.
+            // To do that, we just loop through the list of safeHouses and remove any that are
+            // already occupied.
+            for (Int32 i = safeHouses.Count - 1; i >= 0 ; i--)
+            {
+                // Get the tile at the position of this SafeHouse.
+                mGetTileAtObjectMsg.Reset();
+                mGetTileAtObjectMsg.mObject_In = safeHouses[i];
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtObjectMsg);
+
+                // If there is no Tile, there we should not be trying to go here at all.
+                if (null == mGetTileAtObjectMsg.mTile_Out)
+                {
+                    continue;
+                }
+
+                // If the tile is occupied we should not try to go there.
+                if (!mGetTileAtObjectMsg.mTile_Out.HasAttribute(Level.Tile.Attribute.Occupied))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

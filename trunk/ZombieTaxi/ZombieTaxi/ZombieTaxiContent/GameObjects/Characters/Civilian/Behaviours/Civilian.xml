@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.CivilianDefinition">
+    <mSafeHouseScore>500</mSafeHouseScore>
   </Asset>
 </XnaContent>
 

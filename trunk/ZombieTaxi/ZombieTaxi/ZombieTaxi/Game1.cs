@@ -126,6 +126,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\GunTurretPickup\\GunTurretPickup", 100);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Detector\\Detector", 600);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\GunTurret\\GunTurret", 600);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\ButtonHint\\ButtonHint", 4);
             
 
             // The tiled background image that travels will the player creating the illusion of
@@ -154,7 +155,7 @@ namespace ZombieTaxi
             if (CommandLineManager.pInstance["CheatFillInventory"] != null)
             {
                 Inventory.AddObjectMessage addObj = new Inventory.AddObjectMessage();
-                for (Int32 i = 0; i < 15; i++)
+                for (Int32 i = 0; i < 25; i++)
                 {
                     addObj.mObj_In = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Environments\\WallWood\\WallWood");
                     player.OnMessage(addObj);

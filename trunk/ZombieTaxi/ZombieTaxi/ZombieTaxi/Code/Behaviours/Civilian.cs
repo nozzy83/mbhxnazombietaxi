@@ -42,9 +42,34 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
+        /// Retrive the score value awarded when this object reaches the SafeHouse.
+        /// </summary>
+        public class GetSafeHouseScoreMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The score awarded for reaching the SafeHouse.
+            /// </summary>
+            public Int32 mSafeHouseScore_Out;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mSafeHouseScore_Out = 0;
+            }
+        }
+
+        /// <summary>
         /// The currently active extraction point.
         /// </summary>
         private GameObject mExtractionPoint;
+
+        /// <summary>
+        /// The number of points awarded when this GameObject arrives
+        /// at a SafeHouse.
+        /// </summary>
+        private Int32 mSafeHouseScore;
 
         /// <summary>
         /// Preallocate messages to avoid GC.
@@ -83,8 +108,11 @@ namespace ZombieTaxi.Behaviours
             AddState(new FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
             AddState(new FSMStateDead(), "Dead");
             AddState(new FSMStateGoToExtraction(), "GoToExtraction");
+            AddState(new FSMStateResearchStatBoost(), "ResearchStatBoost");
 
             mParentGOH.pDirection.mSpeed = 0.5f;
+
+            mSafeHouseScore = def.mSafeHouseScore;
 
             mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
@@ -155,6 +183,11 @@ namespace ZombieTaxi.Behaviours
             {
                 GetExtractionPointMessage temp = (GetExtractionPointMessage)msg;
                 temp.mExtractionPoint_Out = mExtractionPoint;
+            }
+            else if (msg is GetSafeHouseScoreMessage)
+            {
+                GetSafeHouseScoreMessage temp = (GetSafeHouseScoreMessage)msg;
+                temp.mSafeHouseScore_Out = mSafeHouseScore;
             }
         }
     }

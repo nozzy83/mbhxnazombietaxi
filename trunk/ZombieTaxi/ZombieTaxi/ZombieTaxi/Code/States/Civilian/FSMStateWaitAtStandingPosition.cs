@@ -1,6 +1,9 @@
 ﻿using MBHEngine.StateMachine;
 using MBHEngine.Behaviour;
 using MBHEngine.World;
+using MBHEngine.Input;
+using ZombieTaxi.Behaviours;
+using MBHEngine.GameObject;
 
 namespace ZombieTaxi.States.Civilian
 {
@@ -10,6 +13,11 @@ namespace ZombieTaxi.States.Civilian
     /// </summary>
     class FSMStateWaitAtStandingPosition : FSMState
     {
+        /// <summary>
+        /// Button hint that is shown to the player when standing near this GameObject.
+        /// </summary>
+        private GameObject mButtonHint;
+
         /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
@@ -43,6 +51,41 @@ namespace ZombieTaxi.States.Civilian
             {
                 mGetTileAtObjectMsg.mTile_Out.SetAttribute(Level.Tile.Attribute.Occupied);
             }
+
+            // Set up the button hint.
+            mButtonHint = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Interface\\ButtonHint\\ButtonHint");
+            mButtonHint.pPosition = pParentGOH.pPosition;
+
+            mSetActiveAnimationMsg.mAnimationSetName_In = "X";
+            mButtonHint.OnMessage(mSetActiveAnimationMsg);
+
+            mButtonHint.pDoRender = false;
+
+            GameObjectManager.pInstance.Add(mButtonHint);
+        }
+
+        /// <summary>
+        /// Call repeatedly until it returns a valid new state to transition to.
+        /// </summary>
+        /// <returns>Identifier of a state to transition to.</returns>
+        public override string OnUpdate()
+        {
+            if (pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
+            {
+                mButtonHint.pDoRender = true;
+
+                if (InputManager.pInstance.CheckAction(InputManager.InputActions.X, true))
+                {
+
+                    return "ResearchStatBoost";
+                }
+            }
+            else
+            {
+                mButtonHint.pDoRender = false;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -57,6 +100,8 @@ namespace ZombieTaxi.States.Civilian
                 // to 
                 mGetTileAtObjectMsg.mTile_Out.ClearAttribute(Level.Tile.Attribute.Occupied);
             }
+
+            GameObjectManager.pInstance.Remove(mButtonHint);
         }
     }
 }

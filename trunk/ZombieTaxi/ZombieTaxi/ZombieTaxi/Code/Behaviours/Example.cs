@@ -78,7 +78,8 @@ namespace ZombieTaxi.Behaviours
         /// Called once render cycle by the game object manager.
         /// </summary>
         /// <param name="batch">The sprite batch to render to.</param>
-        public override void Render(SpriteBatch batch)
+        /// <param name="effect">The effect being used to render this object.</param>
+        public override void Render(SpriteBatch batch, Effect effect)
         {
         }
 
