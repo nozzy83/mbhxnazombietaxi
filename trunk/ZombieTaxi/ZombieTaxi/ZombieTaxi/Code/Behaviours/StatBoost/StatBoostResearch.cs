@@ -12,7 +12,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
     /// <summary>
     /// Researchs an upgrade to a stat over time.
     /// </summary>
-    class StatBoostResearch : MBHEngine.Behaviour.Behaviour
+    abstract class StatBoostResearch : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
         /// Set the GameObject getting the stat boost.
@@ -47,9 +47,29 @@ namespace ZombieTaxi.StatBoost.Behaviours
         }
 
         /// <summary>
-        /// How long does it take for this research to complete?
+        /// Allows clients to check if there are any levels actually available, prior 
+        /// showing the user a prompt.
         /// </summary>
-        private Int32 mFramesToComplete;
+        public class GetLevelsRemainingMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The number of levels still available for upgrading to.
+            /// </summary>
+            public Int32 mLevelsRemaining;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mLevelsRemaining = 0;
+            }
+        }
+
+        /// <summary>
+        /// Store the definition since it stores the leveling information in a convienient package.
+        /// </summary>
+        StatBoostResearchDefinition mDef;
 
         /// <summary>
         /// Tracks how long the research has been taking place.
@@ -65,6 +85,12 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// Sprite used to show progress of research.
         /// </summary>
         private GameObject mProgressBar;
+
+        /// <summary>
+        /// The current level of this type of research. Static since there can be many instances of this
+        /// Behaviour and they should all be at the same level.
+        /// </summary>
+        protected static Int32 mNextLevel = 0;
 
         /// <summary>
         /// Preallocated messages to avoid GC.
@@ -92,9 +118,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
         {
             base.LoadContent(fileName);
 
-            StatBoostResearchDefinition def = GameObjectManager.pInstance.pContentManager.Load<StatBoostResearchDefinition>(fileName);
-
-            mFramesToComplete = def.mFramesToComplete;
+            mDef = GameObjectManager.pInstance.pContentManager.Load<StatBoostResearchDefinition>(fileName);
 
             mOnResearchCompleteMsg = new OnResearchComplete();
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
@@ -169,6 +193,8 @@ namespace ZombieTaxi.StatBoost.Behaviours
                 // is possible since the target is set after the fact.
                 if (null != mTarget)
                 {
+                    FillOnResearchCompleteMessage();
+
                     mTarget.OnMessage(mMessageOnComplete);
                 }
 
@@ -177,6 +203,8 @@ namespace ZombieTaxi.StatBoost.Behaviours
 
                 // Announce that the research has been completed.
                 mParentGOH.OnMessage(mOnResearchCompleteMsg);
+
+                mNextLevel++;
             }
         }
 
@@ -197,6 +225,18 @@ namespace ZombieTaxi.StatBoost.Behaviours
 
                 mResearchTimer.Restart();
             }
+            else if (msg is GetLevelsRemainingMessage)
+            {
+                GetLevelsRemainingMessage temp = (GetLevelsRemainingMessage)msg;
+
+                temp.mLevelsRemaining = mDef.mLevels.Length - mNextLevel;
+            }
         }
+
+        /// <summary>
+        /// Gets called right before the OnResearchCompleteMessage is sent. It is the responsibility of 
+        /// the derived class to use this chance to populate the message with up to date data.
+        /// </summary>
+        protected abstract void FillOnResearchCompleteMessage();
     }
 }

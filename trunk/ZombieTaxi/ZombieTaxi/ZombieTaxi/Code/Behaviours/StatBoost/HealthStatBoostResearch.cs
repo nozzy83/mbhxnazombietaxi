@@ -15,6 +15,12 @@ namespace ZombieTaxi.StatBoost.Behaviours
     class HealthStatBoostResearch : ZombieTaxi.StatBoost.Behaviours.StatBoostResearch
     {
         /// <summary>
+        /// Store the definition for later use since it stores the leveling information in a
+        /// nice clean way.
+        /// </summary>
+        HealthStatBoostResearchDefinition mDef;
+
+        /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
         /// </summary>
@@ -33,12 +39,20 @@ namespace ZombieTaxi.StatBoost.Behaviours
         {
             base.LoadContent(fileName);
 
-            HealthStatBoostResearchDefinition def = GameObjectManager.pInstance.pContentManager.Load<HealthStatBoostResearchDefinition>(fileName);
+            mDef = GameObjectManager.pInstance.pContentManager.Load<HealthStatBoostResearchDefinition>(fileName);
 
-            Health.SetMaxHealthMessage temp = new Health.SetMaxHealthMessage();
-            temp.mMaxHealth_In = def.mAmount;
+            mMessageOnComplete = new Health.IncrementMaxHealthMessage();
+        }
 
-            mMessageOnComplete = temp;
+        /// <summary>
+        /// Gets called right before the OnResearchCompleteMessage is sent. It is the responsibility of 
+        /// the derived class to use this chance to populate the message with up to date data.
+        /// </summary>
+        protected override void FillOnResearchCompleteMessage()
+        {
+            Health.IncrementMaxHealthMessage temp = (Health.IncrementMaxHealthMessage)mMessageOnComplete;
+
+            temp.mIncrementAmount_In = mDef.mLevels[mNextLevel].mIntValue;
         }
     }
 }

@@ -97,10 +97,6 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new MarkOnMiniMap(go, fileName);
                     }
-                case "ZombieTaxi.Behaviours.StatBoost.StatBoostResearch":
-                    {
-                        return new StatBoostResearch(go, fileName);
-                    }
                 case "ZombieTaxi.Behaviours.StatBoost.HealthStatBoostResearch":
                     {
                         return new HealthStatBoostResearch(go, fileName);

@@ -2,8 +2,28 @@
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.StatBoost.HealthStatBoostResearchDefinition">
     <mIsEnabled>false</mIsEnabled>
-    <mFramesToComplete>120</mFramesToComplete>
-    <mAmount>700</mAmount>
+    <mLevels>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+    </mLevels>
   </Asset>
 </XnaContent>
 

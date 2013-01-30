@@ -383,10 +383,7 @@ namespace MBHEngine.GameObject
 
             for (int i = 0; i < mBehaviours.Count; i++)
             {
-                if (mBehaviours[i].pIsEnabled)
-                {
-                    mBehaviours[i].OnMessage(ref msg);
-                }
+                mBehaviours[i].OnMessage(ref msg);
             }
 
             return msg;

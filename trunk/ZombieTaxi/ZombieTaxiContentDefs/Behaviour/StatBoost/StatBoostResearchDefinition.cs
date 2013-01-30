@@ -9,8 +9,24 @@ namespace ZombieTaxiContentDefs.StatBoost
     public class StatBoostResearchDefinition : BehaviourDefinition
     {
         /// <summary>
-        /// How long does it take for this research to complete?
+        /// A single level of upgrades for a stat.
         /// </summary>
-        public Int32 mFramesToComplete;
+        public class LevelStat
+        {
+            /// <summary>
+            /// How many frames need to pass before this upgrade is researched.
+            /// </summary>
+            public Int32 mFramesToComplete;
+
+            /// <summary>
+            /// Meaning changes based on derived class.
+            /// </summary>
+            public Int32 mIntValue;
+        }
+
+        /// <summary>
+        /// All the LevelStats for this stat boost type.
+        /// </summary>
+        public LevelStat[] mLevels;
     }
 }
