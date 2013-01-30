@@ -608,7 +608,6 @@ namespace MBHEngine.Behaviour
                     mAnimations[mActiveAnimation].mAnimationComplete = false;
 
                 }
-                
             }
             else if (msg is GetAttachmentPointMessage)
             {

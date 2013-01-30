@@ -15,17 +15,30 @@ namespace ZombieTaxi.Behaviours.HUD
     class PlayerHealthBar : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
+        /// For every Hit Point of Health, this many pixels should be rendered on the
+        /// health bar. This allows us to dynamically resize the bar as we level up.
+        /// </summary>
+        private Single mPixPerHP;
+
+        /// <summary>
         /// The diferent textures that make up this single HUD element.
         /// </summary>
         private Texture2D mTextureBG;
         private Texture2D mTextureBorder;
+        private Texture2D mTextureBorderEnd;
         private Texture2D mTextureFill;
 
         /// <summary>
-        /// The fill texture gets resized to match the player's current health percentage.  This
+        /// The fill texture gets resized to match the player's current health.  This
         /// rectangle defines that area.
         /// </summary>
         private Rectangle mFillRect;
+
+        /// <summary>
+        /// The border and background textures get resized to match the current max health.
+        /// This rectangle defines that area.
+        /// </summary>
+        private Rectangle mBGRect;
 
         /// <summary>
         /// Messages are preallocated to avoid garbage collection.
@@ -53,11 +66,28 @@ namespace ZombieTaxi.Behaviours.HUD
 
             mTextureBG = GameObjectManager.pInstance.pContentManager.Load<Texture2D>("Sprites\\Interface\\HealthBarBG");
             mTextureBorder = GameObjectManager.pInstance.pContentManager.Load<Texture2D>("Sprites\\Interface\\HealthBarBorder");
+            mTextureBorderEnd = GameObjectManager.pInstance.pContentManager.Load<Texture2D>("Sprites\\Interface\\HealthBarBorderEnd");
             mTextureFill = GameObjectManager.pInstance.pContentManager.Load<Texture2D>("Sprites\\Interface\\HealthBarFill");
 
             mFillRect = new Rectangle(0, 0, mTextureFill.Width, mTextureFill.Height);
+            mBGRect = new Rectangle(0, 0, mTextureBG.Width, mTextureBG.Height);
 
             mGetHealthMsg = new Health.GetHealthMessage();
+        }
+
+        /// <summary>
+        /// Called at the end of the frame where mParentGOH was added to the GameObjectManager.
+        /// </summary>
+        public override void OnAdd()
+        {
+            // This can't be done during load, so we wait for it to be added to the manager first.
+            GameObjectManager.pInstance.pPlayer.OnMessage(mGetHealthMsg);
+
+            // The pixels per hit point are based on the actual width of the fill texture.
+            // This means that the width of the health bar fill png will be the width of 
+            // the health bar at level 1. As we level up it will grow, relative to that
+            // starting size.
+            mPixPerHP = mTextureFill.Width / mGetHealthMsg.mMaxHealth_Out;
         }
 
         /// <summary>
@@ -68,11 +98,14 @@ namespace ZombieTaxi.Behaviours.HUD
         {
             GameObjectManager.pInstance.pPlayer.OnMessage(mGetHealthMsg);
 
-            // Convert the player's health data into a percent full.
-            Single percent = Math.Max(mGetHealthMsg.mCurrentHealth_Out / mGetHealthMsg.mMaxHealth_Out, 0.0f);
+            // Earlier we calculated the how many pixels per hitpoint should be drawn for the 
+            // health bar. Now use that number scaled by the actually number of HP to determine
+            // the side of the HP fill.
+            mFillRect.Width = (Int32)Math.Round(mPixPerHP * mGetHealthMsg.mCurrentHealth_Out);
 
-            // Use that percent to define a source rectangle for the fill texture.
-            mFillRect.Width = (Int32)(mTextureFill.Width * percent);
+            // The backgound uses the same calculation except using the map HP since it doesn't
+            // change as the HP lowers. Add 2 pixel since this overlaps with the border.
+            mBGRect.Width = (Int32)Math.Round(mPixPerHP * mGetHealthMsg.mMaxHealth_Out) + 2;
         }
 
         /// <summary>
@@ -82,13 +115,27 @@ namespace ZombieTaxi.Behaviours.HUD
         /// <param name="effect">The currently set shader.</param>
         public override void Render(SpriteBatch batch, Effect effect)
         {
-            batch.Draw(mTextureBG, mParentGOH.pPosition, Color.White);
+            batch.Draw(
+                mTextureBG,
+                new Vector2(mParentGOH.pPosition.X, mParentGOH.pPosition.Y),
+                mBGRect,
+                Color.White);
+
             batch.Draw(
                 mTextureFill, 
                 new Vector2(mParentGOH.pPosition.X + 1, mParentGOH.pPosition.Y + 1),
                 mFillRect, 
                 Color.White);
-            batch.Draw(mTextureBorder, mParentGOH.pPosition, Color.White);
+
+            batch.Draw(
+                mTextureBorder,
+                new Vector2(mParentGOH.pPosition.X, mParentGOH.pPosition.Y),
+                mBGRect,
+                Color.White);
+            batch.Draw(
+                mTextureBorderEnd,
+                new Vector2(mParentGOH.pPosition.X + mBGRect.Width - 1, mParentGOH.pPosition.Y),
+                Color.White);
         }
     }
 }
