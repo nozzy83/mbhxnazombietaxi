@@ -534,10 +534,12 @@ namespace MBHEngine.Behaviour
             }
 
 #if ALLOW_GARBAGE
+            Vector2 pos = new Vector2();
             foreach (KeyValuePair<String, SpriteRenderDefinition.AtachmentPoint> pair in mAttachmentPoints)
             {
+                FindAttachmentPointInWorldSpace(pair.Key, ref pos);
                 //DebugShapeDisplay.pInstance.AddTransform(mParentGOH.pPosition + pair.Value);
-                DebugShapeDisplay.pInstance.AddPoint(FindAttachmentPointInWorldSpace(pair.Key), 1.0f, Color.Purple);
+                DebugShapeDisplay.pInstance.AddPoint(pos, 1.0f, Color.Purple);
             }
 #endif
         }
@@ -612,7 +614,7 @@ namespace MBHEngine.Behaviour
             {
                 GetAttachmentPointMessage temp = (GetAttachmentPointMessage)msg;
 
-                temp.mPoisitionInWorld_Out = FindAttachmentPointInWorldSpace(temp.mName_In);
+                FindAttachmentPointInWorldSpace(temp.mName_In, ref temp.mPoisitionInWorld_Out);
             }
             else if (msg is SetColorMessage)
             {
@@ -638,12 +640,11 @@ namespace MBHEngine.Behaviour
         /// </summary>
         /// <param name="pointName">The name of the attachment point.</param>
         /// <returns>Position of attachment point in world space.</returns>
-        private Vector2 FindAttachmentPointInWorldSpace(String pointName)
+        private void FindAttachmentPointInWorldSpace(String pointName, ref Vector2 pos)
         {
             if (mAttachmentPoints.ContainsKey(pointName))
             {
-                Single attachX = mAttachmentPoints[pointName].mOffset.X;
-                Single attachY = mAttachmentPoints[pointName].mOffset.Y;
+                pos = mAttachmentPoints[pointName].mOffset;
 
                 // If requested, adjust the attachment point position based on the current facing of 
                 // the Sprite.
@@ -651,19 +652,17 @@ namespace MBHEngine.Behaviour
                 {
                     if ((mSpriteEffects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally)
                     {
-                        attachX *= -1;
+                        pos.X *= -1;
                     }
 
                     if ((mSpriteEffects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically)
                     {
-                        attachY *= -1;
+                        pos.Y *= -1;
                     }
                 }
 
-                return new Vector2(attachX + mParentGOH.pPosition.X, attachY + mParentGOH.pPosition.Y);
+                pos += mParentGOH.pPosition;
             }
-
-            return Vector2.Zero;
         }
 
 #if ALLOW_GARBAGE
