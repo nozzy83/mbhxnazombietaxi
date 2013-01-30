@@ -62,6 +62,13 @@ namespace MBHEngineContentDefs
             /// The offset from the motion root.
             /// </summary>
             public Vector2 mOffset;
+
+            /// <summary>
+            /// True if the attach point should move with the Sprite facing. Meaning, if
+            /// the sprite is flipped horizontally, the attachment point will move the the
+            /// opposite side of the sprite on the X axis.
+            /// </summary>
+            public Boolean mMoveWithSpriteFacing;
         };
 
         /// <summary>

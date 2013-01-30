@@ -291,7 +291,7 @@ namespace MBHEngine.Behaviour
         /// A list of position offsets (offset from the motion root) indexed by name.
         /// Used for attaching things to objects without having hard coded values.
         /// </summary>
-        private Dictionary<String, Vector2> mAttachmentPoints;
+        private Dictionary<String, SpriteRenderDefinition.AtachmentPoint> mAttachmentPoints;
 
         /// <summary>
         /// Preallocated messages to avoid garbage collection during gameplay.
@@ -333,12 +333,12 @@ namespace MBHEngine.Behaviour
 
             mSpriteFileName = def.mSpriteFileName;
             mTexture = GameObjectManager.pInstance.pContentManager.Load<Texture2D>(mSpriteFileName);
-            mAttachmentPoints = new Dictionary<string, Vector2>();
+            mAttachmentPoints = new Dictionary<string, SpriteRenderDefinition.AtachmentPoint>();
             if (def.mAttachmentPoints != null)
             {
                 for (Int32 i = 0; i < def.mAttachmentPoints.Count; i++)
                 {
-                    mAttachmentPoints.Add(def.mAttachmentPoints[i].mName, def.mAttachmentPoints[i].mOffset);
+                    mAttachmentPoints.Add(def.mAttachmentPoints[i].mName, def.mAttachmentPoints[i]);
                 }
             }
             mHasShadow = def.mHasShadow;
@@ -477,7 +477,7 @@ namespace MBHEngine.Behaviour
                         // Note: The attachment point is stored as an offset from the motion root, 
                         //       it gets added to the achor which is currently storing the motion 
                         //       root.
-                        shadowAttachmentPoint += mAttachmentPoints["Shadow"];
+                        shadowAttachmentPoint += mAttachmentPoints["Shadow"].mOffset;
                     }
 
                     batch.Draw(mTexture,
@@ -518,7 +518,7 @@ namespace MBHEngine.Behaviour
                         // Note: The attachment point is stored as an offset from the motion root, 
                         //       it gets added to the achor which is currently storing the motion 
                         //       root.
-                        shadowAttachmentPoint += mAttachmentPoints["Shadow"];
+                        shadowAttachmentPoint += mAttachmentPoints["Shadow"].mOffset;
                     }
 
                     batch.Draw(mTexture,
@@ -534,10 +534,10 @@ namespace MBHEngine.Behaviour
             }
 
 #if ALLOW_GARBAGE
-            foreach (KeyValuePair<String, Vector2> pair in mAttachmentPoints)
+            foreach (KeyValuePair<String, SpriteRenderDefinition.AtachmentPoint> pair in mAttachmentPoints)
             {
                 //DebugShapeDisplay.pInstance.AddTransform(mParentGOH.pPosition + pair.Value);
-                DebugShapeDisplay.pInstance.AddPoint(mParentGOH.pPosition + pair.Value, 1.0f, Color.Purple);
+                DebugShapeDisplay.pInstance.AddPoint(FindAttachmentPointInWorldSpace(pair.Key), 1.0f, Color.Purple);
             }
 #endif
         }
@@ -612,24 +612,7 @@ namespace MBHEngine.Behaviour
             {
                 GetAttachmentPointMessage temp = (GetAttachmentPointMessage)msg;
 
-                if (mAttachmentPoints.ContainsKey(temp.mName_In))
-                {
-                    Single attachX = mAttachmentPoints[temp.mName_In].X;
-                    Single attachY = mAttachmentPoints[temp.mName_In].Y;
-
-                    if ((mSpriteEffects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally)
-                    {
-                        attachX *= -1;
-                    }
-
-                    if ((mSpriteEffects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically)
-                    {
-                        attachY *= -1;
-                    }
-
-                    temp.mPoisitionInWorld_Out.X = attachX + mParentGOH.pPosition.X;
-                    temp.mPoisitionInWorld_Out.Y = attachY + mParentGOH.pPosition.Y;
-                }
+                temp.mPoisitionInWorld_Out = FindAttachmentPointInWorldSpace(temp.mName_In);
             }
             else if (msg is SetColorMessage)
             {
@@ -646,6 +629,41 @@ namespace MBHEngine.Behaviour
                 GetTexture2DMessage temp = (GetTexture2DMessage)msg;
                 temp.mTexture_Out = mTexture;
             }
+        }
+
+        /// <summary>
+        /// Finds a named attachment point, and returns that point in world space. Accounts for
+        /// the position of game object, as well as potentially offseting to match a flipped 
+        /// Sprite (if requested through mMoveWithSpriteFacing flag).
+        /// </summary>
+        /// <param name="pointName">The name of the attachment point.</param>
+        /// <returns>Position of attachment point in world space.</returns>
+        private Vector2 FindAttachmentPointInWorldSpace(String pointName)
+        {
+            if (mAttachmentPoints.ContainsKey(pointName))
+            {
+                Single attachX = mAttachmentPoints[pointName].mOffset.X;
+                Single attachY = mAttachmentPoints[pointName].mOffset.Y;
+
+                // If requested, adjust the attachment point position based on the current facing of 
+                // the Sprite.
+                if (mAttachmentPoints[pointName].mMoveWithSpriteFacing)
+                {
+                    if ((mSpriteEffects & SpriteEffects.FlipHorizontally) == SpriteEffects.FlipHorizontally)
+                    {
+                        attachX *= -1;
+                    }
+
+                    if ((mSpriteEffects & SpriteEffects.FlipVertically) == SpriteEffects.FlipVertically)
+                    {
+                        attachY *= -1;
+                    }
+                }
+
+                return new Vector2(attachX + mParentGOH.pPosition.X, attachY + mParentGOH.pPosition.Y);
+            }
+
+            return Vector2.Zero;
         }
 
 #if ALLOW_GARBAGE

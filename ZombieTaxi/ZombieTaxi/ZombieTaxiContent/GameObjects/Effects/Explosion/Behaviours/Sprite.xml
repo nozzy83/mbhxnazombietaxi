@@ -8,6 +8,7 @@
       <Item>
         <mName>Shadow</mName>
         <mOffset>0 -2</mOffset>
+        <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
       </Item>
     </mAttachmentPoints>
     <mAnimationSets>

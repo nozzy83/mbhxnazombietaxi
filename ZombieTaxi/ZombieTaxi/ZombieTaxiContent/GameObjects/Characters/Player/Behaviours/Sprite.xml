@@ -8,6 +8,7 @@
       <Item>
         <mName>Gun</mName>
         <mOffset>1 -4</mOffset>
+        <mMoveWithSpriteFacing>true</mMoveWithSpriteFacing>
       </Item>
     </mAttachmentPoints>
     <mAnimationSets>
