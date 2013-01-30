@@ -1297,13 +1297,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameObjects\Characters\Player\Behaviours\ShapeRender.xml">
-      <Name>ShapeRender</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Sprites\Interface\ResearchProgressBar.png">
       <Name>ResearchProgressBar</Name>
       <Importer>TextureImporter</Importer>
@@ -1323,6 +1316,13 @@
       <Name>Sprite</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Interface\HealthBarBorderEnd.png">
+      <Name>HealthBarBorderEnd</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
