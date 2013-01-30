@@ -8,6 +8,7 @@
       <Item>
         <mName>Ground</mName>
         <mOffset>0 0</mOffset>
+        <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
       </Item>
     </mAttachmentPoints>
     <mAnimationSets>

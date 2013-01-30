@@ -6,6 +6,7 @@
       <Item>
         <mName>SpawnOnDeath</mName>
         <mOffset>0 4</mOffset>
+        <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
       </Item>
     </mAttachmentPoints>
   </Asset>

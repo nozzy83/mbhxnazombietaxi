@@ -96,6 +96,22 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Called when the Behaviour goes from being disabled to enabled.
+        /// This will NOT be called if the behaviour initialially starts enabled.
+        /// </summary>
+        public virtual void OnEnable()
+        {
+        }
+
+        /// <summary>
+        /// Called when the Behaviour goes from being enabled to disable.
+        /// This will NOT be called if the behaviour initially starts disabled.
+        /// </summary>
+        public virtual void OnDisable()
+        {
+        }
+
+        /// <summary>
         /// Called once per frame before the update function. Is called for ALL gameobjects, prior 
         /// to calling Update.
         /// </summary>

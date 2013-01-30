@@ -428,6 +428,15 @@ namespace MBHEngine.GameObject
                 if (mBehaviours[i] is BehaviourType)
                 {
                     mBehaviours[i].pIsEnabled = isEnabled;
+
+                    if (isEnabled)
+                    {
+                        mBehaviours[i].OnEnable();
+                    }
+                    else
+                    {
+                        mBehaviours[i].OnDisable();
+                    }
                 }
             }
         }
@@ -505,6 +514,10 @@ namespace MBHEngine.GameObject
                 case "MBHEngine.Behaviour.Magnetic":
                     {
                         return new MBHEngine.Behaviour.Magnetic(this, fileName);
+                    }
+                case "MBHEngine.Behaviour.ShapeRender":
+                    {
+                        return new MBHEngine.Behaviour.ShapeRender(this, fileName);
                     }
                 default:
                     {
@@ -702,6 +715,24 @@ namespace MBHEngine.GameObject
         {
             get { return mScale; }
             set { mScale = value; }
+        }
+
+        /// <summary>
+        /// The Scale's X value.
+        /// </summary>
+        public Single pScaleX
+        {
+            get { return mScale.X; }
+            set { mScale.X = value; }
+        }
+
+        /// <summary>
+        /// The Scale's Y value.
+        /// </summary>
+        public Single pScaleY
+        {
+            get { return mScale.Y; }
+            set { mScale.Y = value; }
         }
 
         /// <summary>

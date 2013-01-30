@@ -4,6 +4,13 @@
     <mSpriteFileName>Sprites\Characters\Chef</mSpriteFileName>
     <mFrameHeight>8</mFrameHeight>
     <mHasShadow>true</mHasShadow>
+    <mAttachmentPoints>
+      <Item>
+        <mName>ProgressBar</mName>
+        <mOffset>-4 0</mOffset> <!-- Only offset the X because the Y needs to be the same for sorting. -->
+        <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
+      </Item>
+    </mAttachmentPoints>
     <mAnimationSets>
       <Item>
         <mTicksPerFrame>60</mTicksPerFrame>

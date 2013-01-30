@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
+    <mRenderPriority>50</mRenderPriority>
+    <mDoUpdate>true</mDoUpdate>
+    <mDoRender>true</mDoRender>
+    <mPosition>0 0</mPosition>
+    <mRotation>0</mRotation>
+    <mScale>1 1</mScale>
+    <mMotionRoot>0 10</mMotionRoot> <!-- Adjusted the Y here instead of the attachment point to avoid sorting issues. -->
+    <mBehaviourFileNames>
+      <Item>Sprite</Item>
+    </mBehaviourFileNames>
+    <mBehaviourClassNames>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
+    </mBehaviourClassNames>
+  </Asset>
+</XnaContent>
+

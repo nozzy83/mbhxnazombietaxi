@@ -127,7 +127,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Detector\\Detector", 600);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\GunTurret\\GunTurret", 600);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\ButtonHint\\ButtonHint", 4);
-            
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\ResearchProgressBar\\ResearchProgressBar", 4);
 
             // The tiled background image that travels will the player creating the illusion of
             // an infinite background image.

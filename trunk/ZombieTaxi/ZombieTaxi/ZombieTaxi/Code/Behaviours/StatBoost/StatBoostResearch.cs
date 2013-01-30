@@ -62,10 +62,16 @@ namespace ZombieTaxi.StatBoost.Behaviours
         private GameObject mTarget;
 
         /// <summary>
+        /// Sprite used to show progress of research.
+        /// </summary>
+        private GameObject mProgressBar;
+
+        /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
         protected BehaviourMessage mMessageOnComplete;
         private OnResearchComplete mOnResearchCompleteMsg;
+        private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -91,6 +97,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
             mFramesToComplete = def.mFramesToComplete;
 
             mOnResearchCompleteMsg = new OnResearchComplete();
+            mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
         }
 
         /// <summary>
@@ -113,11 +120,43 @@ namespace ZombieTaxi.StatBoost.Behaviours
         }
 
         /// <summary>
+        /// Called when the Behaviour goes from being disabled to enabled.
+        /// This will NOT be called if the behaviour initialially starts enabled.
+        /// </summary>
+        public override void OnEnable()
+        {
+            if (mProgressBar == null)
+            {
+                mGetAttachmentPointMsg.mName_In = "ProgressBar";
+                mParentGOH.OnMessage(mGetAttachmentPointMsg);
+
+                mProgressBar = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Interface\\ResearchProgressBar\\ResearchProgressBar");
+                mProgressBar.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
+                GameObjectManager.pInstance.Add(mProgressBar);
+            }
+        }
+
+        /// <summary>
+        /// Called when the Behaviour goes from being enabled to disable.
+        /// This will NOT be called if the behaviour initially starts disabled.
+        /// </summary>
+        public override void OnDisable()
+        {
+            GameObjectManager.pInstance.Remove(mProgressBar);
+
+            mProgressBar = null;
+        }
+
+        /// <summary>
         /// Called once per frame by the game object.
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void Update(GameTime gameTime)
         {
+            // Scale the progress bar to show how much time is left. Subtract from 1 so that the bar 
+            // drains down instead of filling up. Not sure if that is intuative to the player though.
+            mProgressBar.pScaleX = 1.0f - mResearchTimer.pPercentRemaining;
+
             // Have we finished researching?
             if (mResearchTimer.IsExpired())
             {

@@ -126,6 +126,7 @@
     <Compile Include="Code\Behaviour\PathFind.cs" />
     <Compile Include="Code\Behaviour\PathFollow.cs" />
     <Compile Include="Code\Behaviour\RemoveTileOnDeath.cs" />
+    <Compile Include="Code\Behaviour\ShapeRender.cs" />
     <Compile Include="Code\Behaviour\SimpleMomentum.cs" />
     <Compile Include="Code\Behaviour\SimulatedPhysics.cs" />
     <Compile Include="Code\Behaviour\SpawnOnDeath.cs" />

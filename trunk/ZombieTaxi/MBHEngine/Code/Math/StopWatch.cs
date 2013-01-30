@@ -151,5 +151,16 @@ namespace MBHEngine.Math
                 mIsPaused = value;
             }
         }
+
+        /// <summary>
+        /// The percent of time remaining.
+        /// </summary>
+        public Single pPercentRemaining
+        {
+            get
+            {
+                return mNumFramesPassed / mLifeTime;
+            }
+        }
     }
 }
