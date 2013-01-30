@@ -4,6 +4,7 @@ using MBHEngine.World;
 using MBHEngine.Input;
 using ZombieTaxi.Behaviours;
 using MBHEngine.GameObject;
+using ZombieTaxi.StatBoost.Behaviours;
 
 namespace ZombieTaxi.States.Civilian
 {
@@ -23,6 +24,7 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
+        private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
 
         /// <summary>
         /// Constructor.
@@ -31,6 +33,7 @@ namespace ZombieTaxi.States.Civilian
         {
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
+            mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
         }
 
         /// <summary>
@@ -52,16 +55,7 @@ namespace ZombieTaxi.States.Civilian
                 mGetTileAtObjectMsg.mTile_Out.SetAttribute(Level.Tile.Attribute.Occupied);
             }
 
-            // Set up the button hint.
-            mButtonHint = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Interface\\ButtonHint\\ButtonHint");
-            mButtonHint.pPosition = pParentGOH.pPosition;
-
-            mSetActiveAnimationMsg.mAnimationSetName_In = "X";
-            mButtonHint.OnMessage(mSetActiveAnimationMsg);
-
-            mButtonHint.pDoRender = false;
-
-            GameObjectManager.pInstance.Add(mButtonHint);
+            mButtonHint = null;
         }
 
         /// <summary>
@@ -70,19 +64,35 @@ namespace ZombieTaxi.States.Civilian
         /// <returns>Identifier of a state to transition to.</returns>
         public override string OnUpdate()
         {
-            if (pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
+            pParentGOH.OnMessage(mGetLevelsRemainingMsg);
+
+            if (mGetLevelsRemainingMsg.mLevelsRemaining > 0 && pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
             {
+                if (null == mButtonHint)
+                {
+                    // Set up the button hint.
+                    mButtonHint = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Interface\\ButtonHint\\ButtonHint");
+                    mButtonHint.pPosition = pParentGOH.pPosition;
+
+                    mSetActiveAnimationMsg.mAnimationSetName_In = "X";
+                    mButtonHint.OnMessage(mSetActiveAnimationMsg);
+
+                    GameObjectManager.pInstance.Add(mButtonHint);
+                }
+
                 mButtonHint.pDoRender = true;
 
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.X, true))
                 {
-
                     return "ResearchStatBoost";
                 }
             }
             else
             {
-                mButtonHint.pDoRender = false;
+                if (null != mButtonHint)
+                {
+                    mButtonHint.pDoRender = false;
+                }
             }
 
             return null;
@@ -101,7 +111,11 @@ namespace ZombieTaxi.States.Civilian
                 mGetTileAtObjectMsg.mTile_Out.ClearAttribute(Level.Tile.Attribute.Occupied);
             }
 
-            GameObjectManager.pInstance.Remove(mButtonHint);
+            if (null != mButtonHint)
+            {
+                GameObjectManager.pInstance.Remove(mButtonHint);
+                mButtonHint = null;
+            }
         }
     }
 }

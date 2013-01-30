@@ -91,6 +91,26 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Set the maximum health that this object can have.
+        /// </summary>
+        public class IncrementMaxHealthMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The amount to increase max health by.
+            /// </summary>
+            public Single mIncrementAmount_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mIncrementAmount_In = 0.0f;
+            }
+
+        }
+
+        /// <summary>
         /// The current amount of health.
         /// </summary>
         private Single mCurrentHealth;
@@ -186,6 +206,16 @@ namespace MBHEngine.Behaviour
                 Single percent = mCurrentHealth / mMaxHealth;
 
                 mMaxHealth = temp.mMaxHealth_In;
+
+                mCurrentHealth = percent * mMaxHealth;
+            }
+            else if (msg is IncrementMaxHealthMessage)
+            {
+                IncrementMaxHealthMessage temp = (IncrementMaxHealthMessage)msg;
+
+                Single percent = mCurrentHealth / mMaxHealth;
+
+                mMaxHealth += temp.mIncrementAmount_In;
 
                 mCurrentHealth = percent * mMaxHealth;
             }

@@ -7,6 +7,5 @@ namespace ZombieTaxiContentDefs.StatBoost
 {
     public class HealthStatBoostResearchDefinition : StatBoostResearchDefinition
     {
-        public Int32 mAmount;
     }
 }

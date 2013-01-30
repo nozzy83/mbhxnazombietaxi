@@ -101,6 +101,9 @@ namespace ZombieTaxi.Behaviours.HUD
             // Earlier we calculated the how many pixels per hitpoint should be drawn for the 
             // health bar. Now use that number scaled by the actually number of HP to determine
             // the side of the HP fill.
+            // We have to round due to some odd issure with casting to an Int32 (I think). Even
+            // though the number is a whole number, it was still getting truncated down to the\
+            // next lower whole number (eg. 22.0f became 21).
             mFillRect.Width = (Int32)Math.Round(mPixPerHP * mGetHealthMsg.mCurrentHealth_Out);
 
             // The backgound uses the same calculation except using the map HP since it doesn't
