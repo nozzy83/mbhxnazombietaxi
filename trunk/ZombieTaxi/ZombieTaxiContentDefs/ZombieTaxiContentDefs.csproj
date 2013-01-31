@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviour\CivilianDefinition.cs" />
+    <Compile Include="Behaviour\FSMScoutDefinition.cs" />
     <Compile Include="Behaviour\HUD\MiniMapDefinition.cs" />
     <Compile Include="Behaviour\HUD\PlayerInventoryDefinition.cs" />
     <Compile Include="Behaviour\MarkOnMiniMapDefinition.cs" />

@@ -245,7 +245,7 @@ namespace ZombieTaxi
 
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.Y, true))
             {
-                GameObject chef = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
+                GameObject chef = new GameObject("GameObjects\\Characters\\Scout\\Scout");
                 chef.pPosition = GameObjectManager.pInstance.pPlayer.pPosition;
                 chef.pPosX += 16;
                 GameObjectManager.pInstance.Add(chef);
