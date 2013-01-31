@@ -29,6 +29,20 @@ namespace MBHEngine.GameObject
     public class GameObjectManager
     {
         /// <summary>
+        /// Tracks what is going on in Update() so that different callback functions can
+        /// act differently depending on the UpdatePhase.
+        /// </summary>
+        private enum UpdatePhase
+        {
+            None = 0,
+            Update,
+            Remove,
+            Add,
+            OnRemove,
+            OnAdd,
+        }
+
+        /// <summary>
         /// The static instance of this class, making this a singleton.
         /// </summary>
         static private GameObjectManager mInstance = null;
@@ -71,6 +85,20 @@ namespace MBHEngine.GameObject
         /// interating through the list at the time.
         /// </summary>
         private List<GameObject> mGameObjectsToRemove;
+
+        /// <summary>
+        /// If a client attempts to add an object while we are in the middle of adding objects, it needs to be
+        /// queued up for next frame in a different list, since mGameObjectsToAdd will be cleared at the end
+        /// of the frame.
+        /// </summary>
+        private List<GameObject> mGameObjectsToAddNextFrame;
+
+        /// <summary>
+        /// If a client attempts to remove an object while we are in the middle of removing objects, it needs to be
+        /// queued up for next frame in a different list, since mGameObjectsToRemove will be cleared at the end
+        /// of the frame.
+        /// </summary>
+        private List<GameObject> mGameObjectsToRemoveNextFrame;
 
         /// <summary>
         /// Holds on to an instance of the ContentManager so that we can load new objects
@@ -124,7 +152,13 @@ namespace MBHEngine.GameObject
         /// The one and only Effect this game uses. Right now this is all very hard coded, and there
         /// should be some way to control it from Game side.
         /// </summary>
-        Effect mDefaultEffect;
+        private Effect mDefaultEffect;
+
+        /// <summary>
+        /// Tracks which phase of Update we are in so that we can detect errors like trying to remove
+        /// objects while in the Remove phase.
+        /// </summary>
+        private UpdatePhase mCurrentUpdateState;
 
         /// <summary>
         /// We make the constructor private so that no one accidentally creates
@@ -143,6 +177,8 @@ namespace MBHEngine.GameObject
             // Note: mStaticGameObject is allocated in OnMapInfoChange.
             mGameObjectsToAdd               = new List<GameObject>();
             mGameObjectsToRemove            = new List<GameObject>();
+            mGameObjectsToAddNextFrame      = new List<GameObject>();
+            mGameObjectsToRemoveNextFrame   = new List<GameObject>();
         }
 
         /// <summary>
@@ -175,6 +211,8 @@ namespace MBHEngine.GameObject
 
             // Just an arbitrary choice.
             mCellSize = 100;
+
+            mCurrentUpdateState = UpdatePhase.None;
         }
 
         /// <summary>
@@ -268,6 +306,7 @@ namespace MBHEngine.GameObject
                 DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mCellSize, 0), new Vector2(x * mCellSize, size), Color.Black);
             }
 #endif
+            mCurrentUpdateState = UpdatePhase.Update;
 
             // Keep track of how many objects were updated this frame.
             int count = 0;
@@ -307,6 +346,8 @@ namespace MBHEngine.GameObject
 #if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Updated " + count + " GameObjects");
 #endif
+
+            mCurrentUpdateState = UpdatePhase.Remove;
 
             // Now loop through our list of objects which need to be removed and
             // remove them.
@@ -354,6 +395,8 @@ namespace MBHEngine.GameObject
                     }
                 }
             }
+
+            mCurrentUpdateState = UpdatePhase.Add;
 
             // Loop through all the game objects that exist.  We want to insert the new game objects
             // in the order that they were added, based on render priority.  If the new object shares
@@ -437,6 +480,8 @@ namespace MBHEngine.GameObject
                 }
             }
 
+            mCurrentUpdateState = UpdatePhase.OnRemove;
+
             if (mGameObjectsToRemove.Count != 0)
             {
                 // At this point all objects for the frame have been removed from
@@ -451,6 +496,8 @@ namespace MBHEngine.GameObject
                 mGameObjectsToRemove.Clear();
             }
 
+            mCurrentUpdateState = UpdatePhase.OnAdd;
+
             if (mGameObjectsToAdd.Count != 0)
             {
                 // At this point all objects for the frame have been added to
@@ -463,6 +510,22 @@ namespace MBHEngine.GameObject
                 }
 
                 mGameObjectsToAdd.Clear();
+            }
+			
+            mCurrentUpdateState = UpdatePhase.None;
+
+            if (mGameObjectsToRemoveNextFrame.Count > 0)
+            {
+                mGameObjectsToRemove.AddRange(mGameObjectsToRemoveNextFrame);
+
+                mGameObjectsToRemoveNextFrame.Clear();
+            }
+
+            if (mGameObjectsToAddNextFrame.Count > 0)
+            {
+                mGameObjectsToAdd.AddRange(mGameObjectsToAddNextFrame);
+
+                mGameObjectsToAddNextFrame.Clear();
             }
         }
 
@@ -587,11 +650,19 @@ namespace MBHEngine.GameObject
             // See the Update method in this class for more details why.
             //
 
-            for (int i = 0; i < mGameObjectsToAdd.Count; i++)
+            List<GameObject> objList = mGameObjectsToAdd;
+
+            // If we are in the middle of adding objects, this one needs to wait for next frame.
+            if (mCurrentUpdateState == UpdatePhase.OnAdd)
             {
-                if (go.pRenderPriority < mGameObjectsToAdd[i].pRenderPriority)
+                objList = mGameObjectsToAddNextFrame;
+            }
+
+            for (int i = 0; i < objList.Count; i++)
+            {
+                if (go.pRenderPriority < objList[i].pRenderPriority)
                 {
-                    mGameObjectsToAdd.Insert(i, go);
+                    objList.Insert(i, go);
 
                     return;
                 }
@@ -600,7 +671,7 @@ namespace MBHEngine.GameObject
             // If we make it to this point than the object has a higher priority than any
             // of the existing elements (or the same as the highest).
             // This will also take care of the case where the list is empty.
-            mGameObjectsToAdd.Add(go);
+            objList.Add(go);
         }
 
         /// <summary>
@@ -614,10 +685,17 @@ namespace MBHEngine.GameObject
             {
                 // Make sure this object isn't removed more than once (can cause
                 // significant issues with GameObjectFactory.
-                if (!mGameObjectsToRemove.Contains(go))
+                if (!mGameObjectsToRemove.Contains(go) && !mGameObjectsToRemoveNextFrame.Contains(go))
                 {
-                    //go.Shutdown();
-                    mGameObjectsToRemove.Add(go);
+                    List<GameObject> objList = mGameObjectsToRemove;
+
+                    // If we are in the middle of removing objects, this one needs to wait for next frame.
+                    if (mCurrentUpdateState == UpdatePhase.OnRemove)
+                    {
+                        objList = mGameObjectsToRemoveNextFrame;
+                    }
+
+                    objList.Add(go);
                 }
             }
         }

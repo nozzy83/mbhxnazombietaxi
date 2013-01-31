@@ -83,6 +83,12 @@ namespace MBHEngine.Behaviour
         private FSMState mNextState;
 
         /// <summary>
+        /// Save the initial state so that in the event of a Reset() we can go back to the original state.
+        /// Perhaps one day this will be set by client.
+        /// </summary>
+        private FSMState mInitialState;
+
+        /// <summary>
         /// The current FlowStates of the the mCurrentState.
         /// </summary>
         private FlowStates mCurrentFlowState;
@@ -107,6 +113,14 @@ namespace MBHEngine.Behaviour
             base.LoadContent(fileName);
 
             mStates = new Dictionary<String, FSMState>();
+        }
+
+        /// <summary>
+        /// Called at the end of the frame where this object is remove from the GameObjectManager.
+        /// </summary>
+        public override void OnRemove()
+        {
+            mCurrentState.OnEnd();
         }
 
         /// <summary>
@@ -186,6 +200,15 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Called by GameObjectFactory when object is recycled.
+        /// </summary>
+        public override void Reset()
+        {
+            mCurrentState = mNextState = mInitialState;
+            mCurrentFlowState = FlowStates.INITIAL_STATE;
+        }
+
+        /// <summary>
         /// Interface for adding new FSMState to this FiniteStateMachine.
         /// </summary>
         /// <param name="state">Implementation of the FSMState.</param>
@@ -211,7 +234,7 @@ namespace MBHEngine.Behaviour
             // If this is the first state to be added, use it as the initial FSMState to be run.
             if (mCurrentState == null)
             {
-                mCurrentState = mNextState = state;
+                mInitialState = mCurrentState = mNextState = state;
                 mCurrentFlowState = FlowStates.INITIAL_STATE;
             }
         }

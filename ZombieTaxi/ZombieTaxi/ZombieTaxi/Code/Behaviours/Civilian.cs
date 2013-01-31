@@ -125,6 +125,8 @@ namespace ZombieTaxi.Behaviours
         public override void OnRemove()
         {
             mParentGOH.OnMessage(mClearDestinationMsg);
+
+            base.OnRemove();
         }
 
         /// <summary>

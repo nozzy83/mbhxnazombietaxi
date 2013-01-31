@@ -25,6 +25,7 @@ namespace ZombieTaxi.States.Civilian
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
         private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
+        private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
 
         /// <summary>
         /// Constructor.
@@ -34,6 +35,7 @@ namespace ZombieTaxi.States.Civilian
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
             mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
+            mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
         }
 
         /// <summary>
@@ -85,6 +87,31 @@ namespace ZombieTaxi.States.Civilian
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.X, true))
                 {
                     return "ResearchStatBoost";
+                }
+                else if (InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
+                {
+                    // Spawn some smoke to be more ninja like.
+                    GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Effects\\Dust\\Dust");
+
+                    // Grab that attachment point and position the new object there.
+                    mGetAttachmentPointMsg.mName_In = "Smoke";
+                    pParentGOH.OnMessage(mGetAttachmentPointMsg);
+
+                    // Put the smoke at the right position relative to the Civilian.
+                    go.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
+
+                    // The Smoke gets pushed onto the GameObjectManager and will delete itself when
+                    // it finishes the animation.
+                    GameObjectManager.pInstance.Add(go);
+
+                    // Spawn the Scout to replace this Civilian.
+                    go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Characters\\Scout\\Scout");
+                    go.pPosition = pParentGOH.pPosition;
+                    GameObjectManager.pInstance.Add(go);
+
+                    GameObjectManager.pInstance.Remove(pParentGOH);
+
+                    return null;
                 }
             }
             else
