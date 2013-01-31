@@ -40,6 +40,24 @@ namespace ZombieTaxi.Behaviours.HUD
                 mObjectToMark_In = null;
             }
         }
+        /// <summary>
+        /// Remove an object from the minimap.
+        /// </summary>
+        public class RemoveObjectToMarkMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The GameObject to no longer mark.
+            /// </summary>
+            public GameObject mObjectToRemove_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mObjectToRemove_In = null;
+            }
+        }
 
         /// <summary>
         /// Contains all the information for a single Marker on the MiniMap.
@@ -262,6 +280,23 @@ namespace ZombieTaxi.Behaviours.HUD
                 AddObjectToMarkMessage tmp = (AddObjectToMarkMessage)msg;
 
                 MarkObjects(tmp.mMarkerProfile_In, tmp.mObjectToMark_In);
+            }
+            else if (msg is RemoveObjectToMarkMessage)
+            {
+                RemoveObjectToMarkMessage temp = (RemoveObjectToMarkMessage)msg;
+
+                // Find the object to remove.
+                for (Int32 i = 0; i < mMarkers.Count; i++)
+                {
+                    GameObject obj = mMarkers[i].pObjectToMark;
+
+                    if (obj == temp.mObjectToRemove_In)
+                    {
+                        mMarkers.RemoveAt(i);
+
+                        break;
+                    }
+                }
             }
         }
 

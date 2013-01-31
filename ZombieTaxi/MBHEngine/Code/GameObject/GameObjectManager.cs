@@ -828,6 +828,16 @@ namespace MBHEngine.GameObject
         /// Sends a message to all GameObject currently managed by the GameObjectManager.
         /// </summary>
         /// <param name="msg">The message to send.</param>
+        public void BroadcastMessage(BehaviourMessage msg)
+        {
+            BroadcastMessage(msg, null);
+        }
+
+        /// <summary>
+        /// Sends a message to all GameObject currently managed by the GameObjectManager.
+        /// </summary>
+        /// <param name="msg">The message to send.</param>
+        /// <param name="sender">The object sending the message.</param>
         public void BroadcastMessage(BehaviourMessage msg, GameObject sender)
         {
             for (Int32 i = 0; i < mGameObjects.Count; i++)

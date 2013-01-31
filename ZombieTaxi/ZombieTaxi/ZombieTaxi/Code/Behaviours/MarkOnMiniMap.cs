@@ -22,6 +22,12 @@ namespace ZombieTaxi.Behaviours
         private MarkOnMiniMapDefinition mDef;
 
         /// <summary>
+        /// Preallocate messages.
+        /// </summary>
+        private MiniMap.RemoveObjectToMarkMessage mRemoveObjectToMarkMsg;
+        private MiniMap.AddObjectToMarkMessage mAddMarkerMsg;
+
+        /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
         /// </summary>
@@ -30,6 +36,8 @@ namespace ZombieTaxi.Behaviours
         public MarkOnMiniMap(GameObject parentGOH, String fileName)
             : base(parentGOH, fileName)
         {
+            mRemoveObjectToMarkMsg = new MiniMap.RemoveObjectToMarkMessage();
+            mAddMarkerMsg = new MiniMap.AddObjectToMarkMessage();
         }
 
         /// <summary>
@@ -52,10 +60,18 @@ namespace ZombieTaxi.Behaviours
             // frame and BroadcastMessage won't work right away.
             //
 
-            MiniMap.AddObjectToMarkMessage addMarkerMsg = new MiniMap.AddObjectToMarkMessage();
-            addMarkerMsg.mMarkerProfile_In = mDef.mMarkerProfile;
-            addMarkerMsg.mObjectToMark_In = mParentGOH;
-            GameObjectManager.pInstance.BroadcastMessage(addMarkerMsg, null);
+            mAddMarkerMsg.mMarkerProfile_In = mDef.mMarkerProfile;
+            mAddMarkerMsg.mObjectToMark_In = mParentGOH;
+            GameObjectManager.pInstance.BroadcastMessage(mAddMarkerMsg);
+        }
+
+        /// <summary>
+        /// Called at the end of the frame where mParentGOH was removed from the GameObjectManager.
+        /// </summary>
+        public override void OnRemove()
+        {
+            mRemoveObjectToMarkMsg.mObjectToRemove_In = mParentGOH;
+            GameObjectManager.pInstance.BroadcastMessage(mRemoveObjectToMarkMsg);
         }
     }
 }

@@ -136,6 +136,7 @@
     <None Include="Code\Behaviours\Example.cs" />
     <Compile Include="Code\Behaviours\Explosive.cs" />
     <Compile Include="Code\Behaviours\ExtractionPoint.cs" />
+    <Compile Include="Code\Behaviours\FSMScout.cs" />
     <Compile Include="Code\Behaviours\HUD\MiniMap.cs" />
     <Compile Include="Code\Behaviours\HUD\PlayerInventory.cs" />
     <Compile Include="Code\Behaviours\HUD\PlayerScore.cs" />
@@ -162,6 +163,9 @@
     <Compile Include="Code\States\Civilian\FSMStateWaitAtStandingPosition.cs" />
     <Compile Include="Code\States\Civilian\FSMStateWaitInSafeHouse.cs" />
     <Compile Include="Code\States\Civilian\FSMStateWanderInSafeHouse.cs" />
+    <Compile Include="Code\States\Scout\FSMStateWaitAtTarget.cs" />
+    <Compile Include="Code\States\Scout\FSMStateBeginSearch.cs" />
+    <Compile Include="Code\States\Scout\FSMStateWaitAtStandingPosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />

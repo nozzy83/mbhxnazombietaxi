@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\Characters\Scout</mSpriteFileName>
+    <mFrameHeight>16</mFrameHeight>
+    <mHasShadow>true</mHasShadow>
+    <mAttachmentPoints>
+      <Item>
+        <mName>ProgressBar</mName>
+        <mOffset>-4 0</mOffset> <!-- Only offset the X because the Y needs to be the same for sorting. -->
+        <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
+      </Item>
+      <Item>
+        <mName>Smoke</mName>
+        <mOffset>0 -4</mOffset>
+        <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
+      </Item>
+    </mAttachmentPoints>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>60</mTicksPerFrame>
+        <mName>Idle</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>1</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>RaiseArm</mName>
+        <mStartingFrame>1</mStartingFrame>
+        <mNumFrames>3</mNumFrames>
+        <mLooping>false</mLooping>
+        <!--<mRemoveGameObjectOnComplete>true</mRemoveGameObjectOnComplete>-->
+        <mFrameOverrides>
+          <Item>
+            <Key>2</Key>
+            <Value>
+              <mTicksPerFrame>60</mTicksPerFrame>
+            </Value>
+          </Item>
+        </mFrameOverrides>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+
