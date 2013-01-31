@@ -10,6 +10,18 @@ namespace MBHEngineContentDefs
     public class SpriteRenderDefinition : BehaviourDefinition
     {
         /// <summary>
+        /// Data that can be overwritten on a frame by frame basis (rather than the data for
+        /// the animation as a set).
+        /// </summary>
+        public struct FrameOverrides
+        {
+            /// <summary>
+            /// How many update passes to hold on a single frame of animation.
+            /// </summary>
+            public Int32 mTicksPerFrame;
+        }
+
+        /// <summary>
         /// Defines a single set of animation.  A sprite sheet will usually contain a number of animation
         /// sets.
         /// </summary>
@@ -46,6 +58,14 @@ namespace MBHEngineContentDefs
             /// </summary>
             [ContentSerializer(Optional = true)]
             public Boolean mRemoveGameObjectOnComplete;
+
+            /// <summary>
+            /// Allows induvidual frames to have settings different from the rest of the animation.
+            /// This is just to simplify things, so the client doesn't need to specify data for
+            /// every frame since it will be the same 99% of the time.
+            /// </summary>
+            [ContentSerializer(Optional = true)]
+            public Dictionary<Int32, FrameOverrides> mFrameOverrides;
         };
 
         /// <summary>

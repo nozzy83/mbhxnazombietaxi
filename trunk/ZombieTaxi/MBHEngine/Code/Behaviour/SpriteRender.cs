@@ -235,6 +235,21 @@ namespace MBHEngine.Behaviour
             /// Has a non-looping animation completed?
             /// </summary>
             public Boolean mAnimationComplete;
+
+            /// <summary>
+            /// Allows induvidual frames to have settings different from the rest of the animation.
+            /// This is just to simplify things, so the client doesn't need to specify data for
+            /// every frame since it will be the same 99% of the time.
+            /// </summary>
+            public Dictionary<Int32, SpriteRenderDefinition.FrameOverrides> mFrameOverrides;
+
+            /// <summary>
+            /// Reset the message to it's initial state.
+            /// </summary>
+            public void Reset()
+            {
+                mAnimationComplete = false;
+            }
         };
 
         /// <summary>
@@ -268,9 +283,10 @@ namespace MBHEngine.Behaviour
         private Int32 mFrameCounter;
 
         /// <summary>
-        /// The current frame of animation being displayed.
+        /// The current frame of animation being displayed. This is relative to the current 
+        /// Animation Set (mActiveAnimation).
         /// </summary>
-        private Int32 mCurrentFrame;
+        private Int32 mCurrentAnimationFrame;
 
         /// <summary>
         /// A list of all the animations this sprite contains.
@@ -366,6 +382,7 @@ namespace MBHEngine.Behaviour
                 for (int i = 0; i < def.mAnimationSets.Count; i++)
                 {
                     AnimationSet temp = new AnimationSet();
+                    temp.Reset();
                     temp.mNumFrames = def.mAnimationSets[i].mNumFrames;
                     temp.mTicksPerFrame = def.mAnimationSets[i].mTicksPerFrame;
                     temp.mName = def.mAnimationSets[i].mName;
@@ -373,6 +390,7 @@ namespace MBHEngine.Behaviour
                     temp.mLooping = def.mAnimationSets[i].mLooping;
                     temp.mRemoveGameObjectOnComplete = def.mAnimationSets[i].mRemoveGameObjectOnComplete;
                     temp.mAnimationComplete = false;
+                    temp.mFrameOverrides = def.mAnimationSets[i].mFrameOverrides;
                     mAnimations.Add(temp);
                 }
             }
@@ -381,13 +399,7 @@ namespace MBHEngine.Behaviour
                 mIsAnimated     = false;
             }
 
-            mSpriteEffects = SpriteEffects.None;
-
-            mFrameCounter = 0;
-            mCurrentFrame = 0;
-            mActiveAnimation = 0;
-            mColor = Color.White;
-            mTint = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+            Reset();
 
             mOnAnimationCompleteMsg = new OnAnimationCompleteMessage();
         }
@@ -402,18 +414,30 @@ namespace MBHEngine.Behaviour
             {
                 mFrameCounter += 1;
 
-                if (mFrameCounter > mAnimations[mActiveAnimation].mTicksPerFrame)
-                {
-                    mCurrentFrame += 1;
+                // By default use the animation set frame data, but there is a chance this was overwritten
+                // on a per frame basis.
+                Int32 framesToCheck = mAnimations[mActiveAnimation].mTicksPerFrame;
 
-                    if (mCurrentFrame >= mAnimations[mActiveAnimation].mNumFrames)
+                // Is this frame special? Did it supply some specific timing?
+                if (mAnimations[mActiveAnimation].mFrameOverrides != null &&
+                    mAnimations[mActiveAnimation].mFrameOverrides.ContainsKey(mCurrentAnimationFrame))
+                {
+                    framesToCheck = mAnimations[mActiveAnimation].mFrameOverrides[mCurrentAnimationFrame].mTicksPerFrame;
+                }
+
+                // Is it time to advance to the next frame of animation.
+                if (mFrameCounter > framesToCheck)
+                {
+                    mCurrentAnimationFrame += 1;
+
+                    if (mCurrentAnimationFrame >= mAnimations[mActiveAnimation].mNumFrames)
                     {
                         // Handle the case where the animation does not loop.
                         if (!mAnimations[mActiveAnimation].mLooping)
                         {
                             // The current frame was already incremented above, so we need to reverse that so that
                             // we don't render the frame after this animation.
-                            mCurrentFrame -= 1;
+                            mCurrentAnimationFrame -= 1;
 
                             // Avoid the animation getting updates now since there is not point; it will just sit on the 
                             // last frame until it is reset or a new animation is played.
@@ -426,7 +450,7 @@ namespace MBHEngine.Behaviour
                         else
                         {
                             // In the case of a looping animation we simple go back to the first frame.
-                            mCurrentFrame = 0;
+                            mCurrentAnimationFrame = 0;
                         }
 
                         if (mAnimations[mActiveAnimation].mRemoveGameObjectOnComplete)
@@ -450,7 +474,7 @@ namespace MBHEngine.Behaviour
 
             if (mIsAnimated)
             {
-                Int32 baseIndex = (mAnimations[mActiveAnimation].mStartingFrame + mCurrentFrame) * mFrameHeight;
+                Int32 baseIndex = (mAnimations[mActiveAnimation].mStartingFrame + mCurrentAnimationFrame) * mFrameHeight;
                 Rectangle rect = new Rectangle(0, baseIndex, mTexture.Width, mFrameHeight);
                 batch.Draw(mTexture,
                            mParentGOH.pPosition,
@@ -586,7 +610,7 @@ namespace MBHEngine.Behaviour
                         if (mAnimations[i].mName == temp.mAnimationSetName_In)
                         {
                             mActiveAnimation = i;
-                            mCurrentFrame = 0;
+                            mCurrentAnimationFrame = 0;
                             mAnimations[mActiveAnimation].mAnimationComplete = false;
 #if DEBUG
                             animationFound = true;
@@ -604,7 +628,7 @@ namespace MBHEngine.Behaviour
                 // the animation.
                 else if (mAnimations[mActiveAnimation].mAnimationComplete)
                 {
-                    mCurrentFrame = 0;
+                    mCurrentAnimationFrame = 0;
                     mAnimations[mActiveAnimation].mAnimationComplete = false;
 
                 }
@@ -661,6 +685,26 @@ namespace MBHEngine.Behaviour
                 }
 
                 pos += mParentGOH.pPosition;
+            }
+        }
+
+        /// <summary>
+        /// Reset the Behaviour to a default state so that it can be reused.
+        /// </summary>
+        public override void Reset()
+        {
+            mSpriteEffects = SpriteEffects.None;
+
+            mFrameCounter = 0;
+            mCurrentAnimationFrame = 0;
+            mActiveAnimation = 0;
+            mColor = Color.White;
+            mTint = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+
+            // If this Sprite is animated, reset the animation data, like frame counters.
+            for (int i = 0; null != mAnimations && i < mAnimations.Count; i++)
+            {
+                mAnimations[i].Reset();
             }
         }
 
