@@ -130,8 +130,6 @@ namespace ZombieTaxi.StatBoost.Behaviours
         public override void OnAdd()
         {
             mResearchTimer = StopWatchManager.pInstance.GetNewStopWatch();
-
-            mResearchTimer.pLifeTime = mFramesToComplete;
         }
 
         /// <summary>
@@ -158,6 +156,8 @@ namespace ZombieTaxi.StatBoost.Behaviours
                 mProgressBar.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
                 GameObjectManager.pInstance.Add(mProgressBar);
             }
+
+            mResearchTimer.pLifeTime = mDef.mLevels[mNextLevel].mFramesToComplete;
         }
 
         /// <summary>
