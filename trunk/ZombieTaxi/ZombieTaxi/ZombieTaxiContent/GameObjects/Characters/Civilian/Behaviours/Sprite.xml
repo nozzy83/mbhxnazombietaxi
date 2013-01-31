@@ -10,6 +10,11 @@
         <mOffset>-4 0</mOffset> <!-- Only offset the X because the Y needs to be the same for sorting. -->
         <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
       </Item>
+      <Item>
+        <mName>Smoke</mName>
+        <mOffset>0 -4</mOffset>
+        <mMoveWithSpriteFacing>false</mMoveWithSpriteFacing>
+      </Item>
     </mAttachmentPoints>
     <mAnimationSets>
       <Item>

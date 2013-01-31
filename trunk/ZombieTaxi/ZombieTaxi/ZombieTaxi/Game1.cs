@@ -109,6 +109,7 @@ namespace ZombieTaxi
             // Add any objects desired to the Game Object Factory.  These will be allocated now and can
             // be retrived later without any heap allocations.
             //
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Characters\\Scout\\Scout", 32);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\BulletSpark\\BulletSpark", 32);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\Dust\\Dust", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Effects\\Explosion\\Explosion", 10);
