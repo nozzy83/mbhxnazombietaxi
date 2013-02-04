@@ -99,6 +99,7 @@
     <Compile Include="Behaviour\MarkOnMiniMapDefinition.cs" />
     <Compile Include="Behaviour\StatBoost\HealthStatBoostResearchDefinition.cs" />
     <Compile Include="Behaviour\StatBoost\StatBoostResearchDefinition.cs" />
+    <Compile Include="Behaviour\StrandedPopupDefinition.cs" />
     <Compile Include="Behaviour\TilePlacementDefinition.cs" />
     <Compile Include="Behaviour\DamageFlashDefinition.cs" />
     <Compile Include="Behaviour\DamageOnContactDefinition.cs" />

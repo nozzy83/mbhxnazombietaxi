@@ -5,6 +5,7 @@ using MBHEngine.Input;
 using ZombieTaxi.Behaviours;
 using MBHEngine.GameObject;
 using ZombieTaxi.StatBoost.Behaviours;
+using MBHEngineContentDefs;
 
 namespace ZombieTaxi.States.Civilian
 {
@@ -20,12 +21,19 @@ namespace ZombieTaxi.States.Civilian
         private GameObject mButtonHint;
 
         /// <summary>
+        /// We need to hang onto the StrandedPopup so that we can detect messages broadcast from it.
+        /// </summary>
+        private GameObject mPopup;
+
+        /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
         private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
         private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
+        private StrandedPopup.OnPopupClosedMessage mOnPopupCloseMsg;
+        private FiniteStateMachine.SetStateMessage mSetStateMsg;
 
         /// <summary>
         /// Constructor.
@@ -36,6 +44,8 @@ namespace ZombieTaxi.States.Civilian
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
             mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
+            mOnPopupCloseMsg = new StrandedPopup.OnPopupClosedMessage();
+            mSetStateMsg = new FiniteStateMachine.SetStateMessage();
         }
 
         /// <summary>
@@ -58,6 +68,7 @@ namespace ZombieTaxi.States.Civilian
             }
 
             mButtonHint = null;
+            mPopup = null;
         }
 
         /// <summary>
@@ -66,6 +77,7 @@ namespace ZombieTaxi.States.Civilian
         /// <returns>Identifier of a state to transition to.</returns>
         public override string OnUpdate()
         {
+            // How many levels of leveling up are remaining? All we really care about is if there are any.
             pParentGOH.OnMessage(mGetLevelsRemainingMsg);
 
             if (mGetLevelsRemainingMsg.mLevelsRemaining > 0 && pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
@@ -84,41 +96,24 @@ namespace ZombieTaxi.States.Civilian
 
                 mButtonHint.pDoRender = true;
 
+                // If the player stands on this Stranded, and presses the prompt button, bring up a popup
+                // asking them what kind of task they wish to assign to this character.
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.X, true))
                 {
-                    return "ResearchStatBoost";
-                }
-                else if (InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
-                {
-                    // Spawn some smoke to be more ninja like.
-                    GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Effects\\Dust\\Dust");
+                    mPopup = new GameObject("GameObjects\\Interface\\StrandedPopup\\StrandedPopup");
+                    GameObjectManager.pInstance.Add(mPopup);
 
-                    // Grab that attachment point and position the new object there.
-                    mGetAttachmentPointMsg.mName_In = "Smoke";
-                    pParentGOH.OnMessage(mGetAttachmentPointMsg);
-
-                    // Put the smoke at the right position relative to the Civilian.
-                    go.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
-
-                    // The Smoke gets pushed onto the GameObjectManager and will delete itself when
-                    // it finishes the animation.
-                    GameObjectManager.pInstance.Add(go);
-
-                    // Spawn the Scout to replace this Civilian.
-                    go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Characters\\Scout\\Scout");
-                    go.pPosition = pParentGOH.pPosition;
-                    GameObjectManager.pInstance.Add(go);
-
-                    GameObjectManager.pInstance.Remove(pParentGOH);
-
-                    return null;
+                    // Switch to a new update pass so that the game essentially pauses.
+                    GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.POPUP;
                 }
             }
             else
             {
+                // Get rid of the Button Hint.
                 if (null != mButtonHint)
                 {
-                    mButtonHint.pDoRender = false;
+                    GameObjectManager.pInstance.Remove(mButtonHint);
+                    mButtonHint = null;
                 }
             }
 
@@ -134,14 +129,68 @@ namespace ZombieTaxi.States.Civilian
             if (null != mGetTileAtObjectMsg.mTile_Out)
             {
                 // This would have been set in OnBegin. It will be set again if we are transitioning
-                // to 
+                // to another state where the tile should be occupied.
                 mGetTileAtObjectMsg.mTile_Out.ClearAttribute(Level.Tile.Attribute.Occupied);
             }
 
+            // If the button was active when the state ended it needs to be cleaned up.
             if (null != mButtonHint)
             {
                 GameObjectManager.pInstance.Remove(mButtonHint);
                 mButtonHint = null;
+            }
+
+            mPopup = null;
+        }
+
+        /// <summary>
+        /// The main interface for communicating between behaviours.  Using polymorphism, we
+        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
+        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// from it (set message) or store some data in it (get message).
+        /// </summary>
+        /// <param name="msg">The message being communicated to the behaviour.</param>
+        public override void OnMessage(ref BehaviourMessage msg)
+        {
+            base.OnMessage(ref msg);
+
+            if (msg is StrandedPopup.OnPopupClosedMessage)
+            {
+                // This message is broadcast to all GameObjects, so make sure it is actually a popup we
+                // opened before reacting to it.
+                if (msg.pSender == mPopup)
+                {
+                    StrandedPopup.OnPopupClosedMessage temp = (StrandedPopup.OnPopupClosedMessage)msg;
+
+                    if (temp.mSelection_In == StrandedPopup.OnPopupClosedMessage.Selection.HpUp)
+                    {
+                        mSetStateMsg.mNextState_In = "ResearchStatBoost";
+                        pParentGOH.OnMessage(mSetStateMsg);
+                    }
+                    else if (temp.mSelection_In == StrandedPopup.OnPopupClosedMessage.Selection.MakeScout)
+                    {
+                        // Spawn some smoke to be more ninja like.
+                        GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Effects\\Dust\\Dust");
+
+                        // Grab that attachment point and position the new object there.
+                        mGetAttachmentPointMsg.mName_In = "Smoke";
+                        pParentGOH.OnMessage(mGetAttachmentPointMsg);
+
+                        // Put the smoke at the right position relative to the Civilian.
+                        go.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
+
+                        // The Smoke gets pushed onto the GameObjectManager and will delete itself when
+                        // it finishes the animation.
+                        GameObjectManager.pInstance.Add(go);
+
+                        // Spawn the Scout to replace this Civilian.
+                        go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Characters\\Scout\\Scout");
+                        go.pPosition = pParentGOH.pPosition;
+                        GameObjectManager.pInstance.Add(go);
+
+                        GameObjectManager.pInstance.Remove(pParentGOH);
+                    }
+                }
             }
         }
     }

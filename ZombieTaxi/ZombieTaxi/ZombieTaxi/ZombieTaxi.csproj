@@ -151,6 +151,7 @@
     <Compile Include="Code\Behaviours\RandomEnemyGenerator.cs" />
     <Compile Include="Code\Behaviours\StatBoost\HealthStatBoostResearch.cs" />
     <Compile Include="Code\Behaviours\StatBoost\StatBoostResearch.cs" />
+    <Compile Include="Code\Behaviours\StrandedPopup.cs" />
     <Compile Include="Code\Behaviours\TilePlacement.cs" />
     <Compile Include="Code\Behaviours\TwinStick.cs" />
     <Compile Include="Code\States\Civilian\FSMStateResearchStatBoost.cs" />
