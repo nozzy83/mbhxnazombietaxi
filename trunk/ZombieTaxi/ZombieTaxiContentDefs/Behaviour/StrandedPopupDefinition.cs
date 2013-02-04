@@ -13,9 +13,10 @@ namespace ZombieTaxiContentDefs
         /// </summary>
         public enum ButtonTypes
         {
-            None = 0,   // No Button was selected.
-            HpUp,       // Health Level Up.
-            MakeScout,  // Morph into Scout.
+            None = 0,       // No Button was selected.
+            HpUp,           // Health Level Up.
+            MakeScout,      // Morph into Scout.
+            ScoutSearch,    // Send the Scout out to search for other Stranded.
         }
 
         /// <summary>
