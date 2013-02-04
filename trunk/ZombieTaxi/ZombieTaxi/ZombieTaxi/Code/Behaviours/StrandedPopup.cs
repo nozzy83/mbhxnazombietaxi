@@ -59,7 +59,6 @@ namespace ZombieTaxi.Behaviours
             /// Prealloced messages to avoid GC.
             /// </summary>
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
-            private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
 
             /// <summary>
             /// Constructor.
@@ -82,7 +81,6 @@ namespace ZombieTaxi.Behaviours
                 mHintText = def.mHintText;
 
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
-                mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
             }
 
             /// <summary>
