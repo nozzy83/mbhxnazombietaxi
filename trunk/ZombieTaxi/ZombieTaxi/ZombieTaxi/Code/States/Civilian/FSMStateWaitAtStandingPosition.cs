@@ -31,7 +31,6 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
-        private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
         private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
         private StrandedPopup.OnPopupClosedMessage mOnPopupCloseMsg;
         private FiniteStateMachine.SetStateMessage mSetStateMsg;
@@ -43,7 +42,6 @@ namespace ZombieTaxi.States.Civilian
         {
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
-            mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
             mOnPopupCloseMsg = new StrandedPopup.OnPopupClosedMessage();
             mSetStateMsg = new FiniteStateMachine.SetStateMessage();
@@ -78,10 +76,7 @@ namespace ZombieTaxi.States.Civilian
         /// <returns>Identifier of a state to transition to.</returns>
         public override string OnUpdate()
         {
-            // How many levels of leveling up are remaining? All we really care about is if there are any.
-            pParentGOH.OnMessage(mGetLevelsRemainingMsg);
-
-            if (mGetLevelsRemainingMsg.mLevelsRemaining > 0 && pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
+            if (pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
             {
                 if (null == mButtonHint)
                 {
@@ -191,6 +186,10 @@ namespace ZombieTaxi.States.Civilian
 
                         GameObjectManager.pInstance.Remove(pParentGOH);
                     }
+
+                    // Popups get recycled so if ours closes, we need to make sure to clear our local 
+                    // reference, else the next object to use it might send messages that we react to.
+                    mPopup = null;
                 }
             }
         }
