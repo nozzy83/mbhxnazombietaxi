@@ -35,6 +35,11 @@ namespace ZombieTaxi.Behaviours
             private GameObject mBG;
 
             /// <summary>
+            /// Image of the strike-through used to indicate that an icon is disabled.
+            /// </summary>
+            private GameObject mCrossOut;
+
+            /// <summary>
             /// The button which will be transitioned to if the user pressed "Left" on the controller.
             /// </summary>
             private Button mLeft;
@@ -50,15 +55,26 @@ namespace ZombieTaxi.Behaviours
             private String mHintText;
 
             /// <summary>
+            /// The text to disable if this Button is disabled.
+            /// </summary>
+            private String mDisabledHintText;
+
+            /// <summary>
             /// The a button is actually pressed, a message is broadcast, and in the message is an enum
             /// indicating what button was pressed. This is where that enum is stored for this Button.
             /// </summary>
             private StrandedPopupDefinition.ButtonTypes mType;
 
             /// <summary>
+            /// Is the button clickable right now.
+            /// </summary>
+            private Boolean mEnabled;
+
+            /// <summary>
             /// Prealloced messages to avoid GC.
             /// </summary>
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
+            private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
 
             /// <summary>
             /// Constructor.
@@ -73,6 +89,12 @@ namespace ZombieTaxi.Behaviours
                 mBG = new GameObject("GameObjects\\Interface\\StrandedPopup\\IconBG\\IconBG");
                 mBG.pPosition = mObject.pPosition;
 
+                mCrossOut = new GameObject("GameObjects\\Interface\\StrandedPopup\\IconX\\IconX");
+                mCrossOut.pPosition = mObject.pPosition;
+                mCrossOut.pPosX += 1;
+                mCrossOut.pPosY += 1;
+                mCrossOut.pDoRender = false;
+
                 // By default a Button has no siblings.
                 mLeft = mRight = null;
 
@@ -80,7 +102,10 @@ namespace ZombieTaxi.Behaviours
 
                 mHintText = def.mHintText;
 
+                mEnabled = true;
+
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
+                mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
             }
 
             /// <summary>
@@ -90,6 +115,12 @@ namespace ZombieTaxi.Behaviours
             {
                 GameObjectManager.pInstance.Add(mObject);
                 GameObjectManager.pInstance.Add(mBG);
+                GameObjectManager.pInstance.Add(mCrossOut);
+
+                UpdateEnabledStatus();
+
+                // Start "off".
+                OnRollOff();
             }
 
             /// <summary>
@@ -99,6 +130,7 @@ namespace ZombieTaxi.Behaviours
             {
                 GameObjectManager.pInstance.Remove(mObject);
                 GameObjectManager.pInstance.Remove(mBG);
+                GameObjectManager.pInstance.Remove(mCrossOut);
             }
 
             /// <summary>
@@ -106,8 +138,15 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             public void OnRollOver()
             {
-                mSetActiveAnimationMsg.mAnimationSetName_In = "RollOver";
-                mObject.OnMessage(mSetActiveAnimationMsg);
+                if (!mEnabled)
+                {
+                    mCrossOut.pDoRender = true;
+                }
+                else
+                {
+                    mSetActiveAnimationMsg.mAnimationSetName_In = "RollOver";
+                    mObject.OnMessage(mSetActiveAnimationMsg);
+                }
             }
 
             /// <summary>
@@ -116,6 +155,8 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             public void OnRollOff()
             {
+                mCrossOut.pDoRender = false;
+
                 mSetActiveAnimationMsg.mAnimationSetName_In = "None";
                 mObject.OnMessage(mSetActiveAnimationMsg);
             }
@@ -129,6 +170,36 @@ namespace ZombieTaxi.Behaviours
             {
                 mLeft = leftButton;
                 leftButton.pRight = this;
+            }
+
+            /// <summary>
+            /// Updates the status of the button on whether or not it is enabled, and in the case
+            /// of being disabled, updates mDisabledHintText. 
+            /// </summary>
+            /// <returns>True if the Button is enabled.</returns>
+            private Boolean UpdateEnabledStatus()
+            {
+                mEnabled = true;
+
+                switch (mType)
+                {
+                    case StrandedPopupDefinition.ButtonTypes.HpUp:
+                    {
+                        // For this upgrade there needs to be some levels left to upgrade to.
+                        GameObjectManager.pInstance.BroadcastMessage(mGetLevelsRemainingMsg);
+
+                        if (mGetLevelsRemainingMsg.mLevelsRemaining <= 0)
+                        {
+                            mDisabledHintText = "MAXED";
+
+                            mEnabled = false;
+                        }
+
+                        break;
+                    }
+                }
+
+                return mEnabled;
             }
 
             /// <summary>
@@ -183,7 +254,14 @@ namespace ZombieTaxi.Behaviours
             {
                 get
                 {
-                    return mHintText;
+                    if (mEnabled)
+                    {
+                        return mHintText;
+                    }
+                    else
+                    {
+                        return mDisabledHintText;
+                    }
                 }
                 set
                 {
@@ -203,6 +281,17 @@ namespace ZombieTaxi.Behaviours
                 set
                 {
                     mType = value;
+                }
+            }
+
+            /// <summary>
+            /// Check if this Button is enabled; can it be clicked.
+            /// </summary>
+            public Boolean pIsEnabled
+            {
+                get
+                {
+                    return mEnabled;
                 }
             }
         }
@@ -381,7 +470,7 @@ namespace ZombieTaxi.Behaviours
                     mCursor.pPosition = mCurrentButton.pGameObject.pPosition;
                 }
             }
-            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
+            else if (mCurrentButton.pIsEnabled && InputManager.pInstance.CheckAction(InputManager.InputActions.A, true))
             {
                 // Start updating all the regular GameObject again.
                 GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.DEFAULT;
@@ -403,7 +492,7 @@ namespace ZombieTaxi.Behaviours
 
                 // Let the Game know that no Button was pressed.
                 mOnPopupCloseMsg.mSelection_In = StrandedPopupDefinition.ButtonTypes.None;
-                GameObjectManager.pInstance.BroadcastMessage(mOnPopupCloseMsg);
+                GameObjectManager.pInstance.BroadcastMessage(mOnPopupCloseMsg, mParentGOH);
             }
         }
 
