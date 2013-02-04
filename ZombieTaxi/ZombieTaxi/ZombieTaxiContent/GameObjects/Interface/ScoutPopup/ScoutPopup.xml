@@ -1,19 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
-    <mRenderPriority>1053</mRenderPriority>
+    <mRenderPriority>1055</mRenderPriority>
     <mDoUpdate>true</mDoUpdate>
     <mDoRender>true</mDoRender>
     <mPosition>80 19</mPosition>
     <mRotation>0</mRotation>
     <mScale>1 1</mScale>
-    <mMotionRoot>4 4</mMotionRoot>
     <mBlendMode>STANDARD_UI</mBlendMode>
     <mBehaviourFileNames>
-      <Item>Sprite</Item>
+      <Item>StrandedPopup</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
-      <Item>MBHEngine.Behaviour.SpriteRender</Item>
+      <Item>ZombieTaxi.Behaviours.StrandedPopup</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

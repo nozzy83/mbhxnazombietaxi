@@ -5,12 +5,14 @@ using MBHEngine.Input;
 using ZombieTaxi.Behaviours;
 using MBHEngine.GameObject;
 using ZombieTaxi.StatBoost.Behaviours;
+using MBHEngineContentDefs;
+using ZombieTaxiContentDefs;
 
 namespace ZombieTaxi.States.Scout
 {
     /// <summary>
-    /// State where the Game Object stands and waits for the Player to stand close enough that
-    /// they will bring up a prompt asking which state to transition to.
+    /// State where the Game Object stands in place waiting for the target to get far enough away
+    /// to trigger a transition back to the follow state.
     /// </summary>
     class FSMStateWaitAtStandingPosition : FSMState
     {
@@ -20,9 +22,16 @@ namespace ZombieTaxi.States.Scout
         private GameObject mButtonHint;
 
         /// <summary>
+        /// We need to hang onto the StrandedPopup so that we can detect messages broadcast from it.
+        /// </summary>
+        private GameObject mPopup;
+
+        /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
+        private StrandedPopup.OnPopupClosedMessage mOnPopupCloseMsg;
+        private FiniteStateMachine.SetStateMessage mSetStateMsg;
 
         /// <summary>
         /// Constructor.
@@ -30,6 +39,8 @@ namespace ZombieTaxi.States.Scout
         public FSMStateWaitAtStandingPosition()
         {
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
+            mOnPopupCloseMsg = new StrandedPopup.OnPopupClosedMessage();
+            mSetStateMsg = new FiniteStateMachine.SetStateMessage();
         }
 
         /// <summary>
@@ -41,6 +52,7 @@ namespace ZombieTaxi.States.Scout
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
             mButtonHint = null;
+            mPopup = null;
         }
 
         /// <summary>
@@ -49,7 +61,6 @@ namespace ZombieTaxi.States.Scout
         /// <returns>Identifier of a state to transition to.</returns>
         public override string OnUpdate()
         {
-            // When the player is standing close to the GameObject, show a button hint and check for input.
             if (pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
             {
                 if (null == mButtonHint)
@@ -66,17 +77,24 @@ namespace ZombieTaxi.States.Scout
 
                 mButtonHint.pDoRender = true;
 
+                // If the player stands on this Stranded, and presses the prompt button, bring up a popup
+                // asking them what kind of task they wish to assign to this character.
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.X, true))
                 {
-                    // Start looking for a Stranded to detect.
-                    return "BeginSearch";
+                    mPopup = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Interface\\ScoutPopup\\ScoutPopup");
+                    GameObjectManager.pInstance.Add(mPopup);
+
+                    // Switch to a new update pass so that the game essentially pauses.
+                    GameObjectManager.pInstance.pCurUpdatePass = BehaviourDefinition.Passes.POPUP;
                 }
             }
             else
             {
+                // Get rid of the Button Hint.
                 if (null != mButtonHint)
                 {
-                    mButtonHint.pDoRender = false;
+                    GameObjectManager.pInstance.Remove(mButtonHint);
+                    mButtonHint = null;
                 }
             }
 
@@ -89,10 +107,45 @@ namespace ZombieTaxi.States.Scout
         /// </summary>
         public override void OnEnd()
         {
+            // If the button was active when the state ended it needs to be cleaned up.
             if (null != mButtonHint)
             {
                 GameObjectManager.pInstance.Remove(mButtonHint);
                 mButtonHint = null;
+            }
+
+            mPopup = null;
+        }
+
+        /// <summary>
+        /// The main interface for communicating between behaviours.  Using polymorphism, we
+        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
+        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// from it (set message) or store some data in it (get message).
+        /// </summary>
+        /// <param name="msg">The message being communicated to the behaviour.</param>
+        public override void OnMessage(ref BehaviourMessage msg)
+        {
+            base.OnMessage(ref msg);
+
+            if (msg is StrandedPopup.OnPopupClosedMessage)
+            {
+                // This message is broadcast to all GameObjects, so make sure it is actually a popup we
+                // opened before reacting to it.
+                if (msg.pSender == mPopup)
+                {
+                    StrandedPopup.OnPopupClosedMessage temp = (StrandedPopup.OnPopupClosedMessage)msg;
+
+                    if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.ScoutSearch)
+                    {
+                        mSetStateMsg.mNextState_In = "BeginSearch";
+                        pParentGOH.OnMessage(mSetStateMsg);
+                    }
+
+                    // Popups get recycled so if ours closes, we need to make sure to clear our local 
+                    // reference, else the next object to use it might send messages that we react to.
+                    mPopup = null;
+                }
             }
         }
     }

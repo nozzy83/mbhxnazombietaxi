@@ -91,8 +91,6 @@ namespace ZombieTaxi.Behaviours
 
                 mCrossOut = new GameObject("GameObjects\\Interface\\StrandedPopup\\IconX\\IconX");
                 mCrossOut.pPosition = mObject.pPosition;
-                mCrossOut.pPosX += 1;
-                mCrossOut.pPosY += 1;
                 mCrossOut.pDoRender = false;
 
                 // By default a Button has no siblings.

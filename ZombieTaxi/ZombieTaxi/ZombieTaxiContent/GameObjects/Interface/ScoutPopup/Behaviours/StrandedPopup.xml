@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.StrandedPopupDefinition">
+    <mUpdatePasses>
+      <Item>POPUP</Item>
+    </mUpdatePasses>
+    <mButtons>
+      <Item>
+        <mIconFileName>GameObjects\Interface\StrandedPopup\IconScoutSearch\IconScoutSearch</mIconFileName>
+        <mHintText>Search</mHintText>
+        <mButtonType>ScoutSearch</mButtonType>
+      </Item>
+    </mButtons>
+  </Asset>
+</XnaContent>
+
