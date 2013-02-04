@@ -105,6 +105,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new HealthStatBoostResearch(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.StrandedPopup":
+                    {
+                        return new StrandedPopup(go, fileName);
+                    }
                 default:
                     {
                         return null;

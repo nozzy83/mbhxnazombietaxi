@@ -16,6 +16,7 @@ namespace MBHEngineContentDefs
         {
             DEFAULT = 0,
             PLACEMENT,
+            POPUP,
         }
 
         /// <summary>

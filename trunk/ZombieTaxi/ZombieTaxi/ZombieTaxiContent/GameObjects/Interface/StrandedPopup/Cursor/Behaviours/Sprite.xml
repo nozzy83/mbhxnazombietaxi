@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mUpdatePasses>
+      <Item>POPUP</Item>
+    </mUpdatePasses>
+    <mSpriteFileName>Sprites\Interface\StrandedPopup\Cursor</mSpriteFileName>
+    <mFrameHeight>10</mFrameHeight>
+    <mHasShadow>false</mHasShadow>
+    <mAnimationSets>
+      <Item>
+        <mTicksPerFrame>1</mTicksPerFrame>
+        <mName>Idle</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>9</mNumFrames>
+        <mLooping>true</mLooping>
+      </Item>
+    </mAnimationSets>
+  </Asset>
+</XnaContent>
+
