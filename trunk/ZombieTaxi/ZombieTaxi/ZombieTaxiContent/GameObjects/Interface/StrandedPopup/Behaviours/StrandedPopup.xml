@@ -4,6 +4,18 @@
     <mUpdatePasses>
       <Item>POPUP</Item>
     </mUpdatePasses>
+    <mButtons>
+      <Item>
+        <mIconFileName>GameObjects\Interface\StrandedPopup\IconLevelUp\IconLevelUp</mIconFileName>
+        <mHintText>HP UP</mHintText>
+        <mButtonType>HpUp</mButtonType>
+      </Item>
+      <Item>
+        <mIconFileName>GameObjects\Interface\StrandedPopup\IconScout\IconScout</mIconFileName>
+        <mHintText>Scout</mHintText>
+        <mButtonType>MakeScout</mButtonType>
+      </Item>
+    </mButtons>
   </Asset>
 </XnaContent>
 
