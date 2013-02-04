@@ -6,6 +6,7 @@ using ZombieTaxi.Behaviours;
 using MBHEngine.GameObject;
 using ZombieTaxi.StatBoost.Behaviours;
 using MBHEngineContentDefs;
+using ZombieTaxiContentDefs;
 
 namespace ZombieTaxi.States.Civilian
 {
@@ -100,7 +101,7 @@ namespace ZombieTaxi.States.Civilian
                 // asking them what kind of task they wish to assign to this character.
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.X, true))
                 {
-                    mPopup = new GameObject("GameObjects\\Interface\\StrandedPopup\\StrandedPopup");
+                    mPopup = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Interface\\StrandedPopup\\StrandedPopup");
                     GameObjectManager.pInstance.Add(mPopup);
 
                     // Switch to a new update pass so that the game essentially pauses.
@@ -162,12 +163,12 @@ namespace ZombieTaxi.States.Civilian
                 {
                     StrandedPopup.OnPopupClosedMessage temp = (StrandedPopup.OnPopupClosedMessage)msg;
 
-                    if (temp.mSelection_In == StrandedPopup.OnPopupClosedMessage.Selection.HpUp)
+                    if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.HpUp)
                     {
                         mSetStateMsg.mNextState_In = "ResearchStatBoost";
                         pParentGOH.OnMessage(mSetStateMsg);
                     }
-                    else if (temp.mSelection_In == StrandedPopup.OnPopupClosedMessage.Selection.MakeScout)
+                    else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.MakeScout)
                     {
                         // Spawn some smoke to be more ninja like.
                         GameObject go = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Effects\\Dust\\Dust");

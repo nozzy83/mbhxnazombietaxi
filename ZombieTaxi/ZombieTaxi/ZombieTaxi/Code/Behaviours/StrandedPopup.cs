@@ -8,6 +8,8 @@ using MBHEngine.Behaviour;
 using MBHEngine.GameObject;
 using MBHEngine.Input;
 using MBHEngineContentDefs;
+using ZombieTaxiContentDefs;
+using ZombieTaxi.StatBoost.Behaviours;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -51,23 +53,22 @@ namespace ZombieTaxi.Behaviours
             /// The a button is actually pressed, a message is broadcast, and in the message is an enum
             /// indicating what button was pressed. This is where that enum is stored for this Button.
             /// </summary>
-            private OnPopupClosedMessage.Selection mOnCloseMsgSelect;
+            private StrandedPopupDefinition.ButtonTypes mType;
 
             /// <summary>
             /// Prealloced messages to avoid GC.
             /// </summary>
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
+            private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
 
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="fileName">The name of the GameObject used for the main icon of the button.</param>
-            /// <param name="hintText">The text to display when this Button is highlighted.</param>
-            /// <param name="onCloseSelection">If this Button is pressed, this enum will be passed with the message.</param>
-            public Button(String fileName, String hintText, OnPopupClosedMessage.Selection onCloseSelection)
+            /// <param name="def">Defines how this Button should be initialized.</param>
+            public Button(StrandedPopupDefinition.ButtonDefinition def)
             {
                 // Create the icon to show on the button.
-                mObject = new GameObject(fileName);
+                mObject = new GameObject(def.mIconFileName);
 
                 // All buttons use the same background image for now.
                 mBG = new GameObject("GameObjects\\Interface\\StrandedPopup\\IconBG\\IconBG");
@@ -76,11 +77,12 @@ namespace ZombieTaxi.Behaviours
                 // By default a Button has no siblings.
                 mLeft = mRight = null;
 
-                mOnCloseMsgSelect = onCloseSelection;
+                mType = def.mButtonType;
 
-                mHintText = hintText;
+                mHintText = def.mHintText;
 
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
+                mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
             }
 
             /// <summary>
@@ -194,15 +196,15 @@ namespace ZombieTaxi.Behaviours
             /// <summary>
             /// Information to attach to message when this button is selected.
             /// </summary>
-            public OnPopupClosedMessage.Selection pOnCloseSelection
+            public StrandedPopupDefinition.ButtonTypes pOnCloseSelection
             {
                 get
                 {
-                    return mOnCloseMsgSelect;
+                    return mType;
                 }
                 set
                 {
-                    mOnCloseMsgSelect = value;
+                    mType = value;
                 }
             }
         }
@@ -213,26 +215,16 @@ namespace ZombieTaxi.Behaviours
         public class OnPopupClosedMessage : BehaviourMessage
         {
             /// <summary>
-            /// Enums for all the possible Button selections.
-            /// </summary>
-            public enum Selection
-            {
-                None = 0,   // No Button was selected.
-                HpUp,       // Health Level Up.
-                MakeScout,  // Morph into Scout.
-            }
-
-            /// <summary>
             /// Indicates which type of Button was pressed.
             /// </summary>
-            public Selection mSelection_In;
+            public StrandedPopupDefinition.ButtonTypes mSelection_In;
 
             /// <summary>
             /// Call to put this message back into default state.
             /// </summary>
             public override void Reset()
             {
-                mSelection_In = Selection.None;
+                mSelection_In = StrandedPopupDefinition.ButtonTypes.None;
             }
         }
 
@@ -286,7 +278,7 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
-            //ExampleDefinition def = GameObjectManager.pInstance.pContentManager.Load<ExampleDefinition>(fileName);
+            StrandedPopupDefinition def = GameObjectManager.pInstance.pContentManager.Load<StrandedPopupDefinition>(fileName);
 
             // All versions of the Stranded popup use the same Window and Cursor.
             mWindow = new GameObject("GameObjects\\Interface\\StrandedPopup\\Window\\Window");
@@ -295,18 +287,27 @@ namespace ZombieTaxi.Behaviours
             // Create the font for displaying the hint text.
             mFont = GameObjectManager.pInstance.pContentManager.Load<SpriteFont>("Fonts\\Retro");
 
-            mButtons = new List<Button>(16);
+            mButtons = new List<Button>(def.mButtons.Count);
 
-            // Create all the Buttons.
-            Button temp = new Button("GameObjects\\Interface\\StrandedPopup\\IconLevelUp\\IconLevelUp", "HP UP", OnPopupClosedMessage.Selection.HpUp);
-            mButtons.Add(temp);
+            mCurrentButton = null;
 
-            // Select the first Button by default.
-            mCurrentButton = temp;
+            for (Int32 i = 0; i < def.mButtons.Count; i++)
+            {
+                // Create all the Buttons.
+                Button temp = new Button(def.mButtons[i]);
+                mButtons.Add(temp);
 
-            temp = new Button("GameObjects\\Interface\\StrandedPopup\\IconScout\\IconScout", "Scout", OnPopupClosedMessage.Selection.MakeScout);
-            temp.LinkLeft(mCurrentButton);
-            mButtons.Add(temp);
+                // Select the first Button by default.
+                if (mCurrentButton == null)
+                {
+                    mCurrentButton = temp;
+                }
+                else
+                {
+                    // If this isn't the first Button than link it to the previous one.
+                    temp.LinkLeft(mButtons[i - 1]);
+                }
+            }
 
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
             mOnPopupCloseMsg = new OnPopupClosedMessage();
@@ -403,7 +404,7 @@ namespace ZombieTaxi.Behaviours
                 GameObjectManager.pInstance.Remove(mParentGOH);
 
                 // Let the Game know that no Button was pressed.
-                mOnPopupCloseMsg.mSelection_In = OnPopupClosedMessage.Selection.None;
+                mOnPopupCloseMsg.mSelection_In = StrandedPopupDefinition.ButtonTypes.None;
                 GameObjectManager.pInstance.BroadcastMessage(mOnPopupCloseMsg);
             }
         }
