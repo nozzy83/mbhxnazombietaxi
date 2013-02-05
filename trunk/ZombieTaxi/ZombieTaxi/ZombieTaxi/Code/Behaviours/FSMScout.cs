@@ -44,6 +44,7 @@ namespace ZombieTaxi.Behaviours
             AddState(new FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
             AddState(new FSMStateBeginSearch(), "BeginSearch");
             AddState(new FSMStateWaitAtTarget(), "WaitAtTarget");
+            AddState(new States.Civilian.FSMStateDead(), "Dead");
         }
 
         /// <summary>
@@ -65,6 +66,11 @@ namespace ZombieTaxi.Behaviours
         public override void OnMessage(ref BehaviourMessage msg)
         {
             base.OnMessage(ref msg);
+
+            if (msg is Health.OnZeroHealthMessage)
+            {
+                AdvanceToState("Dead");
+            }
         }
     }
 }
