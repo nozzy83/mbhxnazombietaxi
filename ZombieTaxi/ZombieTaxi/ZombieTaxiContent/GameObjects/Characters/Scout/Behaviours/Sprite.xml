@@ -40,6 +40,13 @@
           </Item>
         </mFrameOverrides>
       </Item>
+      <Item>
+        <mTicksPerFrame>1</mTicksPerFrame>
+        <mName>Dead</mName>
+        <mStartingFrame>4</mStartingFrame>
+        <mNumFrames>1</mNumFrames>
+        <mLooping>false</mLooping>
+      </Item>
     </mAnimationSets>
   </Asset>
 </XnaContent>
