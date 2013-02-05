@@ -75,6 +75,7 @@ namespace ZombieTaxi.Behaviours
             /// </summary>
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
             private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
+            private GetIsScoutableMessage mGetIsScoutableMsg;
 
             /// <summary>
             /// Constructor.
@@ -104,6 +105,7 @@ namespace ZombieTaxi.Behaviours
 
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
                 mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
+                mGetIsScoutableMsg = new GetIsScoutableMessage();
             }
 
             /// <summary>
@@ -192,6 +194,35 @@ namespace ZombieTaxi.Behaviours
 
                             mEnabled = false;
                         }
+
+                        break;
+                    }
+                    case StrandedPopupDefinition.ButtonTypes.ScoutSearch:
+                    {
+                        // Find all the objects that are Allies.
+                        List<GameObject> objs = GameObjectManager.pInstance.GetGameObjectsOfClassification(MBHEngineContentDefs.GameObjectDefinition.Classifications.ALLY);
+
+                        // Reduce the list to only those object who say that they are in a state which is valid to
+                        // be scouted.
+                        for (Int32 i = 0; i < objs.Count; i++)
+                        {
+                            mGetIsScoutableMsg.Reset();
+
+                            objs[i].OnMessage(mGetIsScoutableMsg);
+
+                            if (mGetIsScoutableMsg.mIsScoutable_Out)
+                            {
+                                mEnabled = true;
+
+                                return mEnabled;
+                            }
+                        }
+
+                        mDisabledHintText = "NONE\nLEFT";
+
+                        // Making it to this point means that no objects said they were scoutable,
+                        // and as a result, this button should be disabled.
+                        mEnabled = false;
 
                         break;
                     }
@@ -310,6 +341,30 @@ namespace ZombieTaxi.Behaviours
             public override void Reset()
             {
                 mSelection_In = StrandedPopupDefinition.ButtonTypes.None;
+            }
+        }
+
+        /// <summary>
+        /// Asks a GameObject if it believes that it is in a state where is should potentially be
+        /// found by a Scout doing a Search. For instance, we don't want to find Stranded who have
+        /// already been saved, or other Scouts. The assumption is that GameObjects are NOT scoutable
+        /// by default.
+        /// </summary>
+        public class GetIsScoutableMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// Can this object be scouted?
+            /// </summary>
+            public Boolean mIsScoutable_Out;
+
+            /// <summary>
+            /// Put it back to a default state.
+            /// </summary>
+            public override void Reset()
+            {
+                // The assumption is always that an object cannot be scouted. It is up to each object
+                // to implement the handling of this message.
+                mIsScoutable_Out = false;
             }
         }
 
@@ -509,19 +564,19 @@ namespace ZombieTaxi.Behaviours
 
             String msg = mCurrentButton.pHintText;
 
-            // The size of a single character, used to calculate offset needed for centering.
-            Single characterWidth = 8.0f;
+            Vector2 stringSize = mFont.MeasureString(msg);
 
             // This GameObject is positioned at the center of the screen, but needs to be offset based on the
             // number of characters in the current score.
             // First find the number of characters needed to offset, which is half of the string.
             // Then multiply that by the size of a single character.
             // Finally negate the number since we want to move left, not right.
-            Single centerOffset = msg.Length * 0.5f * characterWidth * -1.0f;
+            Vector2 centerOffset = stringSize * 0.5f * -1.0f;
 
-            Single xPos = centerOffset + mWindow.pPosition.X;
-            batch.DrawString(mFont, msg, new Vector2(xPos, mWindow.pPosition.Y + 1), Color.Black);
-            batch.DrawString(mFont, msg, new Vector2(xPos, mWindow.pPosition.Y), Color.White);
+            Vector2 pos = centerOffset + mWindow.pPosition;
+            pos.Y += 5.0f;
+            batch.DrawString(mFont, msg, new Vector2(pos.X, pos.Y + 1), Color.Black);
+            batch.DrawString(mFont, msg, new Vector2(pos.X, pos.Y), Color.White);
         }
 
         /// <summary>
