@@ -9,16 +9,16 @@
     <mHasShadow>false</mHasShadow>
     <mAnimationSets>
       <Item>
-        <mTicksPerFrame>1</mTicksPerFrame>
+        <mTicksPerFrame>60</mTicksPerFrame>
         <mName>None</mName>
         <mStartingFrame>0</mStartingFrame>
-        <mNumFrames>38</mNumFrames>
-        <mLooping>true</mLooping>
+        <mNumFrames>1</mNumFrames>
+        <mLooping>false</mLooping>
       </Item>
       <Item>
         <mTicksPerFrame>5</mTicksPerFrame>
         <mName>RollOver</mName>
-        <mStartingFrame>0</mStartingFrame>
+        <mStartingFrame>1</mStartingFrame>
         <mNumFrames>38</mNumFrames>
         <mLooping>true</mLooping>
         <mFrameOverrides>

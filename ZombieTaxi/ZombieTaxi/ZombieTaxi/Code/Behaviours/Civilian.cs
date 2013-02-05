@@ -191,6 +191,18 @@ namespace ZombieTaxi.Behaviours
                 GetSafeHouseScoreMessage temp = (GetSafeHouseScoreMessage)msg;
                 temp.mSafeHouseScore_Out = mSafeHouseScore;
             }
+            else if (msg is StrandedPopup.GetIsScoutableMessage)
+            {
+                // Currently the only thing required for a Civilian to be Scoutable, is that
+                // they are currently in the Cower state. This can later be expanded to include
+                // things like distance from the sender.
+                if (GetCurrentState() is FSMStateCower)
+                {
+                    StrandedPopup.GetIsScoutableMessage temp = (StrandedPopup.GetIsScoutableMessage)msg;
+
+                    temp.mIsScoutable_Out = true;
+                }
+            }
         }
     }
 }

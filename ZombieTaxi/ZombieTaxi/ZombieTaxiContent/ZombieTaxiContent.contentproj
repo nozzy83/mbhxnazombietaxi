@@ -1400,26 +1400,6 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Sprites\Interface\StrandedPopup\IconLevelUpSelected.png">
-      <Name>IconLevelUpSelected</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Interface\StrandedPopup\IconLevelUpUnselected.png">
-      <Name>IconLevelUpUnselected</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Interface\StrandedPopup\IconScoutSelected.png">
-      <Name>IconScoutSelected</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Sprites\Interface\StrandedPopup\IconScoutUnselected.png">
-      <Name>IconScoutUnselected</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Sprites\Interface\StrandedPopup\Window.png">
       <Name>Window</Name>
       <Importer>TextureImporter</Importer>
