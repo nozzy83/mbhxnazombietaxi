@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
-    <mSpriteFileName>Sprites\Characters\Commando</mSpriteFileName>
+    <mSpriteFileName>Sprites\Characters\Robot</mSpriteFileName>
     <mFrameHeight>16</mFrameHeight>
     <mHasShadow>true</mHasShadow>
     <mAttachmentPoints>
@@ -13,23 +13,37 @@
     </mAttachmentPoints>
     <mAnimationSets>
       <Item>
-        <mTicksPerFrame>10</mTicksPerFrame>
+        <mTicksPerFrame>3</mTicksPerFrame>
         <mName>Idle</mName>
         <mStartingFrame>0</mStartingFrame>
-        <mNumFrames>10</mNumFrames>
+        <mNumFrames>13</mNumFrames>
         <mLooping>true</mLooping>
+        <mFrameOverrides>
+          <Item>
+            <Key>0</Key>
+            <Value>
+              <mTicksPerFrame>250</mTicksPerFrame>
+            </Value>
+          </Item>
+          <Item>
+            <Key>8</Key>
+            <Value>
+              <mTicksPerFrame>9</mTicksPerFrame>
+            </Value>
+          </Item>
+        </mFrameOverrides>
       </Item>      
       <Item>
         <mTicksPerFrame>10</mTicksPerFrame>
         <mName>Walk</mName>
-        <mStartingFrame>10</mStartingFrame>
+        <mStartingFrame>13</mStartingFrame>
         <mNumFrames>2</mNumFrames>
         <mLooping>true</mLooping>
       </Item>
       <Item>
         <mTicksPerFrame>5</mTicksPerFrame>
         <mName>Run</mName>
-        <mStartingFrame>10</mStartingFrame>
+        <mStartingFrame>13</mStartingFrame>
         <mNumFrames>2</mNumFrames>
         <mLooping>true</mLooping>
       </Item>
