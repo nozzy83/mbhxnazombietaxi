@@ -192,7 +192,7 @@ namespace ZombieTaxi
             //GameObjectManager.pInstance.Add(enemy);
             
             // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager.
-            new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
+            //new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
             new GameObject("GameObjects\\Utils\\RandCivilianGenerator\\RandCivilianGenerator");
             
             // The vingette effect used to dim out the edges of the screen.
@@ -248,7 +248,7 @@ namespace ZombieTaxi
 
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.Y, true))
             {
-                GameObject chef = new GameObject("GameObjects\\Characters\\Scout\\Scout");
+                GameObject chef = new GameObject("GameObjects\\Characters\\Militant\\Militant");
                 chef.pPosition = GameObjectManager.pInstance.pPlayer.pPosition;
                 chef.pPosX += 16;
                 GameObjectManager.pInstance.Add(chef);

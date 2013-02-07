@@ -74,7 +74,6 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
-        private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
         private PathFind.ClearDestinationMessage mClearDestinationMsg;
 
         /// <summary>
@@ -114,7 +113,6 @@ namespace ZombieTaxi.Behaviours
 
             mSafeHouseScore = def.mSafeHouseScore;
 
-            mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
         }
 
@@ -127,26 +125,6 @@ namespace ZombieTaxi.Behaviours
             mParentGOH.OnMessage(mClearDestinationMsg);
 
             base.OnRemove();
-        }
-
-        /// <summary>
-        /// Called once per frame by the game object.
-        /// </summary>
-        /// <param name="gameTime">The amount of time that has passed this frame.</param>
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
-
-            if (mParentGOH.pDirection.mForward.X < 0)
-            {
-                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipHorizontally;
-                mParentGOH.OnMessage(mSetSpriteFxMsg);
-            }
-            else if (mParentGOH.pDirection.mForward.X > 0)
-            {
-                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
-                mParentGOH.OnMessage(mSetSpriteFxMsg);
-            }
         }
 
         /// <summary>

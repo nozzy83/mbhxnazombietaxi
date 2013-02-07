@@ -83,7 +83,6 @@ namespace ZombieTaxi.Behaviours
         private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
         private PathFind.ClearDestinationMessage mClearDestinationMsg;
         private Explosive.DetonateMessage mDetonateMsg;
-        private SpriteRender.SetSpriteEffectsMessage mSetSpriteFxMsg;
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimMsg;
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
@@ -130,7 +129,6 @@ namespace ZombieTaxi.Behaviours
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
             mDetonateMsg = new Explosive.DetonateMessage();
-            mSetSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
             mSetActiveAnimMsg = new SpriteRender.SetActiveAnimationMessage();
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
@@ -271,17 +269,6 @@ namespace ZombieTaxi.Behaviours
 
                     mCurrentFollowType = FollowType.PathFinding;
                 }
-            }
-
-            if (mParentGOH.pDirection.mForward.X < 0)
-            {
-                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.FlipHorizontally;
-                mParentGOH.OnMessage( mSetSpriteFxMsg );
-            }
-            else if (mParentGOH.pDirection.mForward.X > 0)
-            {
-                mSetSpriteFxMsg.mSpriteEffects_In = SpriteEffects.None;
-                mParentGOH.OnMessage(mSetSpriteFxMsg);
             }
         }
 

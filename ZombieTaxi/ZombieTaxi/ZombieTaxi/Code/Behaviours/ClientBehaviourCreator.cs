@@ -53,6 +53,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new FSMScout(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.FSMMilitant":
+                    {
+                        return new FSMMilitant(go, fileName);
+                    }
                 case "ZombieTaxi.Behaviours.DamageFlash":
                     {
                         return new DamageFlash(go, fileName);
