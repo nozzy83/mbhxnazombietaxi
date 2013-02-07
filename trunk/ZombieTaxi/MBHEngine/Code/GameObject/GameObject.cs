@@ -516,6 +516,10 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.ShapeRender(this, fileName);
                     }
+                case "MBHEngine.Behaviour.FaceForward":
+                    {
+                        return new MBHEngine.Behaviour.FaceForward(this, fileName);
+                    }
                 default:
                     {
 #if ALLOW_GARBAGE

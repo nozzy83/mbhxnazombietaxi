@@ -117,6 +117,7 @@
     <Compile Include="Code\Behaviour\BehaviourCreator.cs" />
     <Compile Include="Code\Behaviour\BehaviourMessage.cs" />
     <None Include="Code\Behaviour\Example.cs" />
+    <Compile Include="Code\Behaviour\FaceForward.cs" />
     <Compile Include="Code\Behaviour\FiniteStateMachine.cs" />
     <Compile Include="Code\Behaviour\FrameRateDisplay.cs" />
     <Compile Include="Code\Behaviour\Health.cs" />

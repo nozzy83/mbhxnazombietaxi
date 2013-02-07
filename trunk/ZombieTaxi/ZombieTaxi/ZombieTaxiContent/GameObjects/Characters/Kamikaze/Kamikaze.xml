@@ -23,6 +23,7 @@
       <Item>Kamikaze</Item>
       <Item>SimpleMomentum</Item>
       <Item>TileCollision</Item>
+      <Item>FaceForward</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
@@ -34,6 +35,7 @@
       <Item>ZombieTaxi.Behaviours.Kamikaze</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
       <Item>MBHEngine.Behaviour.TileCollision</Item>
+      <Item>MBHEngine.Behaviour.FaceForward</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>

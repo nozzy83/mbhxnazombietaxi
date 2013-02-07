@@ -9,30 +9,28 @@
     <mScale>1 1</mScale>
     <mCollisionBoxDimensions>8.0 8.0</mCollisionBoxDimensions>
     <mCollisionRoot>0 -4</mCollisionRoot>
-    <mMotionRoot>4 8</mMotionRoot>
+    <mMotionRoot>8 16</mMotionRoot>
     <mClassifications>
       <Item>ALLY</Item>
     </mClassifications>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
-      <Item>Civilian</Item>
+      <Item>FSMMilitant</Item>
       <Item>PathFind</Item>
       <Item>PathFollow</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
       <Item>SimpleMomentum</Item>
-      <Item>HealthStatBoostResearch</Item>
       <Item>FaceForward</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
-      <Item>ZombieTaxi.Behaviours.Civilian</Item>
+      <Item>ZombieTaxi.Behaviours.FSMMilitant</Item>
       <Item>MBHEngine.Behaviour.PathFind</Item>
       <Item>MBHEngine.Behaviour.PathFollow</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
-      <Item>ZombieTaxi.Behaviours.StatBoost.HealthStatBoostResearch</Item>
       <Item>MBHEngine.Behaviour.FaceForward</Item>
     </mBehaviourClassNames>
   </Asset>
