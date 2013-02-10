@@ -108,10 +108,12 @@ namespace MBHEngine.Behaviour
 
             // If we have a best node chosen (again maybe not a complete path, but the best so far), start
             // moving towards the next point on the path.
-            if (mGetCurrentBestNodeMsg.mBest_Out != null)
+            if (mGetCurrentBestNodeMsg.mBest_Out != null && mGetCurrentBestNodeMsg.mBest_Out.mPathSolved)
             {
+                //return; 
+
                 // This is the node closest to the destination that we have found.
-                PathFind.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
+                MBHEngine.PathFind.AStar.Planner.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
                 // Traverse back towards the source node until the previous one has already been reached.
                 // That means the current one is the next one that has not been reached yet.
@@ -182,6 +184,8 @@ namespace MBHEngine.Behaviour
                 mParentGOH.OnMessage(mSetSourceMsg);
                 mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
                 mParentGOH.OnMessage(mSetDestinationMsg);
+
+                mParentGOH.pDirection.mForward = Vector2.Zero;
             }
         }
 
