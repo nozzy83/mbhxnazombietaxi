@@ -7,6 +7,7 @@ using MBHEngine.Debug;
 using MBHEngine.GameObject;
 using MBHEngine.Input;
 using System.Diagnostics;
+using MBHEngine.World;
 
 namespace MBHEngine.Behaviour
 {
@@ -75,7 +76,7 @@ namespace MBHEngine.Behaviour
             /// <summary>
             /// The current best node. Use pPrev to trace your way back to mSource.
             /// </summary>
-            public MBHEngine.PathFind.AStar.Planner.PathNode mBest_Out;
+            public MBHEngine.PathFind.GenericAStar.PathNode mBest_Out;
 
             /// <summary>
             /// Call this to put a message back to its default state.
@@ -106,12 +107,13 @@ namespace MBHEngine.Behaviour
         /// <summary>
         /// The planner used to find a path.
         /// </summary>
-        public MBHEngine.PathFind.AStar.Planner mPlanner;
+        public MBHEngine.PathFind.GenericAStar.Planner mPlanner;
 
         /// <summary>
         /// Preallocated to avoid garbage at runtime.
         /// </summary>
         private OnPathFindFailedMessage mOnPathFindFailedMsg;
+        private MBHEngine.Behaviour.Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -137,11 +139,12 @@ namespace MBHEngine.Behaviour
             // TODO: This should be read in from the xml.
             mUpdateSourceAutomatically = false;
 
-            mPlanner = new MBHEngine.PathFind.AStar.Planner();
+            mPlanner = new MBHEngine.PathFind.GenericAStar.Planner();
             
             // Preallocate messages to avoid GC during gameplay.
             //
             mOnPathFindFailedMsg = new OnPathFindFailedMessage();
+            mGetTileAtPositionMsg = new Level.GetTileAtPositionMessage();
         }
 
         /// <summary>
@@ -154,14 +157,17 @@ namespace MBHEngine.Behaviour
             // based on our parents position?
             if (mUpdateSourceAutomatically)
             {
+                mGetTileAtPositionMsg.mPosition_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
                 // Update the source incase the GO has moved since the last update.
-                mPlanner.SetSource(mParentGOH.pPosition + mParentGOH.pCollisionRoot);
+                mPlanner.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
             }
 
-            MBHEngine.PathFind.AStar.Planner.Result res = mPlanner.Update(gameTime);
+            MBHEngine.PathFind.GenericAStar.Planner.Result res = mPlanner.PlanPath();
 
             // If the planner failed to find the destination tell the other behaviours.
-            if (res == MBHEngine.PathFind.AStar.Planner.Result.Failed)
+            if (res == MBHEngine.PathFind.GenericAStar.Planner.Result.Failed)
             {
                 mParentGOH.OnMessage(mOnPathFindFailedMsg);
             }
@@ -182,7 +188,10 @@ namespace MBHEngine.Behaviour
             {
                 SetDestinationMessage tmp = (SetDestinationMessage)msg;
 
-                mPlanner.SetDestination(tmp.mDestination_In);
+                mGetTileAtPositionMsg.mPosition_In = tmp.mDestination_In;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                mPlanner.SetDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
             }
             else if (msg is ClearDestinationMessage)
             {
@@ -192,7 +201,11 @@ namespace MBHEngine.Behaviour
             {
                 SetSourceMessage tmp = (SetSourceMessage)msg;
 
-                mPlanner.SetSource(tmp.mSource_In);
+                mGetTileAtPositionMsg.mPosition_In = tmp.mSource_In;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                // Update the source incase the GO has moved since the last update.
+                mPlanner.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
             }
             else if (msg is GetCurrentBestNodeMessage)
             {

@@ -276,7 +276,7 @@ namespace MBHEngine.Debug
         /// </summary>
         /// <param name="box">Rectangle to render.</param>
         /// <param name="color">The color to render it as.</param>
-        public void AddAABB(Math.Rectangle box, Color color)
+        public void AddAABB(Math.Rectangle box, Color color, Boolean isSolid = true)
         {
             Vector2[] verts = new Vector2[8];
             verts[0] = new Vector2(box.pLeft, box.pBottom);
@@ -284,7 +284,14 @@ namespace MBHEngine.Debug
             verts[2] = new Vector2(box.pRight, box.pTop);
             verts[3] = new Vector2(box.pRight, box.pBottom);
 
-            AddSolidPolygon(verts, 4, color);
+            if (isSolid)
+            {
+                AddSolidPolygon(verts, 4, color);
+            }
+            else
+            {
+                AddPolygon(verts, 4, color);
+            }
         }
 
         /// <summary>

@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
 using MBHEngineContentDefs;
 using MBHEngine.Debug;
 using MBHEngine.Math;
 using MBHEngine.Render;
-using MBHEngine.Input;
+using MBHEngine.PathFind.HPAStar;
+using MBHEngine.PathFind.GenericAStar;
 
 namespace MBHEngine.Behaviour
 {
@@ -180,6 +177,19 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Sent when the NavMesh managed by the Level becomes invalid.
+        /// </summary>
+        public class OnNavMeshInvalidatedMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+            }
+        }
+
+        /// <summary>
         /// Data about a single tile.
         /// </summary>
         public class Tile
@@ -271,6 +281,11 @@ namespace MBHEngine.Behaviour
             private Attribute mAttributes = Attribute.None;
 
             /// <summary>
+            /// Tile and TileGraphNode objects have a 1:1 mapping.
+            /// </summary>
+            public GraphNode mGraphNode;
+
+            /// <summary>
             /// Check if a particular Attribute is set.
             /// </summary>
             /// <param name="att">The attribute the check.</param>
@@ -342,6 +357,16 @@ namespace MBHEngine.Behaviour
         private MapInfo mMapInfo;
 
         /// <summary>
+        /// Nav mesh used by HPAStar.
+        /// </summary>
+        private NavMesh mNavMesh;
+
+        /// <summary>
+        /// Search graph used by GenericAStar.
+        /// </summary>
+        private MBHEngine.PathFind.GenericAStar.Graph mGraph;
+
+        /// <summary>
         /// These are needed to do our wall collision and we want to avoid allocating them over and
         /// over again, so instead we just reuse the same ones.
         /// </summary>
@@ -369,6 +394,8 @@ namespace MBHEngine.Behaviour
 
             LevelDefinition def = GameObjectManager.pInstance.pContentManager.Load<LevelDefinition>(fileName);
 
+            mGraph = new MBHEngine.PathFind.GenericAStar.Graph();
+
             mMapInfo = new MapInfo();
 
             // TODO: This should be loaded in from the def.
@@ -391,15 +418,29 @@ namespace MBHEngine.Behaviour
                     // Allocate space for the Array itself.
                     mCollisionGrid[x, y].mAdjecentTiles = new Tile[(Int32)Tile.AdjacentTileDir.NUM_DIRECTIONS];
 
+                    // Calculate the center point of the tile.
+                    Vector2 cent = new Vector2((x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f), (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f));
+
+                    // Create a rectangle to represent the tile.
+                    mCollisionGrid[x, y].mCollisionRect = new MBHEngine.Math.Rectangle(mMapInfo.mTileWidth, mMapInfo.mTileHeight, cent);
+
+                    mCollisionGrid[x, y].mGraphNode = new TileGraphNode(mCollisionGrid[x, y]);
+
+                    mGraph.AddNode(mCollisionGrid[x, y].mGraphNode);
+
                     // Start with the tiles left of this one, but avoid looking outside the map.
                     if (x > 0)
                     {
                         // Store a reference to the tile to the left.
                         mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.LEFT] = mCollisionGrid[x - 1, y];
 
+                        mCollisionGrid[x, y].mGraphNode.AddNeighbour(mCollisionGrid[x - 1, y].mGraphNode);
+
                         // Since the tile to the left was created before this one, it needs to be updated to point to this
                         // once as the tile on it right.
                         mCollisionGrid[x - 1, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.RIGHT] = mCollisionGrid[x, y];
+
+                        mCollisionGrid[x - 1, y].mGraphNode.AddNeighbour(mCollisionGrid[x, y].mGraphNode);
 
                         // Check up and to the left if that is not outside the map.
                         if (y > 0)
@@ -407,7 +448,9 @@ namespace MBHEngine.Behaviour
                             // Again, set ourselves and then the adjecent one which was created prior to us being
                             // created.
                             mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.LEFT_UP] = mCollisionGrid[x - 1, y - 1];
+                            mCollisionGrid[x, y].mGraphNode.AddNeighbour(mCollisionGrid[x - 1, y - 1].mGraphNode);
                             mCollisionGrid[x - 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.RIGHT_DOWN] = mCollisionGrid[x, y];
+                            mCollisionGrid[x - 1, y - 1].mGraphNode.AddNeighbour(mCollisionGrid[x, y].mGraphNode);
                         }
                     }
 
@@ -416,24 +459,22 @@ namespace MBHEngine.Behaviour
                     {
                         // Set our up, their down.
                         mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.UP] = mCollisionGrid[x, y - 1];
+                        mCollisionGrid[x, y].mGraphNode.AddNeighbour(mCollisionGrid[x, y - 1].mGraphNode);
                         mCollisionGrid[x, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.DOWN] = mCollisionGrid[x, y];
+                        mCollisionGrid[x, y - 1].mGraphNode.AddNeighbour(mCollisionGrid[x, y].mGraphNode);
 
                         // All that is left is the RIGHT_UP/LEFT_DOWN relationship.
                         if (x < mMapInfo.mMapWidth - 1)
                         {
                             mCollisionGrid[x, y].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.RIGHT_UP] = mCollisionGrid[x + 1, y - 1];
+                            mCollisionGrid[x, y].mGraphNode.AddNeighbour(mCollisionGrid[x + 1, y - 1].mGraphNode);
                             mCollisionGrid[x + 1, y - 1].mAdjecentTiles[(Int32)Tile.AdjacentTileDir.LEFT_DOWN] = mCollisionGrid[x, y];
+                            mCollisionGrid[x + 1, y - 1].mGraphNode.AddNeighbour(mCollisionGrid[x, y].mGraphNode);
                         }
                     }
 
-                    // Calculate the center point of the tile.
-                    Vector2 cent = new Vector2((x * mMapInfo.mTileWidth) + (mMapInfo.mTileWidth * 0.5f), (y * mMapInfo.mTileHeight) + (mMapInfo.mTileHeight * 0.5f));
-
-                    // Create a rectangle to represent the tile.
-                    mCollisionGrid[x, y].mCollisionRect = new MBHEngine.Math.Rectangle(mMapInfo.mTileWidth, mMapInfo.mTileHeight, cent);
-
                     // Give it a random chance to be solid.
-                    if (RandomManager.pInstance.RandomPercent() <= 0.05f)
+                    if (RandomManager.pInstance.RandomPercent() <= 0.05f)// && false)
                     {
                         mCollisionGrid[x, y].mType = Level.Tile.TileTypes.Solid;
 
@@ -499,8 +540,21 @@ namespace MBHEngine.Behaviour
             mMapInfo.mTileMap = GameObjectManager.pInstance.pContentManager.Load<Texture2D>
                 (def.mTileMapImageName);
 
+            // Instantiate the NavMesh, but wait to actually initialize it.
+            mNavMesh = new NavMesh(5);
+
             // Let the GameObjectManager know that the level data has changed.
             GameObjectManager.pInstance.OnMapInfoChange(mMapInfo);
+        }
+
+        /// <summary>
+        /// Called at the end of the frame where mParentGOH was added to the GameObjectManager.
+        /// </summary>
+        public override void OnAdd()
+        {
+            // Create the NavMesh after OnLoad because CreateNavMesh is going to try to call OnMessage
+            // on this Level.
+            mNavMesh.CreateNavMesh(mParentGOH);
         }
 
         /// <summary>
@@ -698,6 +752,9 @@ namespace MBHEngine.Behaviour
                     }
                 }
             }
+
+            //mNavMesh.DebugDraw();
+            //mGraph.DebugDraw(false);
         }
 
         /// <summary>
@@ -761,6 +818,10 @@ namespace MBHEngine.Behaviour
                 temp.mInfo_Out = mMapInfo;
 
                 msg = temp;
+            }
+            else if (msg is OnNavMeshInvalidatedMessage)
+            {
+                mNavMesh.CreateNavMesh(mParentGOH);
             }
         }
 

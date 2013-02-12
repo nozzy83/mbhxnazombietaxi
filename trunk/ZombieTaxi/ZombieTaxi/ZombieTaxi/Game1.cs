@@ -1,13 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using MBHEngine.GameObject;
 using MBHEngine.IO;
 using MBHEngine.Math;
@@ -15,10 +8,10 @@ using MBHEngine.Input;
 using MBHEngine.Debug;
 using MBHEngine.Render;
 using ZombieTaxi.Behaviours;
-using OgmoXNA4;
 using MBHEngine.Behaviour;
 using MBHEngine.World;
-using MBHEngineContentDefs;
+using MBHEngine.PathFind.GenericAStar;
+using Microsoft.Xna.Framework.Input;
 
 namespace ZombieTaxi
 {
@@ -40,6 +33,11 @@ namespace ZombieTaxi
         /// </summary>
         private Int32 mFrameSkip = 0;
         private Int32 mFameSkipCount = 0;
+
+        /// <summary>
+        /// Tracks the object that is spawned through some debug keys.
+        /// </summary>
+        private GameObject mSpawned;
         
         /// <summary>
         /// Constuctor
@@ -192,7 +190,7 @@ namespace ZombieTaxi
             //GameObjectManager.pInstance.Add(enemy);
             
             // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager.
-            //new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
+            new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
             new GameObject("GameObjects\\Utils\\RandCivilianGenerator\\RandCivilianGenerator");
             
             // The vingette effect used to dim out the edges of the screen.
@@ -248,10 +246,16 @@ namespace ZombieTaxi
 
             if (InputManager.pInstance.CheckAction(InputManager.InputActions.Y, true))
             {
-                GameObject chef = new GameObject("GameObjects\\Characters\\Militant\\Militant");
-                chef.pPosition = GameObjectManager.pInstance.pPlayer.pPosition;
-                chef.pPosX += 16;
-                GameObjectManager.pInstance.Add(chef);
+                if (mSpawned != null)
+                {
+                    GameObjectManager.pInstance.Remove(mSpawned);
+                    mSpawned = null;
+                }
+
+                mSpawned = new GameObject("GameObjects\\Characters\\Militant\\Militant");
+                mSpawned.pPosition = GameObjectManager.pInstance.pPlayer.pPosition;
+                mSpawned.pPosX += 64;
+                GameObjectManager.pInstance.Add(mSpawned);
             }
 
 #if DEBUG && false // Temporarily disable this feature while working on tile placement mode.
@@ -273,7 +277,7 @@ namespace ZombieTaxi
 
 #if ALLOW_GARBAGE
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Game-Time Delta: " + gameTime.ElapsedGameTime.TotalSeconds);
-                DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + PathFind.pNumUnusedNodes);
+                DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + MBHEngine.PathFind.GenericAStar.Planner.pNumUnusedNodes);
 #endif
 
                 mFameSkipCount = 0;
