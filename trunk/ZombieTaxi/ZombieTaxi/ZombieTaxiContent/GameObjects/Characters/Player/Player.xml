@@ -13,7 +13,7 @@
     <mClassifications>
       <Item>PLAYER</Item>
     </mClassifications>
-    <mBlendMode>TEST</mBlendMode>
+    <mBlendMode>STANDARD</mBlendMode>
     <mBehaviourFileNames>
       <Item>MarkOnMiniMap</Item>
       <Item>Sprite</Item>

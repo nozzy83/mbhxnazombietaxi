@@ -580,11 +580,9 @@ namespace MBHEngine.GameObject
                             }
                             else if (blend == GameObjectDefinition.BlendMode.TEST)
                             {
-                                batch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, mDefaultEffect, CameraManager.pInstance.pFinalTransform);
-
-                                // Keep the sprites looking crisp.
-                                batch.GraphicsDevice.SamplerStates[0] = mSpriteSamplerState;
-                                batch.GraphicsDevice.RasterizerState = mSpriteRasterState;
+                                // Keeping the TEST blend mode around because it will be handy for trying out new stuff, but
+                                // in the mean time we want to catch GameObjects using it by accident.
+                                System.Diagnostics.Debug.Assert(false, "BlendMode.TEST in use but not currently implemented.");
                             }
                             else if (blend == GameObjectDefinition.BlendMode.MULTIPLY)
                             {
