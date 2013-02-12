@@ -108,25 +108,25 @@ namespace MBHEngine.Behaviour
 
             // If we have a best node chosen (again maybe not a complete path, but the best so far), start
             // moving towards the next point on the path.
-            if (mGetCurrentBestNodeMsg.mBest_Out != null && mGetCurrentBestNodeMsg.mBest_Out.mPathSolved)
+            if (mGetCurrentBestNodeMsg.mBest_Out != null && mGetCurrentBestNodeMsg.mBest_Out.pPathSolved)
             {
                 //return; 
 
                 // This is the node closest to the destination that we have found.
-                MBHEngine.PathFind.AStar.Planner.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
+                MBHEngine.PathFind.GenericAStar.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
                 // Traverse back towards the source node until the previous one has already been reached.
                 // That means the current one is the next one that has not been reached yet.
                 // We also want to make sure we don't try to get to the starting node since we should be 
                 // standing on top of it already (hence the check for prev.prev).
-                while (p.mPrev != null && p.mPrev.mPrev != null && !p.mPrev.mReached)
+                while (p.pPrevious != null && p.pPrevious.pPrevious != null && !p.pPrevious.pReached)
                 {
-                    p = p.mPrev;
+                    p = p.pPrevious;
                 }
 
                 // If the current node is flagged as being reached, that means that every node
                 // in the path has been reached.
-                if (p.mReached)
+                if (p.pReached)
                 {
                     mParentGOH.OnMessage(mOnReachedPathEndMsg);
 
@@ -145,10 +145,10 @@ namespace MBHEngine.Behaviour
                 Single minDist = mParentGOH.pDirection.mSpeed * 2.0f;
 
                 // Once we are within one unit of the target consider it reached.
-                if (Vector2.Distance(p.mTile.mCollisionRect.pCenterBottom, mParentGOH.pPosition) <= minDist)
+                if (Vector2.Distance(p.pGraphNode.pPosition + new Vector2(0.0f, 4.0f), mParentGOH.pPosition) <= minDist)
                 {
                     // This node has been reached, so next update it will start moving towards the next node.
-                    p.mReached = true;
+                    p.pReached = true;
 
                     // Recalculate the path every time we reach a node in the path.  This accounts for things like
                     // the target moving.
@@ -168,7 +168,7 @@ namespace MBHEngine.Behaviour
                 //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
 
                 // Move towards the nodes center point.
-                Vector2 d = p.mTile.mCollisionRect.pCenterBottom - mParentGOH.pPosition;
+                Vector2 d = p.pGraphNode.pPosition - mParentGOH.pPosition + new Vector2(0.0f, 4.0f);
                 if (d.Length() != 0.0f)
                 {
                     d = Vector2.Normalize(d);

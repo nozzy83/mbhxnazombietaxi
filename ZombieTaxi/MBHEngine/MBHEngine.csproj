@@ -152,6 +152,12 @@
     <Compile Include="Code\Math\StopWatchManager.cs" />
     <Compile Include="Code\Math\Util.cs" />
     <Compile Include="Code\PathFind\AStar\Planner.cs" />
+    <Compile Include="Code\PathFind\GenericAStar\Graph.cs" />
+    <Compile Include="Code\PathFind\GenericAStar\GraphNode.cs" />
+    <Compile Include="Code\PathFind\GenericAStar\PathNode.cs" />
+    <Compile Include="Code\PathFind\GenericAStar\Planner.cs" />
+    <Compile Include="Code\PathFind\GenericAStar\TileGraphNode.cs" />
+    <Compile Include="Code\PathFind\HPAStar\NavMesh.cs" />
     <Compile Include="Code\Render\CameraManager.cs" />
     <Compile Include="Code\Render\DebugDrawBox2D.cs" />
     <Compile Include="Code\Render\DebugDrawBox2DSpritePoly.cs" />

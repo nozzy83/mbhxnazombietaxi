@@ -247,7 +247,7 @@ namespace ZombieTaxi.Behaviours.HUD
 
             // Sometimes the game will throw an exception because we are trying to write to a texture which
             // is locked by the graphic device. This frees it up apparently.
-            //GameObjectManager.pInstance.pGraphicsDevice.Textures[0] = null;
+            GameObjectManager.pInstance.pGraphicsDevice.Textures[0] = null;
 
             // Take all that color data an write it to the texture.
             mMapTexture.SetData(mColorData);

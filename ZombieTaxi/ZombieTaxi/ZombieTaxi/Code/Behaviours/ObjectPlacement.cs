@@ -99,6 +99,7 @@ namespace ZombieTaxi.Behaviours
         private Inventory.SelectNextItemMessage mSelectNextItemMsg;
         private SpriteRender.GetTexture2DMessage mGetTexture2DMsg;
         private Inventory.PeekCurrentObjectMessage mPeekCurrentObjectMsg;
+        private Level.OnNavMeshInvalidatedMessage mOnNavMeshInvalidatedMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -143,6 +144,7 @@ namespace ZombieTaxi.Behaviours
             mSelectNextItemMsg = new Inventory.SelectNextItemMessage();
             mGetTexture2DMsg = new SpriteRender.GetTexture2DMessage();
             mPeekCurrentObjectMsg = new Inventory.PeekCurrentObjectMessage();
+            mOnNavMeshInvalidatedMsg = new Level.OnNavMeshInvalidatedMessage();
         }
 
         /// <summary>
@@ -225,6 +227,8 @@ namespace ZombieTaxi.Behaviours
                         // The object has been placed in the world, so the GameObjectManager needs to
                         // start managing it.
                         GameObjectManager.pInstance.Add(mGetCurrentObjectMsg.mObj_Out);
+
+                        lvl.OnMessage(mOnNavMeshInvalidatedMsg);
                     }
                     else
                     {
