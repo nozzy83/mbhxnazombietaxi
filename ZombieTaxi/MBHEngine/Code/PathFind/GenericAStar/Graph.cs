@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MBHEngine.Debug;
 using Microsoft.Xna.Framework;
+using MBHEngine.Render;
 
 namespace MBHEngine.PathFind.GenericAStar
 {
@@ -39,21 +40,37 @@ namespace MBHEngine.PathFind.GenericAStar
         /// Visualize what this graph looks like in world space.
         /// </summary>
         /// <param name="showLinks">True to show links between GraphNode objects.</param>
-        public void DebugDraw(Boolean showLinks)
+        public virtual void DebugDraw(Boolean showLinks)
         {
+            Vector2 center = CameraManager.pInstance.pViewRect.pCenterPoint;
+
             // Loop through al the nodes.
             for (Int32 i = 0; i < mNodes.Count; i++)
             {
-                // Draw the node a circle.
-                DebugShapeDisplay.pInstance.AddCircle(mNodes[i].pPosition, 4.0f, Color.DarkRed);
-
-                // If requested show the links between this node and all his neighbours.
-                if (showLinks)
+                if (Vector2.DistanceSquared(center, mNodes[i].pPosition) < 50 * 50) //80
                 {
-                    for (Int32 j = 0; j < mNodes[i].pNeighbours.Count; j++)
-                    {
-                        DebugShapeDisplay.pInstance.AddSegment(mNodes[i].pPosition, mNodes[i].pNeighbours[j].mGraphNode.pPosition, Color.DarkRed);
-                    }
+                    DrawNode(mNodes[i], showLinks);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Renders a single GraphNode and optionally links to all it's neighbours. Derived Graph classes should try
+        /// to use this function even if overriding DebugDraw so that there is a consistent look to Graph objects.
+        /// </summary>
+        /// <param name="node">The GraphNode to render.</param>
+        /// <param name="showLinks">True to draw links to neighbouring GraphNode objects.</param>
+        protected virtual void DrawNode(GraphNode node, Boolean showLinks)
+        {                    
+            // Draw the node a circle.
+            DebugShapeDisplay.pInstance.AddCircle(node.pPosition, 4.0f, Color.DarkRed);
+
+            // If requested show the links between this node and all his neighbours.
+            if (showLinks)
+            {
+                for (Int32 j = 0; j < node.pNeighbours.Count; j++)
+                {
+                    DebugShapeDisplay.pInstance.AddSegment(node.pPosition, node.pNeighbours[j].mGraphNode.pPosition, Color.DarkRed);
                 }
             }
         }

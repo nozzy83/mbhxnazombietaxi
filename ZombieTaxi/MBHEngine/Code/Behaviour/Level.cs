@@ -753,7 +753,7 @@ namespace MBHEngine.Behaviour
                 }
             }
 
-            //mNavMesh.DebugDraw();
+            mNavMesh.DebugDraw(true);
             //mGraph.DebugDraw(false);
         }
 
