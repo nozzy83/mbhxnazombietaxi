@@ -9,7 +9,9 @@ using MBHEngine.Render;
 namespace MBHEngine.PathFind.GenericAStar
 {
     /// <summary>
-    /// Stores a complete set off all GraphNode data. This gets fed into a Planner.
+    /// Stores a complete set off all GraphNode data. This is not actually needed for path planning,
+    /// as the GraphNodes hold all the information and links they need, but the Graph is a convenient
+    /// place to store them all in one place, and hold onto references to them all.
     /// </summary>
     public class Graph
     {
@@ -31,9 +33,18 @@ namespace MBHEngine.PathFind.GenericAStar
         /// Adds a GraphNode to the Graph.
         /// </summary>
         /// <param name="node">The node to add.</param>
-        public void AddNode(GraphNode node)
+        public virtual void AddNode(GraphNode node)
         {
             mNodes.Add(node);
+        }
+
+        /// <summary>
+        /// Removes a GraphNode from the Graph.
+        /// </summary>
+        /// <param name="node"></param>
+        public virtual void RemoveNode(GraphNode node)
+        {
+            mNodes.Remove(node);
         }
 
         /// <summary>
@@ -47,6 +58,7 @@ namespace MBHEngine.PathFind.GenericAStar
             // Loop through al the nodes.
             for (Int32 i = 0; i < mNodes.Count; i++)
             {
+                // Only draw nodeds that are close to the center of the screen.
                 if (Vector2.DistanceSquared(center, mNodes[i].pPosition) < 50 * 50) //80
                 {
                     DrawNode(mNodes[i], showLinks);
@@ -70,7 +82,8 @@ namespace MBHEngine.PathFind.GenericAStar
             {
                 for (Int32 j = 0; j < node.pNeighbours.Count; j++)
                 {
-                    DebugShapeDisplay.pInstance.AddSegment(node.pPosition, node.pNeighbours[j].mGraphNode.pPosition, Color.DarkRed);
+                    Color costColor = Color.Lerp(Color.White, Color.Red, node.pNeighbours[j].mCostToTravel / (5.0f * 11.134f));
+                    DebugShapeDisplay.pInstance.AddSegment(node.pPosition, node.pNeighbours[j].mGraphNode.pPosition, costColor);
                 }
             }
         }

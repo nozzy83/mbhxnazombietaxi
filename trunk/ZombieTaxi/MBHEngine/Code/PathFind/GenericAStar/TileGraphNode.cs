@@ -33,7 +33,7 @@ namespace MBHEngine.PathFind.GenericAStar
         {
             // If this GraphNode is not storing a tile, or that Tile is not empty, thats
             // an instant fail.
-            if (mTile == null || mTile.mType != Level.Tile.TileTypes.Empty)
+            if (!IsEmpty())
             {
                 return false;
             }
