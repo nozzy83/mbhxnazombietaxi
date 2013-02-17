@@ -190,6 +190,18 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Retrieves the NavMesh for this level.
+        /// </summary>
+        public class GetNavMeshMessage : BehaviourMessage
+        {
+            public NavMesh mNavMesh_Out;
+
+            public override void Reset()
+            {
+            }
+        }
+
+        /// <summary>
         /// Data about a single tile.
         /// </summary>
         public class Tile
@@ -822,6 +834,11 @@ namespace MBHEngine.Behaviour
             else if (msg is OnNavMeshInvalidatedMessage)
             {
                 mNavMesh.CreateNavMesh(mParentGOH);
+            }
+            else if (msg is GetNavMeshMessage)
+            {
+                GetNavMeshMessage temp = (GetNavMeshMessage)msg;
+                temp.mNavMesh_Out = mNavMesh;
             }
         }
 

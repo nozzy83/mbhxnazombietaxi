@@ -54,6 +54,7 @@ namespace MBHEngine.PathFind.HPAStar
         /// <param name="level"></param>
         public void CreateNavMesh(GameObject.GameObject level)
         {
+            // The gets used over and over again throughout the life if this object.
             level.OnMessage(mGetMapInfoMsg);
 
             Int32 mapWidth = mGetMapInfoMsg.mInfo_Out.mMapWidth;
@@ -62,6 +63,7 @@ namespace MBHEngine.PathFind.HPAStar
             Int32 tileWidth = mGetMapInfoMsg.mInfo_Out.mTileWidth;
             Int32 tileHeight = mGetMapInfoMsg.mInfo_Out.mTileHeight;
 
+            // Clusters get indexed based on their X, Y positions in the world.
             mClusters = new Cluster[mapWidth / mClusterSize, mapHeight / mClusterSize];
 
             // Loop through Cluster by Cluster initializing them.
@@ -119,26 +121,67 @@ namespace MBHEngine.PathFind.HPAStar
                     // eg.  A <-> BCD
                     //      B <-> CD
                     //      C <-> D
-                    for (Int32 i = 0; i < temp.pGraphNodes.Count; i++)
+                    for (Int32 i = 0; i < temp.pNodes.Count; i++)
                     {
-                        for (Int32 j = i + 1; j < temp.pGraphNodes.Count; j++)
+                        for (Int32 j = i + 1; j < temp.pNodes.Count; j++)
                         {
-                            /// <todo>
-                            /// A* search to make sure these can connect and get a real cost.
-                            /// </todo>
-                            /// 
-
-                            // Link the two neightbours.
-                            temp.pGraphNodes[i].AddNeighbour(temp.pGraphNodes[j]);
-                            temp.pGraphNodes[j].AddNeighbour(temp.pGraphNodes[i]);
+                            LinkGraphNodes(temp.pNodes[i], temp.pNodes[j], temp);
                         }
 
                         // Storing the GraphNode objects in the Cluster is just to make this a little eaiser, but
                         // for the PathPlanner to work, all the GraphNode data needs to be in this Graph.
-                        AddNode(temp.pGraphNodes[i]);
+                        AddNode(temp.pNodes[i]);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Links two GraphNode objects as Neighbour. Does the slightly expensive task of calculating actual
+        /// A* path between the two, and caches that value as the cost between the two.
+        /// </summary>
+        /// <param name="a">A node to link to <paramref name="b"/>.</param>
+        /// <param name="b">A node to link to <paramref name="a"/>.</param>
+        /// <param name="cluster">The cluster containing both nodes.</param>
+        private void LinkGraphNodes(GraphNode a, GraphNode b, Cluster cluster)
+        {
+            GenericAStar.Planner planner = new Planner();
+            planner.SetSource((a.pData as Level.Tile).mGraphNode);
+            planner.SetDestination((b.pData as Level.Tile).mGraphNode);
+
+            // Do a standard A* search with the adde constraint of staying within the 
+            // bounds of this cluster.
+            Planner.Result result = planner.PlanPath(cluster.pBounds, false);
+
+            // Keep searching unti we either fail or succeed.
+            while (result != Planner.Result.Failed && result != Planner.Result.Solved)
+            {
+                result = planner.PlanPath(cluster.pBounds, false);
+            }
+
+            // Only connect the nodes if they can be reached from one another within the same cluster.
+            if (result == Planner.Result.Solved)
+            {
+                PathNode path = planner.pCurrentBest;
+
+                // Link the two neightbours.
+                a.AddNeighbour(b, path.pFinalCost);
+                b.AddNeighbour(a, path.pFinalCost);
+            }
+
+            planner.ClearDestination();
+        }
+
+        /// <summary>
+        /// Take two GraphNode objects and remove any link they have as Neighbour.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        private void UnlinkGraphNodes(GraphNode a, GraphNode b)
+        {
+            a.RemoveNeighbour(b);
+            b.RemoveNeighbour(a);
+
         }
 
         /// <summary>
@@ -158,6 +201,8 @@ namespace MBHEngine.PathFind.HPAStar
             // if the tile in this Cluster is solid.
             Level.Tile adj = tile.mAdjecentTiles[(Int32)dirCheck];
 
+            Boolean entraceMade = false;
+
             if (null != adj)
             {
                 // If we don't yet have a sequence start point, and this tile is an entrace,
@@ -171,6 +216,8 @@ namespace MBHEngine.PathFind.HPAStar
                 else if (null != sequeceStart && (tile.mType != Level.Tile.TileTypes.Empty || adj.mType != Level.Tile.TileTypes.Empty))
                 {
                     CreateEntrance(cluster, tile, ref sequeceStart, dirWalk, dirCheck, dirNeighbourCluster, true);
+
+                    entraceMade = true;
                 }
             }
 
@@ -178,7 +225,7 @@ namespace MBHEngine.PathFind.HPAStar
             adj = tile.mAdjecentTiles[(Int32)dirWalk];
 
             // Are we still in the Cluster/Level?
-            if (null != adj && cluster.Contains(adj))
+            if (null != adj && cluster.IsInBounds(adj))
             {
                 // Recursivly visit the next Tile.
                 WalkWall(cluster, adj, sequeceStart, dirWalk, dirCheck, dirNeighbourCluster);
@@ -189,6 +236,8 @@ namespace MBHEngine.PathFind.HPAStar
                 // the current sequence, should one be in progress.
                 if (null != sequeceStart)
                 {
+                    System.Diagnostics.Debug.Assert(!entraceMade, "Entrance made twice.");
+
                     CreateEntrance(cluster, tile, ref sequeceStart, dirWalk, dirCheck, dirNeighbourCluster, false);
                 }
             }
@@ -209,41 +258,272 @@ namespace MBHEngine.PathFind.HPAStar
         {
             // Find the center point between the tile at the start of the sequence of enpty tiles
             // and the current tile.
-            Vector2 middle = tile.mCollisionRect.pCenterPoint - sequenceStart.mCollisionRect.pCenterPoint;
+            Vector2 sequenceVector = tile.mCollisionRect.pCenterPoint - sequenceStart.mCollisionRect.pCenterPoint;
 
             // If we enter this block by hitting a wall, we need to remove that a Tile length from our
             // calculations since that wall is not part of the entrance/exit.
             if (removeSelf)
             {
-                middle -= Vector2.Normalize(middle) * new Vector2(cluster.pTileDimensions.X, cluster.pTileDimensions.Y);
+                sequenceVector -= Vector2.Normalize(sequenceVector) * new Vector2(cluster.pTileDimensions.X, cluster.pTileDimensions.Y);
             }
 
-            // Add half the length in order to put us in the middle of the sequence.
-            middle = (middle * 0.5f) + sequenceStart.mCollisionRect.pCenterPoint;
+            // If the sequence is long enough, instead of putting a GraphNode in the center, create 2 GraphNode objects,
+            // and place them at opposite ends of the Sequence. This is recommended by the original HPA* white paper.
+            if (sequenceVector.LengthSquared() >= (mClusterSize * mGetMapInfoMsg.mInfo_Out.mMapWidth * 0.5f))
+            {                
+                // Add the length of the Sequence to the starting point to get our ending position.
+                Vector2 end = (sequenceVector) + sequenceStart.mCollisionRect.pCenterPoint;
 
-            // We need to find the tile at that position because our GraphNode depends on that data.
-            mGetTileAtPositionMsg.mPosition_In = middle;
-            WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+                // We need to find the tile at that position because our GraphNode depends on that data.
+                mGetTileAtPositionMsg.mPosition_In = end;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
-            System.Diagnostics.Debug.Assert(null != mGetTileAtPositionMsg.mTile_Out, "Unable to find tile.");
+                System.Diagnostics.Debug.Assert(null != mGetTileAtPositionMsg.mTile_Out, "Unable to find tile.");
+
+                CreateEntranceNodes(
+                    cluster,
+                    cluster.pNeighbouringClusters[(Int32)dirNeighbourCluster],
+                    mGetTileAtPositionMsg.mTile_Out,
+                    mGetTileAtPositionMsg.mTile_Out.mAdjecentTiles[(Int32)dirCheck]);
+
+                CreateEntranceNodes(
+                    cluster,
+                    cluster.pNeighbouringClusters[(Int32)dirNeighbourCluster],
+                    sequenceStart,
+                    sequenceStart.mAdjecentTiles[(Int32)dirCheck]);
+            }
+            else
+            {
+                // Add half the length in order to put us in the middle of the sequence.
+                Vector2 middle = (sequenceVector * 0.5f) + sequenceStart.mCollisionRect.pCenterPoint;
+
+                // We need to find the tile at that position because our GraphNode depends on that data.
+                mGetTileAtPositionMsg.mPosition_In = middle;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                System.Diagnostics.Debug.Assert(null != mGetTileAtPositionMsg.mTile_Out, "Unable to find tile.");
+
+                CreateEntranceNodes(
+                    cluster,
+                    cluster.pNeighbouringClusters[(Int32)dirNeighbourCluster],
+                    mGetTileAtPositionMsg.mTile_Out,
+                    mGetTileAtPositionMsg.mTile_Out.mAdjecentTiles[(Int32)dirCheck]);
+            }
+
+            // Start a new sequence.
+            sequenceStart = null;
+        }
+
+        /// <summary>
+        /// Helper function for creating 2 linked GraphNodes in neighnbouring clusters.
+        /// </summary>
+        /// <param name="localCluster">The cluster currently being evaluated.</param>
+        /// <param name="otherCluster">The neighbouring cluster of <paramref name="localCluster"/>.</param>
+        /// <param name="localTile">The Tile on which the new entrance sits on top of.</param>
+        /// <param name="otherTile">The Tile on wihich the other new entrace sits on top of.</param>
+        private void CreateEntranceNodes(Cluster localCluster, Cluster otherCluster, Level.Tile localTile, Level.Tile otherTile)
+        {
+            GraphNode localNode;
+            GraphNode otherNode;
 
             // Create the new nodes with the appropriate Tile data.
-            TileGraphNode localNode = new TileGraphNode(mGetTileAtPositionMsg.mTile_Out);
-            TileGraphNode otherNode = new TileGraphNode(mGetTileAtPositionMsg.mTile_Out.mAdjecentTiles[(Int32)dirCheck]);
+            Boolean localCreated = CreateEntraceNode(localCluster, localTile, out localNode);
+            Boolean otherCreated = CreateEntraceNode(otherCluster, otherTile, out otherNode);
 
             // Link the two nodes together creating an Intra-Connection.
             localNode.AddNeighbour(otherNode);
             otherNode.AddNeighbour(localNode);
 
             // Add the nodes the appropriate Cluster objects.
-            cluster.AddNode(localNode);
-            cluster.pNeighbouringClusters[(Int32)dirNeighbourCluster].AddNode(otherNode);
-
-            // Start a new sequence.
-            sequenceStart = null;
+            if (localCreated)
+            {
+                localCluster.AddNode(localNode);
+            }
+            if (otherCreated)
+            {
+                otherCluster.AddNode(otherNode);
+            }
         }
 
-        
+
+        /// <summary>
+        /// Helper function for creating a Node for an entrace but also checking that it hasn't already been
+        /// created, and if it has, just using that one instead to avoid multiple Nodes on top of the same
+        /// tile.
+        /// </summary>
+        /// <param name="cluster">The custer which this node lives in.</param>
+        /// <param name="tile">The tile which this node wraps.</param>
+        /// <param name="node">
+        /// If a node already exists over <paramref name="tile"/> this will be that GraphNode. If not it will 
+        /// be a newly created GraphNode.
+        /// </param>
+        /// <returns>True if a new GraphNode was created.</returns>
+        private Boolean CreateEntraceNode(Cluster cluster, Level.Tile tile, out GraphNode node)
+        {
+            Boolean created = false;
+
+            // First see if this Tile is already managed by this cluster. If it is, it will return us
+            // the node which contains it.
+            node = cluster.GetNodeContaining(tile);
+
+            // If the node isn't already being managed, we need to create a new one.
+            if (null == node)
+            {
+                node = new NavMeshTileGraphNode(tile);
+
+                created = true;
+            }
+
+            return created;
+        }
+
+        /// <summary>
+        /// Find the GraphNode in this NavMesh, closest to a given positon within the cluster at that
+        /// location.
+        /// </summary>
+        /// <param name="pos">The position the search near.</param>
+        /// <returns>The clostest GraphNode in the Cluster at the given position.</returns>
+        public GraphNode GetClostestNode(Vector2 pos)
+        {
+            // How many pixels wide/high is a single cluster? This will be needed to go from
+            // screen size, to cluster index.
+            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
+            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
+
+            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
+            
+            GraphNode best = null;
+
+            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            {
+                Cluster cluster = mClusters[index.X, index.Y];
+                Single bestDist = Single.MaxValue;
+
+                for (Int32 i = 0; i < cluster.pNodes.Count; i++)
+                {
+                    GraphNode node = cluster.pNodes[i];
+
+                    Single dist = Vector2.DistanceSquared(node.pPosition, pos);
+
+                    if (null == best || dist < bestDist)
+                    {
+                        best = node;
+                        bestDist = dist;
+                    }
+                }
+            }
+
+            return best;
+        }
+
+        /// <summary>
+        /// Finds the GraphNode at a given position (should one exist).
+        /// </summary>
+        /// <param name="pos">The position to search at.</param>
+        /// <returns>The GraphNode at <paramref name="pos"/></returns>
+        public GraphNode FindNodeAt(Vector2 pos)
+        {
+            // How many pixels wide/high is a single cluster? This will be needed to go from
+            // screen size, to cluster index.
+            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
+            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
+
+            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
+
+            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            {
+                Cluster cluster = mClusters[index.X, index.Y];
+
+                mGetTileAtPositionMsg.Reset();
+                mGetTileAtPositionMsg.mPosition_In = pos;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                return cluster.GetNodeContaining(mGetTileAtPositionMsg.mTile_Out);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Inserts a new GraphNode into the Graph 'after the fact'.
+        /// </summary>
+        /// <param name="pos">The position at which to insert the GraphNode.</param>
+        /// <returns></returns>
+        public GraphNode InsertSearchNode(Vector2 pos)
+        {            
+            // How many pixels wide/high is a single cluster? This will be needed to go from
+            // screen size, to cluster index.
+            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
+            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
+
+            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
+
+            GraphNode node = null;
+
+            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            {
+                Cluster cluster = mClusters[index.X, index.Y];
+
+                mGetTileAtPositionMsg.Reset();
+                mGetTileAtPositionMsg.mPosition_In = pos;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                node = cluster.GetNodeContaining(mGetTileAtPositionMsg.mTile_Out);
+
+                if (node == null)
+                {
+                    node = new NavMeshTileGraphNode(mGetTileAtPositionMsg.mTile_Out);
+
+                    // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
+                    // the nodes that follow it (and back), so by the end of the loop everyone should be
+                    // linked to each other.
+                    // eg.  A <-> BCD
+                    //      B <-> CD
+                    //      C <-> D
+                    for (Int32 i = 0; i < cluster.pNodes.Count; i++)
+                    {
+                        LinkGraphNodes(node, cluster.pNodes[i], cluster);
+                    }
+
+                    // Storing the GraphNode objects in the Cluster is just to make this a little eaiser, but
+                    // for the PathPlanner to work, all the GraphNode data needs to be in this Graph.
+                    cluster.AddNode(node);
+                    AddNode(node);
+                }
+            }
+
+            return node;
+        }
+
+        /// <summary>
+        /// Removes a GraphNode from the Graph and also removes all the associated links to and from other
+        /// GraphNode objects in this Graph.
+        /// </summary>
+        /// <param name="node">The GraphNode to remove.</param>
+        public void RemoveSearchNode(GraphNode node)
+        {            
+            // How many pixels wide/high is a single cluster? This will be needed to go from
+            // screen size, to cluster index.
+            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
+            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
+
+            Point index = new Point((Int32)(node.pPosition.X / pixelsPerClusterX), (Int32)(node.pPosition.Y / pixelsPerClusterY));
+
+            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            {
+                Cluster cluster = mClusters[index.X, index.Y];
+
+                for (Int32 i = 0; i < cluster.pNodes.Count; i++)
+                {
+                    UnlinkGraphNodes(node, cluster.pNodes[i]);
+                }
+
+                cluster.RemoveNode(node);
+            }
+
+            RemoveNode(node);
+        }
+
         /// <summary>
         /// Since this Graph is organized into clusters, we can severly limit the amount of debug draw needed
         /// by indexing directly into clusters base on camera position.
@@ -272,9 +552,9 @@ namespace MBHEngine.PathFind.HPAStar
                 {
                     Cluster temp = mClusters[x, y];
 
-                    for (Int32 i = 0; i < temp.pGraphNodes.Count; i++)
+                    for (Int32 i = 0; i < temp.pNodes.Count; i++)
                     {
-                        DrawNode(temp.pGraphNodes[i], showLinks);
+                        DrawNode(temp.pNodes[i], showLinks);
                     }
 
                     // Render the cluster boundaries as well.

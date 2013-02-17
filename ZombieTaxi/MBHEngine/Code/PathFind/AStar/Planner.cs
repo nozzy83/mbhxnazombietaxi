@@ -153,12 +153,6 @@ namespace MBHEngine.PathFind.AStar
         Boolean mPathInvalidated;
 
         /// <summary>
-        /// Allows for the possibility to automatically update the source position based on the parent 
-        /// Game Object.
-        /// </summary>
-        Boolean mUpdateSourceAutomatically;
-
-        /// <summary>
         /// Preallocated to avoid garbage at runtime.
         /// </summary>
         private MBHEngine.Behaviour.Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
@@ -190,9 +184,6 @@ namespace MBHEngine.PathFind.AStar
             // Assume the path is not solved.
             mSolved = false;
             mPathInvalidated = false;
-
-            // TODO: This should be read in from the xml.
-            mUpdateSourceAutomatically = false;
 
             // Preallocate messages to avoid GC during gameplay.
             //

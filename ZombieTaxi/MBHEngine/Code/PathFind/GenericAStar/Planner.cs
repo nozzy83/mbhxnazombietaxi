@@ -18,6 +18,7 @@ namespace MBHEngine.PathFind.GenericAStar
             Solved = 0,
             Failed,
             NotStarted,
+            InProgress,
         };
 
         /// <summary>
@@ -58,8 +59,14 @@ namespace MBHEngine.PathFind.GenericAStar
         /// </summary>
         private Boolean mSolved;
 
+        /// <summary>
+        /// Allows aync function to tell the main update pass to restart the search.
+        /// </summary>
         private Boolean mPathInvalidated;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public Planner()
         {
             // mUnusedNodes is a static used by all instances of the behavior.  We only want to allocate
@@ -81,7 +88,13 @@ namespace MBHEngine.PathFind.GenericAStar
             mSolved = false;
         }
 
-        public Result PlanPath()
+        /// <summary>
+        /// Perform the path finding. Call repeatedly to continue to try and find the path over a number
+        /// of frames.
+        /// </summary>
+        /// <param name="restrictedArea">Restrict choosen nodes to this area.</param>
+        /// <returns>The result of the path finding for this frame.</returns>
+        public Result PlanPath(MBHEngine.Math.Rectangle restrictedArea = null, Boolean drawDebug = true)
         {            
             // If there is no tile at the destination then there is no path finding to do.
             if (mEnd == null)
@@ -89,8 +102,11 @@ namespace MBHEngine.PathFind.GenericAStar
                 return Result.NotStarted;
             }
 
-            // If we have a destination draw it. Even if there isn't a source yet.
-            DebugShapeDisplay.pInstance.AddPoint(mEnd.pPosition, 2.0f, Color.Yellow);
+            if (drawDebug)
+            {
+                // If we have a destination draw it. Even if there isn't a source yet.
+                DebugShapeDisplay.pInstance.AddPoint(mEnd.pPosition, 2.0f, Color.Yellow);
+            }
 
             // If the destination is a solid tile then we will never be able to solve the path.
             if (null != mEnd && !mEnd.IsEmpty())
@@ -113,8 +129,11 @@ namespace MBHEngine.PathFind.GenericAStar
                 return Result.Failed;
             }
 
-            // If there is a source, draw it.
-            DebugShapeDisplay.pInstance.AddPoint(mStart.pPosition, 2.0f, Color.Orange);
+            if (drawDebug)
+            {
+                // If there is a source, draw it.
+                DebugShapeDisplay.pInstance.AddPoint(mStart.pPosition, 2.0f, Color.Orange);
+            }
 
             // If the path hasn't already been invalidated this frame, we need to check that
             // the path didn't get blocked from something like the Player placing blocks.
@@ -158,9 +177,17 @@ namespace MBHEngine.PathFind.GenericAStar
                 p.pCostFromStart = 0;
 
                 // For H we use the actual distance to the destination.  The Manhattan Heuristic method.
-                p.pCostToEnd = 8.0f * System.Math.Max(System.Math.Abs(
+                /*
+                p.pCostToEnd = System.Math.Max(System.Math.Abs(
                         p.pGraphNode.pPosition.X - mEnd.pPosition.X),
                         System.Math.Abs(p.pGraphNode.pPosition.Y - mEnd.pPosition.Y));
+                */
+
+                Vector2 source = p.pGraphNode.pPosition;
+
+                Single h_diagonal = System.Math.Min(System.Math.Abs(source.X - mEnd.pPosition.X), System.Math.Abs(source.Y - mEnd.pPosition.Y));
+                Single h_straight = System.Math.Abs(source.X - mEnd.pPosition.X) + System.Math.Abs(source.Y - mEnd.pPosition.Y);
+                p.pCostToEnd = (11.314f) * h_diagonal + 8.0f * (h_straight - 2 * h_diagonal);
 
                 // Add it to the list, and start the search!
                 mOpenNodes.Add(p);
@@ -179,7 +206,7 @@ namespace MBHEngine.PathFind.GenericAStar
 
             // Loop until all possibilities have been exhusted, the time slice is expired or the 
             // path is solved.
-            while (mOpenNodes.Count > 0 && count < maxLoops && !mSolved)
+            while (mOpenNodes.Count > 0 && count < maxLoops && !mSolved)// && (!drawDebug || Input.InputManager.pInstance.CheckAction(Input.InputManager.InputActions.B, true)))
             {
                 count++;
 
@@ -200,7 +227,7 @@ namespace MBHEngine.PathFind.GenericAStar
                 //
                 if (mBestPathEnd.pGraphNode == mEnd)
                 {
-                    OnPathSolved();
+                    OnPathSolved(drawDebug);
 
                     mSolved = true;
 
@@ -211,7 +238,7 @@ namespace MBHEngine.PathFind.GenericAStar
                 {
                     GraphNode.Neighbour nextNode = mBestPathEnd.pGraphNode.pNeighbours[i];
 
-                    if (nextNode.mGraphNode.IsPassable(mBestPathEnd.pGraphNode))
+                    if (nextNode.mGraphNode.IsPassable(mBestPathEnd.pGraphNode) && (restrictedArea == null || restrictedArea.Intersects(nextNode.mGraphNode.pPosition)))
                     {
                         Boolean found = false;
                         for (Int32 j = 0; j < mClosedNodes.Count; j++)
@@ -267,19 +294,20 @@ namespace MBHEngine.PathFind.GenericAStar
                             p.pCostFromStart = costFromCurrentBest;
 
                             // Combo
-                            /*
+                            
                             Vector2 source = p.pGraphNode.pPosition;
 
                             Single h_diagonal = System.Math.Min(System.Math.Abs(source.X - mEnd.pPosition.X), System.Math.Abs(source.Y - mEnd.pPosition.Y));
                             Single h_straight = System.Math.Abs(source.X - mEnd.pPosition.X) + System.Math.Abs(source.Y - mEnd.pPosition.Y);
                             p.pCostToEnd = (11.314f) * h_diagonal + 8.0f * (h_straight - 2 * h_diagonal);
                             //p.mCostToEnd *= (10.0f + (1.0f/1000.0f));
-                            */
+                            
 
-                            p.pCostToEnd = 8.0f * System.Math.Max(System.Math.Abs(
+                            /*
+                            p.pCostToEnd = System.Math.Max(System.Math.Abs(
                                                     p.pGraphNode.pPosition.X - mEnd.pPosition.X),
                                                     System.Math.Abs(p.pGraphNode.pPosition.Y - mEnd.pPosition.Y));
-
+                            */
                             mOpenNodes.Add(p);
 
                             // Ending the search now will alomost always result in the best path
@@ -290,7 +318,7 @@ namespace MBHEngine.PathFind.GenericAStar
                                 // tracing back through the path from now on.
                                 mBestPathEnd = p;
                                 
-                                OnPathSolved();
+                                OnPathSolved(drawDebug);
                                 
                                 break;
                             }
@@ -313,12 +341,23 @@ namespace MBHEngine.PathFind.GenericAStar
             }
 
             // Draw the path.
-            if (mBestPathEnd != null)
+            if (drawDebug && mBestPathEnd != null)
             {
                 DebugDraw();
             }
 
-            return (mSolved ? Result.Solved : Result.Failed);
+            if (mSolved)
+            {
+                return Result.Solved;
+            }
+            else if (mOpenNodes.Count > 0)
+            {
+                return Result.InProgress;
+            }
+            else
+            {
+                return Result.Failed;
+            }
         }
 
         /// <summary>
@@ -375,12 +414,16 @@ namespace MBHEngine.PathFind.GenericAStar
         /// <summary>
         /// Called when the path has been solved.
         /// </summary>
-        private void OnPathSolved()
+        /// <param name="drawDebug">Should the path be drawn.</param>
+        private void OnPathSolved(Boolean drawDebug)
         {
-            // Since solving the path triggers and early return in the main update loop,
-            // the code that usually draws the path will not be executed.  We need to do
-            // it here once to avoid a flicker.
-            DebugDraw();
+            if (drawDebug)
+            {
+                // Since solving the path triggers and early return in the main update loop,
+                // the code that usually draws the path will not be executed.  We need to do
+                // it here once to avoid a flicker.
+                DebugDraw();
+            }
 
             // The path is now solved.  This will tell the main update loop to stop trying to
             // solve it until it becomes invalidated again.

@@ -8,6 +8,7 @@ using MBHEngine.GameObject;
 using MBHEngine.Input;
 using System.Diagnostics;
 using MBHEngine.World;
+using MBHEngine.PathFind.GenericAStar;
 
 namespace MBHEngine.Behaviour
 {
@@ -114,6 +115,7 @@ namespace MBHEngine.Behaviour
         /// </summary>
         private OnPathFindFailedMessage mOnPathFindFailedMsg;
         private MBHEngine.Behaviour.Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
+        private Level.GetNavMeshMessage mGetNavMeshMsg;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -145,6 +147,7 @@ namespace MBHEngine.Behaviour
             //
             mOnPathFindFailedMsg = new OnPathFindFailedMessage();
             mGetTileAtPositionMsg = new Level.GetTileAtPositionMessage();
+            mGetNavMeshMsg = new Level.GetNavMeshMessage();
         }
 
         /// <summary>
@@ -188,10 +191,15 @@ namespace MBHEngine.Behaviour
             {
                 SetDestinationMessage tmp = (SetDestinationMessage)msg;
 
-                mGetTileAtPositionMsg.mPosition_In = tmp.mDestination_In;
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+                //mGetTileAtPositionMsg.mPosition_In = tmp.mDestination_In;
+                //WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
-                mPlanner.SetDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+                //mPlanner.SetDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+
+                GraphNode node = mGetNavMeshMsg.mNavMesh_Out.GetClostestNode(tmp.mDestination_In); //mGetNavMeshMsg.mNavMesh_Out.AddSearchNode(tmp.mDestination_In);
+                mPlanner.SetDestination(node);
             }
             else if (msg is ClearDestinationMessage)
             {
@@ -201,11 +209,16 @@ namespace MBHEngine.Behaviour
             {
                 SetSourceMessage tmp = (SetSourceMessage)msg;
 
-                mGetTileAtPositionMsg.mPosition_In = tmp.mSource_In;
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+                //mGetTileAtPositionMsg.mPosition_In = tmp.mSource_In;
+                //WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
                 // Update the source incase the GO has moved since the last update.
-                mPlanner.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+                //mPlanner.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+
+                GraphNode node = mGetNavMeshMsg.mNavMesh_Out.GetClostestNode(tmp.mSource_In);//mGetNavMeshMsg.mNavMesh_Out.AddSearchNode(tmp.mSource_In);
+                mPlanner.SetSource(node);
             }
             else if (msg is GetCurrentBestNodeMessage)
             {

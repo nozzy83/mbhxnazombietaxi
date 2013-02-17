@@ -13,7 +13,7 @@ namespace MBHEngine.PathFind.HPAStar
     /// calculate all the entrances/exits in the cluster and links them to entrances/exits in the neighbouring
     /// Cluster.
     /// </summary>
-    public class Cluster
+    public class Cluster : Graph
     {
         /// <summary>
         /// Clusters are connected by the 4 basic directions.
@@ -31,13 +31,7 @@ namespace MBHEngine.PathFind.HPAStar
         /// tiles in the cluster.
         /// </summary>
         private Level.Tile mTopLeft;
-
-        /// <summary>
-        /// Although the Graph storing this cluster will have a list of all GraphNode objects
-        /// it is sometimes handy to have access to just the GraphNode objects in this Cluster.
-        /// </summary>
-        private List<TileGraphNode> mNodes;
-
+		
         /// <summary>
         /// Clusters are connected to their neighbours left, right, up and down.
         /// </summary>
@@ -66,10 +60,8 @@ namespace MBHEngine.PathFind.HPAStar
         /// <param name="tileWidth">The width in pixels of a single Tile in this Level.</param>
         /// <param name="tileHeight">The height in pixels of a single Tile in this Level.</param>
         public Cluster(Int32 clusterSize, Int32 tileWidth, Int32 tileHeight)
+            : base()
         {
-            // On average we probably have 2 entraces per side.
-            mNodes = new List<TileGraphNode>(8);
-
             mClusterSize = clusterSize;
 
             mTileDimensions = new Point(tileWidth, tileHeight);
@@ -80,12 +72,27 @@ namespace MBHEngine.PathFind.HPAStar
         }
 
         /// <summary>
-        /// Add a single GraphNode to this Cluster.
+        /// Doesn't actually do anthing different in Release, but in Debug it does some checks for 
+        /// duplicate entries. Doing this for all Graph objects would be too expensive even for testing.
         /// </summary>
-        /// <param name="node"></param>
-        public void AddNode(TileGraphNode node)
+        /// <param name="node">The node to add.</param>
+        public override void AddNode(GraphNode node)
         {
-            mNodes.Add(node);
+#if DEBUG
+            for(Int32 i = 0; i < pNodes.Count; i++)
+            {
+                if (pNodes[i].pPosition == node.pPosition)
+                {
+                    System.Diagnostics.Debug.Assert(false, "Attempting to add GraphNode at dupe position.");
+                }
+
+                if (pNodes.Contains(node))
+                {
+                    System.Diagnostics.Debug.Assert(false, "Attempting to add Dupe GraphNode.");
+                }
+            }
+#endif
+            base.AddNode(node);
         }
 
         /// <summary>
@@ -93,9 +100,34 @@ namespace MBHEngine.PathFind.HPAStar
         /// </summary>
         /// <param name="tile">The Tile to check for.</param>
         /// <returns>True if tile is inside this cluster.</returns>
-        public Boolean Contains(Level.Tile tile)
+        public Boolean IsInBounds(Level.Tile tile)
         {
             return (mBounds.Intersects(tile.mCollisionRect));
+        }
+
+        /// <summary>
+        /// Is a particular Tile already part of this Cluster, meaning that a GraphNode in this
+        /// Cluster is wrapping that tile. If it is, then that GraphNode gets returned so that it
+        /// can be reused.
+        /// </summary>
+        /// <param name="tile">The tile to check for.</param>
+        /// <returns>The GraphNode in this Cluster which wraps the given Tile.</returns>
+        public GraphNode GetNodeContaining(Level.Tile tile)
+        {
+            // Just loop through every GraphNode looking for one that is storing the Tile.
+            for (Int32 i = 0; i < pNodes.Count; i++)
+            {
+                if (pNodes[i].pData as Level.Tile == tile)
+                {
+                    return pNodes[i];
+                }
+                else if (pNodes[i].pPosition == tile.mCollisionRect.pCenterPoint)
+                {
+                    System.Diagnostics.Debug.Assert(false, "Tile at same position but claiming to be different.");
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -123,17 +155,6 @@ namespace MBHEngine.PathFind.HPAStar
             get
             {
                 return mBounds;
-            }
-        }
-
-        /// <summary>
-        /// Access to a list of all the GraphNode objects in this cluster.
-        /// </summary>
-        public List<TileGraphNode> pGraphNodes
-        {
-            get
-            {
-                return mNodes;
             }
         }
 
