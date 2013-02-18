@@ -106,9 +106,15 @@ namespace MBHEngine.Behaviour
         private Boolean mUpdateSourceAutomatically;
 
         /// <summary>
-        /// The planner used to find a path.
+        /// The planner used to find a path at a high level.
         /// </summary>
-        public MBHEngine.PathFind.GenericAStar.Planner mPlanner;
+        public Planner mPlannerNavMesh;
+
+        /// <summary>
+        /// The planner used to find path at a low level. Used to find path between PathNode objects
+        /// in <see cref="mPlannerNavMesh"/>.
+        /// </summary>
+        public Planner mPlannerTileMap;
 
         /// <summary>
         /// Preallocated to avoid garbage at runtime.
@@ -141,7 +147,8 @@ namespace MBHEngine.Behaviour
             // TODO: This should be read in from the xml.
             mUpdateSourceAutomatically = false;
 
-            mPlanner = new MBHEngine.PathFind.GenericAStar.Planner();
+            mPlannerNavMesh = new Planner();
+            mPlannerTileMap = new Planner();
             
             // Preallocate messages to avoid GC during gameplay.
             //
@@ -160,19 +167,48 @@ namespace MBHEngine.Behaviour
             // based on our parents position?
             if (mUpdateSourceAutomatically)
             {
-                mGetTileAtPositionMsg.mPosition_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
-
-                // Update the source incase the GO has moved since the last update.
-                mPlanner.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+                SetSource(mParentGOH.pPosition);
             }
 
-            MBHEngine.PathFind.GenericAStar.Planner.Result res = mPlanner.PlanPath();
+            // Plan the path at a high level.
+            MBHEngine.PathFind.GenericAStar.Planner.Result res = mPlannerNavMesh.PlanPath();
 
             // If the planner failed to find the destination tell the other behaviours.
             if (res == MBHEngine.PathFind.GenericAStar.Planner.Result.Failed)
             {
                 mParentGOH.OnMessage(mOnPathFindFailedMsg);
+            }
+            else if (res == Planner.Result.Solved)
+            {
+                // When the high level path finding is solved, start path finding at a lower
+                // level betwen PathNodes within the higher level.
+                PathNode node = mPlannerNavMesh.pCurrentBest;
+
+                // Loop all the way back to one after the starting point. We don't want the starting
+                // node because that is where we are likely already standing.
+                while (node != null && node.pPrevious != null && node.pPrevious.pPrevious != null)
+                {
+                    node = node.pPrevious;
+                }
+
+                // The lower level search uses the Level.Tile Graph, not the NavMesh, so we need to 
+                // use the node in NavMesh to find a node in the main tile map.
+                mGetTileAtPositionMsg.Reset();
+                mGetTileAtPositionMsg.mPosition_In = node.pGraphNode.pPosition;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                // Each tile stores a reference to the GraphNode that stores it.
+                mPlannerTileMap.SetDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+
+                // Start planning the path.
+                Planner.Result tileRes = mPlannerTileMap.PlanPath();
+                
+                // Keep going until it is solved. Should be very quick since this is such a
+                // small problem maze to solve.
+                while (tileRes == Planner.Result.InProgress)
+                {
+                    tileRes = mPlannerTileMap.PlanPath();
+                }
             }
         }
 
@@ -191,39 +227,78 @@ namespace MBHEngine.Behaviour
             {
                 SetDestinationMessage tmp = (SetDestinationMessage)msg;
 
-                //mGetTileAtPositionMsg.mPosition_In = tmp.mDestination_In;
-                //WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
-
-                //mPlanner.SetDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
-
                 WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
 
+                // Find the GraphNode in the NavMesh closest to the new destination.
+                /// <todo>
+                /// This should be accurate to the Level.Tile, not just the closest.
+                /// </todo>
                 GraphNode node = mGetNavMeshMsg.mNavMesh_Out.GetClostestNode(tmp.mDestination_In); //mGetNavMeshMsg.mNavMesh_Out.AddSearchNode(tmp.mDestination_In);
-                mPlanner.SetDestination(node);
+
+                // Attempt to set a new destination. Returns true in the case where the destination was 
+                // different (and thus changed).
+                if (mPlannerNavMesh.SetDestination(node))
+                {
+                    // If the destination changes, it means the low level search is no longer valid, and
+                    // needs to wait for the high level search to complete first.
+                    mPlannerTileMap.ClearDestination();
+                }
             }
             else if (msg is ClearDestinationMessage)
             {
-                mPlanner.ClearDestination();
+                mPlannerNavMesh.ClearDestination();
+                mPlannerTileMap.ClearDestination();
             }
             else if (msg is SetSourceMessage)
             {
                 SetSourceMessage tmp = (SetSourceMessage)msg;
 
-                //mGetTileAtPositionMsg.mPosition_In = tmp.mSource_In;
-                //WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
-
-                // Update the source incase the GO has moved since the last update.
-                //mPlanner.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
-
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
-
-                GraphNode node = mGetNavMeshMsg.mNavMesh_Out.GetClostestNode(tmp.mSource_In);//mGetNavMeshMsg.mNavMesh_Out.AddSearchNode(tmp.mSource_In);
-                mPlanner.SetSource(node);
+                SetSource(tmp.mSource_In);
             }
             else if (msg is GetCurrentBestNodeMessage)
             {
                 GetCurrentBestNodeMessage tmp = (GetCurrentBestNodeMessage)msg;
-                tmp.mBest_Out = mPlanner.pCurrentBest;
+
+                // If the low level search hasn't started yet, return the high level one, so that
+                // movement can start as soon as possible.
+                tmp.mBest_Out = mPlannerTileMap.pCurrentBest != null ? mPlannerTileMap.pCurrentBest : mPlannerNavMesh.pCurrentBest;
+            }
+        }
+
+        /// <summary>
+        /// Helper function for doing the work needed to go from a position to a GraphNode, and then finally
+        /// sending that GraphNode to the Planner.
+        /// </summary>
+        /// <param name="pos">The position at which we wish to travel from.</param>
+        private void SetSource(Vector2 pos)
+        {
+            WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+
+            // First, check if we are standing on an existing GraphNode. This is best case, 
+            // as it means we don't need to create a new GraphNode (and do the associated
+            // A* search to get cost to all other GraphNode objects in Graph).
+            GraphNode node = mGetNavMeshMsg.mNavMesh_Out.FindNodeAt(pos);
+
+            // If we don't find a GraphNode at the target position, we need to create a new
+            // node to use in ou search.
+            if (null == node)
+            {
+                // Create a node, but only do the links from this node to neighbours (not back
+                // again).
+                node = mGetNavMeshMsg.mNavMesh_Out.CreateOneWayGraphNode(pos); //mGetNavMeshMsg.mNavMesh_Out.GetClostestNode(tmp.mSource_In);//mGetNavMeshMsg.mNavMesh_Out.AddSearchNode(tmp.mSource_In);
+            }
+
+            // If we got a node to target, pass it on to the Planner.
+            if (null != node)
+            {
+                mPlannerNavMesh.SetSource(node);
+
+                // Find the TileGraphNode that maps to the location of node.
+                mGetTileAtPositionMsg.Reset();
+                mGetTileAtPositionMsg.mPosition_In = pos;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                mPlannerTileMap.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
             }
         }
     }

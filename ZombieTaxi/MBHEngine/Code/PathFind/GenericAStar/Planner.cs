@@ -463,14 +463,18 @@ namespace MBHEngine.PathFind.GenericAStar
         /// to look up the tile at that position in the world.
         /// </summary>
         /// <param name="destination"></param>
-        public void SetDestination(GraphNode destination)
+        public Boolean SetDestination(GraphNode destination)
         {
             if (mEnd != destination)
             {
                 mEnd = destination;
                 mPathInvalidated = true;
                 mSolved = false;
+
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
@@ -478,14 +482,18 @@ namespace MBHEngine.PathFind.GenericAStar
         /// position in the world.
         /// </summary>
         /// <param name="source">The position in the world that the planner will start at.</param>
-        public void SetSource(GraphNode source)
+        public Boolean SetSource(GraphNode source)
         {
             if (mStart != source)
             {
                 mStart = source;
                 mPathInvalidated = true;
                 mSolved = false;
+
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>

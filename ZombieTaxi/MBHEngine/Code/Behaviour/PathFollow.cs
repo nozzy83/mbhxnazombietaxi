@@ -97,6 +97,23 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// Called when the Behaviour goes from being disabled to enabled.
+        /// This will NOT be called if the behaviour initialially starts enabled.
+        /// </summary>
+        public override void OnEnable()
+        {
+            // If we don't have a destination set yet, set it up now.
+            mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
+            mParentGOH.OnMessage(mSetSourceMsg);
+
+            if (mTarget != null)
+            {
+                mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
+                mParentGOH.OnMessage(mSetDestinationMsg);
+            }
+        }
+
+        /// <summary>
         /// Called once per frame by the game object.
         /// </summary>
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
@@ -133,6 +150,7 @@ namespace MBHEngine.Behaviour
                     // If we don't have a dynamically moving target there is nothing left to do here.
                     if (null != mTarget)
                     {
+                        mParentGOH.pDirection.mForward = Vector2.Zero;
                         return;
                     }
                 }
@@ -167,23 +185,19 @@ namespace MBHEngine.Behaviour
 
                 //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
 
-                // Move towards the nodes center point.
-                Vector2 d = p.pGraphNode.pPosition - mParentGOH.pPosition + new Vector2(0.0f, 4.0f);
-                if (d.Length() != 0.0f)
+                if (p.pGraphNode != null)
                 {
-                    d = Vector2.Normalize(d);
-                    mParentGOH.pDirection.mForward = d;
+                    // Move towards the nodes center point.
+                    Vector2 d = p.pGraphNode.pPosition - mParentGOH.pPosition + new Vector2(0.0f, 4.0f);
+                    if (d.Length() != 0.0f)
+                    {
+                        d = Vector2.Normalize(d);
+                        mParentGOH.pDirection.mForward = d;
+                    }
                 }
             }
             else if(null != mTarget)
             {
-                //DebugMessageDisplay.pInstance.AddConstantMessage("Setting first path destination.");
-
-                // If we don't have a destination set yet, set it up now.
-                mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
-                mParentGOH.OnMessage(mSetSourceMsg);
-                mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
-                mParentGOH.OnMessage(mSetDestinationMsg);
 
                 mParentGOH.pDirection.mForward = Vector2.Zero;
             }
@@ -203,6 +217,12 @@ namespace MBHEngine.Behaviour
                 SetTargetObjectMessage temp = (SetTargetObjectMessage)msg;
 
                 mTarget = temp.mTarget_In;
+
+                if (null != mTarget)
+                {
+                    mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
+                    mParentGOH.OnMessage(mSetDestinationMsg);
+                }
             }
         }
     }
