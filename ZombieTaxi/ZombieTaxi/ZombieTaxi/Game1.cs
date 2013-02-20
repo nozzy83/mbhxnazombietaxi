@@ -252,7 +252,9 @@ namespace ZombieTaxi
                     mSpawned = null;
                 }
 
+                //mSpawned = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
                 mSpawned = new GameObject("GameObjects\\Characters\\Militant\\Militant");
+                //mSpawned = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
                 mSpawned.pPosition = GameObjectManager.pInstance.pPlayer.pPosition;
                 mSpawned.pPosX += 64;
                 GameObjectManager.pInstance.Add(mSpawned);

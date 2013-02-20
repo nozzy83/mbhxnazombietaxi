@@ -498,7 +498,7 @@ namespace MBHEngine.PathFind.HPAStar
         /// </summary>
         /// <param name="pos">The position at which to insert the GraphNode.</param>
         /// <returns></returns>
-        public GraphNode InsertSearchNode(Vector2 pos)
+        public GraphNode InsertTempNode(Vector2 pos)
         {            
             // How many pixels wide/high is a single cluster? This will be needed to go from
             // screen size, to cluster index.
@@ -517,7 +517,10 @@ namespace MBHEngine.PathFind.HPAStar
                 mGetTileAtPositionMsg.mPosition_In = pos;
                 WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
-                node = cluster.GetNodeContaining(mGetTileAtPositionMsg.mTile_Out);
+                // Note:    We don't attempt to find an existing node with cluster.GetNodeContaining because
+                //          this node will get removed once the search is complete. It is only temporary, and
+                //          if we used a "real" GraphNode it would need to make sure it didn't get removed, so
+                //          this is just simpler.
 
                 if (node == null)
                 {
@@ -534,8 +537,8 @@ namespace MBHEngine.PathFind.HPAStar
                         LinkGraphNodes(node, cluster.pNodes[i], cluster);
                     }
 
-                    // Storing the GraphNode objects in the Cluster is just to make this a little eaiser, but
-                    // for the PathPlanner to work, all the GraphNode data needs to be in this Graph.
+                    // Added the nodes to the Graph objects is not required but is needed for them to show up\
+                    // in the debug render.
                     cluster.AddNode(node);
                     AddNode(node);
                 }
@@ -549,7 +552,7 @@ namespace MBHEngine.PathFind.HPAStar
         /// GraphNode objects in this Graph.
         /// </summary>
         /// <param name="node">The GraphNode to remove.</param>
-        public void RemoveSearchNode(GraphNode node)
+        public void RemoveTempNode(GraphNode node)
         {            
             // How many pixels wide/high is a single cluster? This will be needed to go from
             // screen size, to cluster index.

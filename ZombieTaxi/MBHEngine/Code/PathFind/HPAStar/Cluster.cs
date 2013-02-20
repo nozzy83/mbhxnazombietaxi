@@ -83,12 +83,12 @@ namespace MBHEngine.PathFind.HPAStar
             {
                 if (pNodes[i].pPosition == node.pPosition)
                 {
-                    System.Diagnostics.Debug.Assert(false, "Attempting to add GraphNode at dupe position.");
+                    //System.Diagnostics.Debug.Assert(false, "Attempting to add GraphNode at dupe position.");
                 }
 
                 if (pNodes.Contains(node))
                 {
-                    System.Diagnostics.Debug.Assert(false, "Attempting to add Dupe GraphNode.");
+                    //System.Diagnostics.Debug.Assert(false, "Attempting to add Dupe GraphNode.");
                 }
             }
 #endif
