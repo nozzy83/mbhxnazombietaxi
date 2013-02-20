@@ -76,10 +76,10 @@ namespace ZombieTaxi.States.Militant
             mSetDestinationMsg.mDestination_In = GameObjectManager.pInstance.pPlayer.pPosition;
             pParentGOH.OnMessage(mSetDestinationMsg);
 
-            pParentGOH.SetBehaviourEnabled<PathFollow>(true);
-
             mSetTargetObjectMsg.mTarget_In = GameObjectManager.pInstance.pPlayer;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
+
+            pParentGOH.SetBehaviourEnabled<PathFollow>(true);
 
             pParentGOH.OnMessage(mGetSafeHouseScoreMessage);
             mIncrementScoreMsg.mAmount_In = mGetSafeHouseScoreMessage.mSafeHouseScore_Out;

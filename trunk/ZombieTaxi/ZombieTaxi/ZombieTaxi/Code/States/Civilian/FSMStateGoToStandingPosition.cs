@@ -143,13 +143,13 @@ namespace ZombieTaxi.States.Civilian
                 mGetTileAtObjectMsg.mTile_Out.SetAttribute(Level.Tile.Attribute.Occupied);
             }
 
-            // With the destination and source set on the PathFind Behaviour, turning on the PathFollow
-            // Behaviour will cause him to walk to the destination.
-            pParentGOH.SetBehaviourEnabled<PathFollow>(true);
-
             // The PathFollow style should not dynamically update the destination.
             mSetTargetObjectMsg.mTarget_In = null;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
+
+            // With the destination and source set on the PathFind Behaviour, turning on the PathFollow
+            // Behaviour will cause him to walk to the destination.
+            pParentGOH.SetBehaviourEnabled<PathFollow>(true);
         }
 
         /// <summary>

@@ -478,6 +478,27 @@ namespace MBHEngine.PathFind.GenericAStar
         }
 
         /// <summary>
+        /// Similar to SetDestination, except in this case the existing path is not invalidated. Instead
+        /// the path searching continues as if the supplied destination were the original destination.
+        /// </summary>
+        /// <param name="destination">The node to try and reach.</param>
+        /// <returns></returns>
+        public Boolean ExtendDestination(GraphNode destination)
+        {
+            if (mEnd != destination)
+            {
+                mEnd = destination;
+
+                // If the path was previously solved, it is not any longer.
+                mSolved = false;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Update where this Planner is travelling from. The position is used to look up a tile at that
         /// position in the world.
         /// </summary>
@@ -520,6 +541,17 @@ namespace MBHEngine.PathFind.GenericAStar
             get
             {
                 return mBestPathEnd;
+            }
+        }
+
+        /// <summary>
+        /// The destination node.
+        /// </summary>
+        public GraphNode pEnd
+        {
+            get
+            {
+                return mEnd;
             }
         }
 

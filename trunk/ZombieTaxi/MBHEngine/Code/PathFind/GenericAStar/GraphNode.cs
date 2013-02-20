@@ -77,12 +77,12 @@ namespace MBHEngine.PathFind.GenericAStar
             {
                 if (mNeighbours[i].mGraphNode == node)
                 {
-                    System.Diagnostics.Debug.Assert(false, "Dupe GraphNode added the neighbouring list.");
+                    //System.Diagnostics.Debug.Assert(false, "Dupe GraphNode added the neighbouring list.");
                 }
 
                 if (mNeighbours[i].mGraphNode.pPosition == node.pPosition)
                 {
-                    System.Diagnostics.Debug.Assert(false, "GraphNode at dupe position added the neighbouring list.");
+                    //System.Diagnostics.Debug.Assert(false, "GraphNode at dupe position added the neighbouring list.");
                 }
             }
 #endif

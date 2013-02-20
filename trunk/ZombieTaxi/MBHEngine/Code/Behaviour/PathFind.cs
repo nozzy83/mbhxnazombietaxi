@@ -117,6 +117,19 @@ namespace MBHEngine.Behaviour
         public Planner mPlannerTileMap;
 
         /// <summary>
+        /// The current best at the mPlannerTileMap level. We don't use mPlannerTileMap.pCurBest directly
+        /// because we will sometimes continue to search deeper into the high level path while this node
+        /// is used to start moving.
+        /// </summary>
+        private PathNode mLowLevelBest;
+
+        /// <summary>
+        /// Tracks the deepest node in the nav mesh that has been pathed to with mPlannerTileMap in the 
+        /// current search problem.
+        /// </summary>
+        private PathNode mLastHighLevelSearched;
+
+        /// <summary>
         /// Preallocated to avoid garbage at runtime.
         /// </summary>
         private OnPathFindFailedMessage mOnPathFindFailedMsg;
@@ -178,15 +191,18 @@ namespace MBHEngine.Behaviour
             {
                 mParentGOH.OnMessage(mOnPathFindFailedMsg);
             }
-            else if (res == Planner.Result.Solved)
+            else if (res == Planner.Result.Solved)// && InputManager.pInstance.CheckAction(InputManager.InputActions.B))
             {
                 // When the high level path finding is solved, start path finding at a lower
                 // level betwen PathNodes within the higher level.
+                //
+
                 PathNode node = mPlannerNavMesh.pCurrentBest;
 
-                // Loop all the way back to one after the starting point. We don't want the starting
-                // node because that is where we are likely already standing.
-                while (node != null && node.pPrevious != null && node.pPrevious.pPrevious != null)
+                // Loop all the way back to one after the starting point avoiding the starting node, as
+                // well as previously searched nodes.
+                // We don't want the starting node because that is where we are likely already standing.
+                while (node != mLastHighLevelSearched && node.pPrevious != mLastHighLevelSearched && node.pPrevious.pPrevious != null)
                 {
                     node = node.pPrevious;
                 }
@@ -197,17 +213,29 @@ namespace MBHEngine.Behaviour
                 mGetTileAtPositionMsg.mPosition_In = node.pGraphNode.pPosition;
                 WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
-                // Each tile stores a reference to the GraphNode that stores it.
-                mPlannerTileMap.SetDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
-
-                // Start planning the path.
-                Planner.Result tileRes = mPlannerTileMap.PlanPath();
-                
-                // Keep going until it is solved. Should be very quick since this is such a
-                // small problem maze to solve.
-                while (tileRes == Planner.Result.InProgress)
+                // If this is the first time we are searching at the low level (for this particular 
+                // search) we want to SET the destination. If that isn't the case, we want to extend
+                // the search to continue to a new destination.
+                if (null == mLowLevelBest)
                 {
-                    tileRes = mPlannerTileMap.PlanPath();
+                    mPlannerTileMap.SetDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+                }
+                else
+                {
+                    mPlannerTileMap.ExtendDestination(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+                }
+
+                // Start/Continue planning the path.
+                Planner.Result tileRes = mPlannerTileMap.PlanPath();
+
+                // Once the path has been solved, store out that this node in the high level search has 
+                // been completed, so the next time through this function, the next node in the path w
+                // will be the target.
+                if (tileRes == Planner.Result.Solved)
+                {
+                    mLowLevelBest = mPlannerTileMap.pCurrentBest;
+
+                    mLastHighLevelSearched = node;
                 }
             }
         }
@@ -227,25 +255,22 @@ namespace MBHEngine.Behaviour
             {
                 SetDestinationMessage tmp = (SetDestinationMessage)msg;
 
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
-
-                // Find the GraphNode in the NavMesh closest to the new destination.
-                /// <todo>
-                /// This should be accurate to the Level.Tile, not just the closest.
-                /// </todo>
-                GraphNode node = mGetNavMeshMsg.mNavMesh_Out.GetClostestNode(tmp.mDestination_In); //mGetNavMeshMsg.mNavMesh_Out.AddSearchNode(tmp.mDestination_In);
-
-                // Attempt to set a new destination. Returns true in the case where the destination was 
-                // different (and thus changed).
-                if (mPlannerNavMesh.SetDestination(node))
-                {
-                    // If the destination changes, it means the low level search is no longer valid, and
-                    // needs to wait for the high level search to complete first.
-                    mPlannerTileMap.ClearDestination();
-                }
+                SetDestination(tmp.mDestination_In);
             }
             else if (msg is ClearDestinationMessage)
             {
+                // If mPlannerNavMesh currently has a destination, that means that we added a temp
+                // node to the nav mesh as that destination, and it needs to be removed now.
+                if (mPlannerNavMesh.pEnd != null)
+                {
+                    mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(mPlannerNavMesh.pEnd);
+                }
+
+                // Members used to coordinate the low level search need to be reset since the 
+                // search had been invalidated.
+                mLowLevelBest = null;
+                mLastHighLevelSearched = null;
+
                 mPlannerNavMesh.ClearDestination();
                 mPlannerTileMap.ClearDestination();
             }
@@ -261,7 +286,44 @@ namespace MBHEngine.Behaviour
 
                 // If the low level search hasn't started yet, return the high level one, so that
                 // movement can start as soon as possible.
-                tmp.mBest_Out = mPlannerTileMap.pCurrentBest != null ? mPlannerTileMap.pCurrentBest : mPlannerNavMesh.pCurrentBest;
+                tmp.mBest_Out = mLowLevelBest != null ? mLowLevelBest : mPlannerNavMesh.pCurrentBest;
+            }
+        }
+
+        /// <summary>
+        /// Sets the current location that we want to path search to.
+        /// </summary>
+        /// <param name="pos">The position to try and reach.</param>
+        private void SetDestination(Vector2 pos)
+        {
+            mGetTileAtPositionMsg.Reset();
+            mGetTileAtPositionMsg.mPosition_In = pos;
+            WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+            GraphNode end = mPlannerNavMesh.pEnd;
+
+            // Only set the new destination if it is different than the current one (or the current
+            // one does not exist).
+            if (end == null || mGetTileAtPositionMsg.mTile_Out != end.pData)
+            {
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+
+                // If the GraphNode was already created, remove it before adding a new one.
+                if (end != null)
+                {
+                    mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(end);
+                }
+
+                GraphNode node = mGetNavMeshMsg.mNavMesh_Out.InsertTempNode(pos);
+
+                // Attempt to set a new destination. Returns true in the case where the destination was 
+                // different (and thus changed).
+                if (mPlannerNavMesh.SetDestination(node))
+                {
+                    // If the destination changes, it means the low level search is no longer valid, and
+                    // needs to wait for the high level search to complete first.
+                    mPlannerTileMap.ClearDestination();
+                }
             }
         }
 
