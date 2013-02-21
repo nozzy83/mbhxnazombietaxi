@@ -228,6 +228,7 @@ namespace ZombieTaxi.Behaviours
                         // start managing it.
                         GameObjectManager.pInstance.Add(mGetCurrentObjectMsg.mObj_Out);
 
+                        mOnNavMeshInvalidatedMsg.mPosition_In = mCursor.pPosition;
                         lvl.OnMessage(mOnNavMeshInvalidatedMsg);
                     }
                     else
@@ -258,6 +259,9 @@ namespace ZombieTaxi.Behaviours
                 {
                     GameObjectManager.pInstance.Remove(mCollidedObjects[i]);
                 }
+
+                mOnNavMeshInvalidatedMsg.mPosition_In = mCursor.pPosition;
+                lvl.OnMessage(mOnNavMeshInvalidatedMsg);
             }
         }
 
