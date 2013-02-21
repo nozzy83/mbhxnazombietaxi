@@ -115,24 +115,165 @@ namespace MBHEngine.PathFind.HPAStar
                 {
                     Cluster temp = mClusters[x, y];
 
-                    // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
-                    // the nodes that follow it (and back), so by the end of the loop everyone should be
-                    // linked to each other.
-                    // eg.  A <-> BCD
-                    //      B <-> CD
-                    //      C <-> D
-                    for (Int32 i = 0; i < temp.pNodes.Count; i++)
-                    {
-                        for (Int32 j = i + 1; j < temp.pNodes.Count; j++)
-                        {
-                            LinkGraphNodes(temp.pNodes[i], temp.pNodes[j], temp);
-                        }
+                    LinkClusterGraphNodes(temp);
+                }
+            }
+        }
 
-                        // Storing the GraphNode objects in the Cluster is just to make this a little eaiser, but
-                        // for the PathPlanner to work, all the GraphNode data needs to be in this Graph.
-                        AddNode(temp.pNodes[i]);
+        /// <summary>
+        /// Clears out a cluster and regenerates all the nodes inside and any links to outside
+        /// cluster GraphNode objects.
+        /// </summary>
+        /// <param name="pos">The position inside a cluster which should be regenerated.</param>
+        public void RegenerateCluster(Vector2 pos)
+        {
+            // To start, find if and what cluster was invalidated.
+            Cluster cluster = GetClusterAtPosition(pos);
+
+            // Remove all the GraphNode objects from the Cluster and remove any links between GraphNodes
+            // and adjacent Cluster objects.
+            ClearCluster(cluster);
+
+            Level.Tile nextStartPoint = cluster.pTopLeft;
+
+            // With the Cluster cleared out, it is now required that entrances/exits be regenerated.
+            nextStartPoint = WalkWall(cluster, nextStartPoint, null, Level.Tile.AdjacentTileDir.RIGHT, Level.Tile.AdjacentTileDir.UP, Cluster.AdjacentClusterDirections.Up);
+            nextStartPoint = WalkWall(cluster, nextStartPoint, null, Level.Tile.AdjacentTileDir.DOWN, Level.Tile.AdjacentTileDir.RIGHT, Cluster.AdjacentClusterDirections.Right);
+            nextStartPoint = WalkWall(cluster, nextStartPoint, null, Level.Tile.AdjacentTileDir.LEFT, Level.Tile.AdjacentTileDir.DOWN, Cluster.AdjacentClusterDirections.Down);
+            nextStartPoint = WalkWall(cluster, nextStartPoint, null, Level.Tile.AdjacentTileDir.UP, Level.Tile.AdjacentTileDir.LEFT, Cluster.AdjacentClusterDirections.Left);
+
+            // Link all the GraphNode within this cluster.
+            LinkClusterGraphNodes(cluster);
+
+            // Neighbouring Clusters may have had GraphNode added to them, and so they may require
+            // new linkages to be set up.
+            for (Int32 i = 0; i < cluster.pNeighbouringClusters.Length; i++)
+            {
+                LinkClusterGraphNodes(cluster.pNeighbouringClusters[i]);
+            }
+        }
+
+        /// <summary>
+        /// Nasty little function which essentially removes a Cluster's nodes and any links associated
+        /// with them. Things get complicated with the fact that adjecent Clusters have GraphNode in them
+        /// which link back to GraphNode in this Cluster, which need to be cleaned up, and sometimes completely
+        /// removed. The method handles it all.
+        /// </summary>
+        /// <param name="cluster"></param>
+        private void ClearCluster(Cluster cluster)
+        {
+            if (null != cluster)
+            {
+                // Loop through every node in the cluster cleaning up its links to other nodes
+                // as we go.
+                for (Int32 i = cluster.pNodes.Count - 1; i >= 0; i--)
+                {
+                    GraphNode node = cluster.pNodes[i];
+
+                    // Loop through all the neighbours removing the links as we go.
+                    for (Int32 j = node.pNeighbours.Count - 1; j >= 0; j--)
+                    {
+                        GraphNode.Neighbour neighbour = node.pNeighbours[j];
+
+                        // Since this is in the cluster being regenerated, all links to other nodes
+                        // should be removed; this node/cluster isn't going to exist in a moment.
+                        UnlinkGraphNodes(node, neighbour.mGraphNode);
+
+                        // Probably redundant since this node is about to go bye-bye.
+                        node.RemoveNeighbour(neighbour.mGraphNode);
+
+                        //
+                        // Next comes the convoluted process for checking if the GraphNode just unlinked
+                        // actually lives in another cluster, and if so, possibly removing that GraphNode
+                        // as well, but only in the case where the neighbour ONLY links to GraphNodes 
+                        // within its own Cluster (remember we already removed the link to the cluster we 
+                        // are destroying. In the case where it links out to another Cluster, that node 
+                        // still has some purpose, so it shouldn't be removed; just the links to the
+                        // Cluster being destroyed.
+                        //
+
+                        Cluster neighbourCluster = GetClusterAtPosition(neighbour.mGraphNode.pPosition);
+
+                        // Is this a GraphNode that lives in a Cluster outside the one being cleared?
+                        if (neighbourCluster != cluster)
+                        {
+                            // Since it does't live in the Cluster being cleared, it would not be part of the
+                            // main loop, and therefore would not remove the current GraphNode from the list
+                            // of neighbours.
+                            neighbour.mGraphNode.RemoveNeighbour(node);
+
+                            // Search through all the neighbours trying to find one that is in a different Cluster,
+                            // signifying that this GraphNode needs to live on. Remember that nodes in corners can
+                            // be linked to multiple adjacent Clusters.
+                            Boolean foundOther = false;
+
+                            for (Int32 k = neighbour.mGraphNode.pNeighbours.Count - 1; k >= 0; k--)
+                            {
+                                // Slicks naming...
+                                GraphNode.Neighbour otherNeighbour = neighbour.mGraphNode.pNeighbours[k];
+
+                                Cluster otherNeighbourCluster = GetClusterAtPosition(otherNeighbour.mGraphNode.pPosition);
+
+                                // If the neighbour lives outside this Cluster than we don't want to remove the current
+                                // neighbour being evaluated.
+                                if (otherNeighbourCluster != neighbourCluster)
+                                {
+                                    foundOther = true;
+                                    break;
+                                }
+                            }
+
+                            if (!foundOther)
+                            {
+                                // Now loop through all the neighbours AGAIN, this time removing all links between the
+                                // GraphNode about to be removed, and all the others that will live on.
+                                for (Int32 k = neighbour.mGraphNode.pNeighbours.Count - 1; k >= 0; k--)
+                                {
+                                    GraphNode.Neighbour otherNeighbour = neighbour.mGraphNode.pNeighbours[k];
+
+                                    UnlinkGraphNodes(neighbour.mGraphNode, otherNeighbour.mGraphNode);
+
+                                    neighbour.mGraphNode.RemoveNeighbour(otherNeighbour.mGraphNode);
+                                    otherNeighbour.mGraphNode.RemoveNeighbour(neighbour.mGraphNode);
+                                }
+
+                                // Remove this neighbour from the Graph objects.
+                                RemoveNode(neighbour.mGraphNode);
+                                neighbourCluster.RemoveNode(neighbour.mGraphNode);
+                            }
+                        }
+                    }
+
+                    RemoveNode(node);
+                    cluster.RemoveNode(node);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create all the intra-connects within a Cluster.
+        /// </summary>
+        /// <param name="cluster">The Cluster to perform the links in.</param>
+        private void LinkClusterGraphNodes(Cluster cluster)
+        {            
+            // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
+            // the nodes that follow it (and back), so by the end of the loop everyone should be
+            // linked to each other.
+            // eg.  A <-> BCD
+            //      B <-> CD
+            //      C <-> D
+            for (Int32 i = 0; i < cluster.pNodes.Count; i++)
+            {
+                for (Int32 j = i + 1; j < cluster.pNodes.Count; j++)
+                {
+                    // Avoid linking the same node multiple times.
+                    if (!cluster.pNodes[i].HasNeighbour(cluster.pNodes[j]))
+                    {
+                        LinkGraphNodes(cluster.pNodes[i], cluster.pNodes[j], cluster);
                     }
                 }
+
+                //AddNode(cluster.pNodes[i]);
             }
         }
 
@@ -198,7 +339,8 @@ namespace MBHEngine.PathFind.HPAStar
         /// <param name="dirWalk">The direction to walk along the wall.</param>
         /// <param name="dirCheck">The direction of the neighbouring Cluster to check. It isn't enough to check outselves; the neighbour may be blocking travel.</param>
         /// <param name="dirNeighbourCluster">Same as dirCheck but using the enum that Clusters understand.</param>
-        private void WalkWall(Cluster cluster, Level.Tile tile, Level.Tile sequeceStart, Level.Tile.AdjacentTileDir dirWalk, Level.Tile.AdjacentTileDir dirCheck, Cluster.AdjacentClusterDirections dirNeighbourCluster)
+        /// <returns>The last tile visited on this wall. Useful for walking an entire perimeter.</returns>
+        private Level.Tile WalkWall(Cluster cluster, Level.Tile tile, Level.Tile sequeceStart, Level.Tile.AdjacentTileDir dirWalk, Level.Tile.AdjacentTileDir dirCheck, Cluster.AdjacentClusterDirections dirNeighbourCluster)
         {
             // Get the Tile in the neighbouring Cluster. It being solid creates a wall just the same as 
             // if the tile in this Cluster is solid.
@@ -231,7 +373,7 @@ namespace MBHEngine.PathFind.HPAStar
             if (null != adj && cluster.IsInBounds(adj))
             {
                 // Recursivly visit the next Tile.
-                WalkWall(cluster, adj, sequeceStart, dirWalk, dirCheck, dirNeighbourCluster);
+                return WalkWall(cluster, adj, sequeceStart, dirWalk, dirCheck, dirNeighbourCluster);
             }
             else
             {
@@ -243,6 +385,8 @@ namespace MBHEngine.PathFind.HPAStar
 
                     CreateEntrance(cluster, tile, ref sequeceStart, dirWalk, dirCheck, dirNeighbourCluster, false);
                 }
+
+                return tile;
             }
         }
 
@@ -375,6 +519,9 @@ namespace MBHEngine.PathFind.HPAStar
                 node = new NavMeshTileGraphNode(tile);
 
                 created = true;
+
+                // New nodes need to be registers with the Graph.
+                AddNode(node);
             }
 
             return created;
@@ -388,18 +535,12 @@ namespace MBHEngine.PathFind.HPAStar
         /// <returns>The clostest GraphNode in the Cluster at the given position.</returns>
         public GraphNode GetClostestNode(Vector2 pos)
         {
-            // How many pixels wide/high is a single cluster? This will be needed to go from
-            // screen size, to cluster index.
-            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
-            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
-
-            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
+            Cluster cluster = GetClusterAtPosition(pos);
             
             GraphNode best = null;
 
-            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            if (null != cluster)
             {
-                Cluster cluster = mClusters[index.X, index.Y];
                 Single bestDist = Single.MaxValue;
 
                 for (Int32 i = 0; i < cluster.pNodes.Count; i++)
@@ -426,17 +567,10 @@ namespace MBHEngine.PathFind.HPAStar
         /// <returns>The GraphNode at <paramref name="pos"/></returns>
         public GraphNode FindNodeAt(Vector2 pos)
         {
-            // How many pixels wide/high is a single cluster? This will be needed to go from
-            // screen size, to cluster index.
-            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
-            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
+            Cluster cluster = GetClusterAtPosition(pos);
 
-            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
-
-            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            if (null != cluster)
             {
-                Cluster cluster = mClusters[index.X, index.Y];
-
                 mGetTileAtPositionMsg.Reset();
                 mGetTileAtPositionMsg.mPosition_In = pos;
                 WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
@@ -454,18 +588,12 @@ namespace MBHEngine.PathFind.HPAStar
         /// <returns></returns>
         public GraphNode CreateOneWayGraphNode(Vector2 pos)
         {
-            // How many pixels wide/high is a single cluster? This will be needed to go from
-            // screen size, to cluster index.
-            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
-            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
-
-            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
+            Cluster cluster = GetClusterAtPosition(pos);
 
             GraphNode node = null;
 
-            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            if (cluster != null)
             {
-                Cluster cluster = mClusters[index.X, index.Y];
 
                 mGetTileAtPositionMsg.Reset();
                 mGetTileAtPositionMsg.mPosition_In = pos;
@@ -616,6 +744,27 @@ namespace MBHEngine.PathFind.HPAStar
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Given a position, find the Cluster that the position is inside of.
+        /// </summary>
+        /// <param name="pos">A position in the world which lies inside of a Cluster bounds.</param>
+        /// <returns>The Cluster which surrounds <paramref name="pos"/>.</returns>
+        public Cluster GetClusterAtPosition(Vector2 pos)
+        {
+            // How many pixels wide/high is a single cluster? This will be needed to go from
+            // screen size, to cluster index.
+            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
+            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
+
+            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
+
+            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            {
+                return mClusters[index.X, index.Y];
+            }
+
+            return null;
+        }
     }
 }

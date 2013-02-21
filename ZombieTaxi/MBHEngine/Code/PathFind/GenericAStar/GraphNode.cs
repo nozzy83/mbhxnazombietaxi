@@ -109,6 +109,25 @@ namespace MBHEngine.PathFind.GenericAStar
         }
 
         /// <summary>
+        /// Helper method for checking if any of the Neighbours of this GraphNode contain a 
+        /// supplied GraphNode.
+        /// </summary>
+        /// <param name="neighbour"></param>
+        /// <returns></returns>
+        public virtual Boolean HasNeighbour(GraphNode neighbour)
+        {
+            for (Int32 i = 0; i < mNeighbours.Count; i++)
+            {
+                if (mNeighbours[i].mGraphNode == neighbour)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Check if this GraphNode can be passed; eg. is it solid of empty?
         /// </summary>
         /// <param name="startingNode">The node we are travelling from.</param>

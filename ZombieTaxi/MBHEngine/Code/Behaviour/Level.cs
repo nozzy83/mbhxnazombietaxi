@@ -182,10 +182,17 @@ namespace MBHEngine.Behaviour
         public class OnNavMeshInvalidatedMessage : BehaviourMessage
         {
             /// <summary>
+            /// The location of change which resulted in the NavMesh being invalidated.
+            /// eg. the location a tile was placed.
+            /// </summary>
+            public Vector2 mPosition_In;
+
+            /// <summary>
             /// Call this to put a message back to its default state.
             /// </summary>
             public override void Reset()
             {
+                mPosition_In = Vector2.Zero;
             }
         }
 
@@ -194,6 +201,9 @@ namespace MBHEngine.Behaviour
         /// </summary>
         public class GetNavMeshMessage : BehaviourMessage
         {
+            /// <summary>
+            /// The NavMesh used on this Level.
+            /// </summary>
             public NavMesh mNavMesh_Out;
 
             public override void Reset()
@@ -821,6 +831,8 @@ namespace MBHEngine.Behaviour
                     DetermineAndSetImage(t);
 
                     UpdateEdgeCollisionData(t);
+
+                    mNavMesh.RegenerateCluster(temp.mPosition_In);
                 }
             }
             else if (msg is GetMapInfoMessage)
@@ -833,7 +845,8 @@ namespace MBHEngine.Behaviour
             }
             else if (msg is OnNavMeshInvalidatedMessage)
             {
-                mNavMesh.CreateNavMesh(mParentGOH);
+                OnNavMeshInvalidatedMessage temp = (OnNavMeshInvalidatedMessage)msg;
+                mNavMesh.RegenerateCluster(temp.mPosition_In);
             }
             else if (msg is GetNavMeshMessage)
             {
