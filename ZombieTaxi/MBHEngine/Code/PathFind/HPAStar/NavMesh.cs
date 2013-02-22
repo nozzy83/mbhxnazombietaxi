@@ -244,8 +244,14 @@ namespace MBHEngine.PathFind.HPAStar
                         }
                     }
 
-                    RemoveNode(node);
-                    cluster.RemoveNode(node);
+                    // If this is a temporary node it should not be removed from the Graph because it will not
+                    // be automatically re-added. It still gets all the links removed because those WILL be 
+                    // automatically generated.
+                    if (!(node as NavMeshTileGraphNode).pIsTemporary)
+                    {
+                        RemoveNode(node);
+                        cluster.RemoveNode(node);
+                    }
                 }
             }
         }
@@ -255,25 +261,28 @@ namespace MBHEngine.PathFind.HPAStar
         /// </summary>
         /// <param name="cluster">The Cluster to perform the links in.</param>
         private void LinkClusterGraphNodes(Cluster cluster)
-        {            
-            // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
-            // the nodes that follow it (and back), so by the end of the loop everyone should be
-            // linked to each other.
-            // eg.  A <-> BCD
-            //      B <-> CD
-            //      C <-> D
-            for (Int32 i = 0; i < cluster.pNodes.Count; i++)
+        {
+            if (cluster != null)
             {
-                for (Int32 j = i + 1; j < cluster.pNodes.Count; j++)
+                // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
+                // the nodes that follow it (and back), so by the end of the loop everyone should be
+                // linked to each other.
+                // eg.  A <-> BCD
+                //      B <-> CD
+                //      C <-> D
+                for (Int32 i = 0; i < cluster.pNodes.Count; i++)
                 {
-                    // Avoid linking the same node multiple times.
-                    if (!cluster.pNodes[i].HasNeighbour(cluster.pNodes[j]))
+                    for (Int32 j = i + 1; j < cluster.pNodes.Count; j++)
                     {
-                        LinkGraphNodes(cluster.pNodes[i], cluster.pNodes[j], cluster);
+                        // Avoid linking the same node multiple times.
+                        if (!cluster.pNodes[i].HasNeighbour(cluster.pNodes[j]))
+                        {
+                            LinkGraphNodes(cluster.pNodes[i], cluster.pNodes[j], cluster);
+                        }
                     }
-                }
 
-                //AddNode(cluster.pNodes[i]);
+                    //AddNode(cluster.pNodes[i]);
+                }
             }
         }
 
@@ -653,6 +662,8 @@ namespace MBHEngine.PathFind.HPAStar
                 if (node == null)
                 {
                     node = new NavMeshTileGraphNode(mGetTileAtPositionMsg.mTile_Out);
+
+                    (node as NavMeshTileGraphNode).pIsTemporary = true;
 
                     // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
                     // the nodes that follow it (and back), so by the end of the loop everyone should be
