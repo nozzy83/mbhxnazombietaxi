@@ -259,20 +259,7 @@ namespace MBHEngine.Behaviour
             }
             else if (msg is ClearDestinationMessage)
             {
-                // If mPlannerNavMesh currently has a destination, that means that we added a temp
-                // node to the nav mesh as that destination, and it needs to be removed now.
-                if (mPlannerNavMesh.pEnd != null)
-                {
-                    mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(mPlannerNavMesh.pEnd);
-                }
-
-                // Members used to coordinate the low level search need to be reset since the 
-                // search had been invalidated.
-                mLowLevelBest = null;
-                mLastHighLevelSearched = null;
-
-                mPlannerNavMesh.ClearDestination();
-                mPlannerTileMap.ClearDestination();
+                ClearDestination();
             }
             else if (msg is SetSourceMessage)
             {
@@ -288,6 +275,27 @@ namespace MBHEngine.Behaviour
                 // movement can start as soon as possible.
                 tmp.mBest_Out = mLowLevelBest != null ? mLowLevelBest : mPlannerNavMesh.pCurrentBest;
             }
+        }
+
+        /// <summary>
+        /// Clears the destination and all the the associated data.
+        /// </summary>
+        private void ClearDestination()
+        {
+            // If mPlannerNavMesh currently has a destination, that means that we added a temp
+            // node to the nav mesh as that destination, and it needs to be removed now.
+            if (mPlannerNavMesh.pEnd != null)
+            {
+                mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(mPlannerNavMesh.pEnd);
+            }
+
+            // Members used to coordinate the low level search need to be reset since the 
+            // search had been invalidated.
+            mLowLevelBest = null;
+            mLastHighLevelSearched = null;
+
+            mPlannerNavMesh.ClearDestination();
+            mPlannerTileMap.ClearDestination();
         }
 
         /// <summary>
@@ -362,6 +370,36 @@ namespace MBHEngine.Behaviour
 
                 mPlannerTileMap.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
             }
+
+            /*
+            GraphNode start = mPlannerNavMesh.pStart;
+
+            // Only set the new source if it is different than the current one (or the current
+            // one does not exist).
+            if (start == null || mGetTileAtPositionMsg.mTile_Out != start.pData)
+            {
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+
+                // If the GraphNode was already created, remove it before adding a new one.
+                if (start != null)
+                {
+                    mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(start);
+                }
+
+                GraphNode node = mGetNavMeshMsg.mNavMesh_Out.InsertTempNode(pos);
+
+                // Attempt to set a new destination. Returns true in the case where the destination was 
+                // different (and thus changed).
+                mPlannerNavMesh.SetSource(node);
+
+                // Find the TileGraphNode that maps to the location of node.
+                mGetTileAtPositionMsg.Reset();
+                mGetTileAtPositionMsg.mPosition_In = pos;
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
+
+                mPlannerTileMap.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+            }
+            */
         }
     }
 }
