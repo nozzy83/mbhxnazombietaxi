@@ -148,6 +148,20 @@ namespace MBHEngine.Behaviour
         }
 
         /// <summary>
+        /// When this behaviour is removed we need to clean up some of the temp nodes that may have been
+        /// created.
+        /// </summary>
+        public override void OnRemove()
+        {
+            WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+            if (mPlannerNavMesh.pStart != null)
+            {
+                mGetNavMeshMsg.mNavMesh_Out.DestroyOneWayGraphNode(mPlannerNavMesh.pStart);
+            }
+            ClearDestination();
+        }
+
+        /// <summary>
         /// Call this to initialize a Behaviour with data supplied in a file.
         /// </summary>
         /// <param name="fileName">The file to load from.</param>
@@ -286,6 +300,7 @@ namespace MBHEngine.Behaviour
             // node to the nav mesh as that destination, and it needs to be removed now.
             if (mPlannerNavMesh.pEnd != null)
             {
+                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
                 mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(mPlannerNavMesh.pEnd);
             }
 
@@ -343,6 +358,11 @@ namespace MBHEngine.Behaviour
         private void SetSource(Vector2 pos)
         {
             WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+
+            if (mPlannerNavMesh.pStart != null)
+            {
+                mGetNavMeshMsg.mNavMesh_Out.DestroyOneWayGraphNode(mPlannerNavMesh.pStart);
+            }
 
             // First, check if we are standing on an existing GraphNode. This is best case, 
             // as it means we don't need to create a new GraphNode (and do the associated

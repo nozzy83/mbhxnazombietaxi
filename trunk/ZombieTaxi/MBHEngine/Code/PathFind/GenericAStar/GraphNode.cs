@@ -15,6 +15,12 @@ namespace MBHEngine.PathFind.GenericAStar
     public abstract class GraphNode
     {
         /// <summary>
+        /// Static collection of Neighbours so that we don't make allocations during gameplay, and instead
+        /// allocate a huge chunk of them on startup, and recycle them as needed.
+        /// </summary>
+        static private Queue<Neighbour> mUnusedNeighbours;
+
+        /// <summary>
         /// Neighbouring GraphNode objects get stored in this wrapper so that things like
         /// the cost to travel there can be cached.
         /// </summary>
@@ -30,6 +36,15 @@ namespace MBHEngine.PathFind.GenericAStar
             /// to this neighbour. This is precomputed and chached for quicker lookups later.
             /// </summary>
             public Single mCostToTravel;
+
+            /// <summary>
+            /// Put this object into a default state.
+            /// </summary>
+            public void Reset()
+            {
+                mGraphNode = null;
+                mCostToTravel = 0;
+            }
         }
 
         /// <summary>
@@ -45,6 +60,22 @@ namespace MBHEngine.PathFind.GenericAStar
         {
             // On average we suspect there will be 8 neighbours.
             mNeighbours = new List<Neighbour>(8);
+
+            // The first GraphNode to be created will take the hit and allocate all Neighbour objects.
+            if (mUnusedNeighbours == null)
+            {
+                // We need a LOT of Neighbours...
+                const Int32 num = 500000;
+
+                mUnusedNeighbours = new Queue<Neighbour>(num);
+
+                for (Int32 i = 0; i < num; i++)
+                {
+                    Neighbour temp = new Neighbour();
+
+                    mUnusedNeighbours.Enqueue(temp);
+                }
+            }
         }
 
         /// <summary>
@@ -58,7 +89,10 @@ namespace MBHEngine.PathFind.GenericAStar
         public virtual void AddNeighbour(GraphNode node, Single cost = -1.0f)
         {
             // Create a new neighbour to wrap the node passed in.
-            Neighbour temp = new Neighbour();
+            Neighbour temp = mUnusedNeighbours.Dequeue(); //new Neighbour();
+
+            // Put it back into a default state.
+            temp.Reset();
 
             temp.mGraphNode = node;
 
@@ -73,6 +107,7 @@ namespace MBHEngine.PathFind.GenericAStar
             }
 
 #if DEBUG
+            /*
             for (Int32 i = 0; i < mNeighbours.Count; i++)
             {
                 if (mNeighbours[i].mGraphNode == node)
@@ -85,6 +120,7 @@ namespace MBHEngine.PathFind.GenericAStar
                     //System.Diagnostics.Debug.Assert(false, "GraphNode at dupe position added the neighbouring list.");
                 }
             }
+            */
 #endif
 
             mNeighbours.Add(temp);
@@ -100,6 +136,11 @@ namespace MBHEngine.PathFind.GenericAStar
             {
                 if (mNeighbours[i].mGraphNode == neighbour)
                 {
+                    mNeighbours[i].Reset();
+                    
+                    // Put this Neighbour back into the Queue so others can reuse it.
+                    mUnusedNeighbours.Enqueue(mNeighbours[i]);
+
                     mNeighbours.RemoveAt(i);
 
                     // Should be no dupes so return after finding one.
@@ -161,5 +202,16 @@ namespace MBHEngine.PathFind.GenericAStar
         /// to access that data, where it can then be cast back to the type it is known to be.
         /// </summary>
         public abstract object pData { get; }
+
+        /// <summary>
+        /// Used for debug display.
+        /// </summary>
+        static public Int32 pNumUnusedNeighbours
+        {
+            get
+            {
+                return mUnusedNeighbours.Count;
+            }
+        }
     }
 }
