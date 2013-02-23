@@ -545,6 +545,17 @@ namespace MBHEngine.PathFind.GenericAStar
         }
 
         /// <summary>
+        /// The source node.
+        /// </summary>
+        public GraphNode pStart
+        {
+            get
+            {
+                return mStart;
+            }
+        }
+
+        /// <summary>
         /// The destination node.
         /// </summary>
         public GraphNode pEnd

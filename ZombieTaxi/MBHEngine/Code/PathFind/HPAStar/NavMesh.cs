@@ -173,14 +173,11 @@ namespace MBHEngine.PathFind.HPAStar
                     // Loop through all the neighbours removing the links as we go.
                     for (Int32 j = node.pNeighbours.Count - 1; j >= 0; j--)
                     {
-                        GraphNode.Neighbour neighbour = node.pNeighbours[j];
+                        GraphNode neighbourNode = node.pNeighbours[j].mGraphNode;
 
                         // Since this is in the cluster being regenerated, all links to other nodes
                         // should be removed; this node/cluster isn't going to exist in a moment.
-                        UnlinkGraphNodes(node, neighbour.mGraphNode);
-
-                        // Probably redundant since this node is about to go bye-bye.
-                        node.RemoveNeighbour(neighbour.mGraphNode);
+                        UnlinkGraphNodes(node, neighbourNode);
 
                         //
                         // Next comes the convoluted process for checking if the GraphNode just unlinked
@@ -192,27 +189,22 @@ namespace MBHEngine.PathFind.HPAStar
                         // Cluster being destroyed.
                         //
 
-                        Cluster neighbourCluster = GetClusterAtPosition(neighbour.mGraphNode.pPosition);
+                        Cluster neighbourCluster = GetClusterAtPosition(neighbourNode.pPosition);
 
                         // Is this a GraphNode that lives in a Cluster outside the one being cleared?
                         if (neighbourCluster != cluster)
                         {
-                            // Since it does't live in the Cluster being cleared, it would not be part of the
-                            // main loop, and therefore would not remove the current GraphNode from the list
-                            // of neighbours.
-                            neighbour.mGraphNode.RemoveNeighbour(node);
-
                             // Search through all the neighbours trying to find one that is in a different Cluster,
                             // signifying that this GraphNode needs to live on. Remember that nodes in corners can
                             // be linked to multiple adjacent Clusters.
                             Boolean foundOther = false;
 
-                            for (Int32 k = neighbour.mGraphNode.pNeighbours.Count - 1; k >= 0; k--)
+                            for (Int32 k = neighbourNode.pNeighbours.Count - 1; k >= 0; k--)
                             {
                                 // Slicks naming...
-                                GraphNode.Neighbour otherNeighbour = neighbour.mGraphNode.pNeighbours[k];
+                                GraphNode otherNeighbourNode = neighbourNode.pNeighbours[k].mGraphNode;
 
-                                Cluster otherNeighbourCluster = GetClusterAtPosition(otherNeighbour.mGraphNode.pPosition);
+                                Cluster otherNeighbourCluster = GetClusterAtPosition(otherNeighbourNode.pPosition);
 
                                 // If the neighbour lives outside this Cluster than we don't want to remove the current
                                 // neighbour being evaluated.
@@ -227,19 +219,16 @@ namespace MBHEngine.PathFind.HPAStar
                             {
                                 // Now loop through all the neighbours AGAIN, this time removing all links between the
                                 // GraphNode about to be removed, and all the others that will live on.
-                                for (Int32 k = neighbour.mGraphNode.pNeighbours.Count - 1; k >= 0; k--)
+                                for (Int32 k = neighbourNode.pNeighbours.Count - 1; k >= 0; k--)
                                 {
-                                    GraphNode.Neighbour otherNeighbour = neighbour.mGraphNode.pNeighbours[k];
+                                    GraphNode otherNeighbourNode = neighbourNode.pNeighbours[k].mGraphNode;
 
-                                    UnlinkGraphNodes(neighbour.mGraphNode, otherNeighbour.mGraphNode);
-
-                                    neighbour.mGraphNode.RemoveNeighbour(otherNeighbour.mGraphNode);
-                                    otherNeighbour.mGraphNode.RemoveNeighbour(neighbour.mGraphNode);
+                                    UnlinkGraphNodes(neighbourNode, otherNeighbourNode);
                                 }
 
                                 // Remove this neighbour from the Graph objects.
-                                RemoveNode(neighbour.mGraphNode);
-                                neighbourCluster.RemoveNode(neighbour.mGraphNode);
+                                RemoveNode(neighbourNode);
+                                neighbourCluster.RemoveNode(neighbourNode);
                             }
                         }
                     }
@@ -610,6 +599,8 @@ namespace MBHEngine.PathFind.HPAStar
 
                 node = new NavMeshTileGraphNode(mGetTileAtPositionMsg.mTile_Out);
 
+                (node as NavMeshTileGraphNode).pIsTemporary = true;
+
                 // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
                 // the nodes that follow it (and back), so by the end of the loop everyone should be
                 // linked to each other.
@@ -628,6 +619,22 @@ namespace MBHEngine.PathFind.HPAStar
             }
 
             return node;
+        }
+
+        /// <summary>
+        /// Counter to CreateOnWayGraphNode. Handles unlinking and freeing up resources.
+        /// </summary>
+        /// <param name="node"></param>
+        public void DestroyOneWayGraphNode(GraphNode node)
+        {
+            // Only perform this operation if the Node was created with CreateOnWayGraphNode.
+            if ((node as NavMeshTileGraphNode).pIsTemporary)
+            {
+                for (Int32 i = node.pNeighbours.Count - 1; i >= 0; i--)
+                {
+                    UnlinkGraphNodes(node, node.pNeighbours[i].mGraphNode);
+                }
+            }
         }
 
         /// <summary>
