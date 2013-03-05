@@ -89,13 +89,23 @@ namespace MBHEngine.PathFind.GenericAStar
         }
 
         /// <summary>
+        /// Return the planner to its original state.
+        /// </summary>
+        public void Reset()
+        {
+            mStart = null;
+            ClearDestination();
+            ClearNodeLists();
+        }
+
+        /// <summary>
         /// Perform the path finding. Call repeatedly to continue to try and find the path over a number
         /// of frames.
         /// </summary>
         /// <param name="restrictedArea">Restrict choosen nodes to this area.</param>
         /// <returns>The result of the path finding for this frame.</returns>
         public Result PlanPath(MBHEngine.Math.Rectangle restrictedArea = null, Boolean drawDebug = true)
-        {            
+        {
             // If there is no tile at the destination then there is no path finding to do.
             if (mEnd == null)
             {
@@ -211,6 +221,8 @@ namespace MBHEngine.PathFind.GenericAStar
                 count++;
 
                 mBestPathEnd = mOpenNodes[0];
+
+                //HPAStar.NavMesh.DebugCheckNode(mBestPathEnd.pGraphNode);
 
                 for (Int32 i = 0; i < mOpenNodes.Count; i++)
                 {
@@ -368,28 +380,34 @@ namespace MBHEngine.PathFind.GenericAStar
             // Draw all the closed nodes.
             for (Int32 i = 0; i < mClosedNodes.Count; i++)
             {
-                DebugShapeDisplay.pInstance.AddAABB(mClosedNodes[i].pGraphNode.pPosition, 4.0f, 4.0f, Color.Red);
-
-                // If it has a previous node, draw a line from this to that, to show the relationship.
-                if (mClosedNodes[i].pPrevious != null)
+                if (mClosedNodes[i].pGraphNode.pData != null)
                 {
-                    DebugShapeDisplay.pInstance.AddSegment(
-                        mClosedNodes[i].pGraphNode.pPosition,
-                        mClosedNodes[i].pPrevious.pGraphNode.pPosition,
-                        Color.Red);
+                    DebugShapeDisplay.pInstance.AddAABB(mClosedNodes[i].pGraphNode.pPosition, 4.0f, 4.0f, Color.Red);
+
+                    // If it has a previous node, draw a line from this to that, to show the relationship.
+                    if (mClosedNodes[i].pPrevious != null)
+                    {
+                        DebugShapeDisplay.pInstance.AddSegment(
+                            mClosedNodes[i].pGraphNode.pPosition,
+                            mClosedNodes[i].pPrevious.pGraphNode.pPosition,
+                            Color.Red);
+                    }
                 }
             }
 
             // Do the same for the open nodes.
             for (Int32 i = 0; i < mOpenNodes.Count; i++)
             {
-                DebugShapeDisplay.pInstance.AddAABB(mOpenNodes[i].pGraphNode.pPosition, 4.0f, 4.0f, Color.Purple);
-                if (mOpenNodes[i].pPrevious != null)
+                if (mOpenNodes[i].pGraphNode.pData != null)
                 {
-                    DebugShapeDisplay.pInstance.AddSegment(
-                        mOpenNodes[i].pGraphNode.pPosition,
-                        mOpenNodes[i].pPrevious.pGraphNode.pPosition,
-                        Color.Purple);
+                    DebugShapeDisplay.pInstance.AddAABB(mOpenNodes[i].pGraphNode.pPosition, 4.0f, 4.0f, Color.Purple);
+                    if (mOpenNodes[i].pPrevious != null)
+                    {
+                        DebugShapeDisplay.pInstance.AddSegment(
+                            mOpenNodes[i].pGraphNode.pPosition,
+                            mOpenNodes[i].pPrevious.pGraphNode.pPosition,
+                            Color.Purple);
+                    }
                 }
             }
 
@@ -487,10 +505,26 @@ namespace MBHEngine.PathFind.GenericAStar
         {
             if (mEnd != destination)
             {
+                // Make sure that we are not trying to extend the destination
+                // to a Node that has already be Closed. If that is the case
+                // then the path needs to be regenerated with fresh data.
+                for (Int32 i = 0; i < mClosedNodes.Count; i++)
+                {
+                    if (mClosedNodes[i].pGraphNode == destination)
+                    {
+                        //DebugMessageDisplay.pInstance.AddConstantMessage("Extending with closed node.");
+                        
+                        return SetDestination(destination);
+                    }
+                }
+                
                 mEnd = destination;
 
                 // If the path was previously solved, it is not any longer.
                 mSolved = false;
+
+                // If the path was already solved, it needs to be told otherwise.
+                mBestPathEnd.pPathSolved = false;
 
                 return true;
             }
@@ -505,6 +539,11 @@ namespace MBHEngine.PathFind.GenericAStar
         /// <param name="source">The position in the world that the planner will start at.</param>
         public Boolean SetSource(GraphNode source)
         {
+#if DEBUG
+            System.Diagnostics.Debug.Assert(source != mEnd || source == null, "Source and Destination are the same.");
+
+            //HPAStar.NavMesh.DebugCheckNode(source);
+#endif 
             if (mStart != source)
             {
                 mStart = source;
@@ -515,6 +554,14 @@ namespace MBHEngine.PathFind.GenericAStar
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Force the Planner to re-plan the path from scratch.
+        /// </summary>
+        public void InvalidateCurrentPath()
+        {
+            mPathInvalidated = true;
         }
 
         /// <summary>

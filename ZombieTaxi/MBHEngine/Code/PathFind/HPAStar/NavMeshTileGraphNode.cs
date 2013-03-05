@@ -26,9 +26,19 @@ namespace MBHEngine.PathFind.HPAStar
         /// Constructor.
         /// </summary>
         /// <param name="tile">The Tile at the location of this GraphNode.</param>
-        public NavMeshTileGraphNode(Level.Tile tile)
-            : base(tile)
+        public NavMeshTileGraphNode()
+            : base()
         {
+        }
+
+        /// <summary>
+        /// Put the Node back to a default state.
+        /// </summary>
+        public override void Reset()
+        {
+            base.Reset();
+
+            mIsTemporary = false;
         }
 
         /// <summary>

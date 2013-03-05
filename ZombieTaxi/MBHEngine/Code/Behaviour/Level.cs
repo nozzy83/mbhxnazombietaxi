@@ -396,6 +396,11 @@ namespace MBHEngine.Behaviour
         private LineSegment mCollisionRectMovement;
 
         /// <summary>
+        /// Preallocated messages.
+        /// </summary>
+        private OnNavMeshInvalidatedMessage mOnNavMeshInvalidatedMsg;
+
+        /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
         /// </summary>
@@ -564,6 +569,8 @@ namespace MBHEngine.Behaviour
 
             // Instantiate the NavMesh, but wait to actually initialize it.
             mNavMesh = new NavMesh(5);
+
+            mOnNavMeshInvalidatedMsg = new Level.OnNavMeshInvalidatedMessage();
 
             // Let the GameObjectManager know that the level data has changed.
             GameObjectManager.pInstance.OnMapInfoChange(mMapInfo);
@@ -775,8 +782,8 @@ namespace MBHEngine.Behaviour
                 }
             }
 
-            mNavMesh.DebugDraw(true);
-            //mGraph.DebugDraw(false);
+            //mNavMesh.DebugDraw(true);
+            //mGraph.DebugDraw(true);
         }
 
         /// <summary>
@@ -833,6 +840,8 @@ namespace MBHEngine.Behaviour
                     UpdateEdgeCollisionData(t);
 
                     mNavMesh.RegenerateCluster(temp.mPosition_In);
+
+                    GameObjectManager.pInstance.BroadcastMessage(mOnNavMeshInvalidatedMsg);
                 }
             }
             else if (msg is GetMapInfoMessage)
@@ -842,11 +851,6 @@ namespace MBHEngine.Behaviour
                 temp.mInfo_Out = mMapInfo;
 
                 msg = temp;
-            }
-            else if (msg is OnNavMeshInvalidatedMessage)
-            {
-                OnNavMeshInvalidatedMessage temp = (OnNavMeshInvalidatedMessage)msg;
-                mNavMesh.RegenerateCluster(temp.mPosition_In);
             }
             else if (msg is GetNavMeshMessage)
             {

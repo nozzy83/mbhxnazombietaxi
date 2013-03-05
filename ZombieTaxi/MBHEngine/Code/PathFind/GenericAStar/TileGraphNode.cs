@@ -16,12 +16,31 @@ namespace MBHEngine.PathFind.GenericAStar
         private Level.Tile mTile;
 
         /// <summary>
-        /// 
+        /// Constructor.
         /// </summary>
-        /// <param name="tile"></param>
-        public TileGraphNode(Level.Tile tile) : base()
+        public TileGraphNode()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="tile">The Tile at this Node's location in the world.</param>
+        public TileGraphNode(Level.Tile tile)
+            : base()
         {
             mTile = tile;
+        }
+
+        /// <summary>
+        /// Put the Node back into a default state.
+        /// </summary>
+        public override void Reset()
+        {
+            mTile = null;
+
+            base.Reset();
         }
 
         /// <summary>
@@ -62,6 +81,10 @@ namespace MBHEngine.PathFind.GenericAStar
             return true;
         }
 
+        /// <summary>
+        /// Checks if this Node is "Empty" meaning, is something occupying this space.
+        /// </summary>
+        /// <returns></returns>
         public override Boolean IsEmpty()
         {
             return (mTile != null && mTile.mType == Level.Tile.TileTypes.Empty);
@@ -74,15 +97,32 @@ namespace MBHEngine.PathFind.GenericAStar
         {
             get
             {
-                return mTile.mCollisionRect.pCenterPoint;
+#if DEBUG
+                System.Diagnostics.Debug.Assert(mTile != null, "Accessing unset pData. Returning default value.");
+#endif
+                if (mTile != null)
+                {
+                    return mTile.mCollisionRect.pCenterPoint;
+                }
+                else
+                {
+                    return Vector2.Zero;
+                }
             }
         }
 
+        /// <summary>
+        /// Access to the "Data" stored in this Node.
+        /// </summary>
         public override object pData
         {
             get 
             {
                 return mTile;
+            }
+            set
+            {
+                mTile = value as Level.Tile;
             }
         }
     }
