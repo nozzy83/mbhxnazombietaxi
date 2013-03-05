@@ -18,6 +18,73 @@ namespace MBHEngine.PathFind.HPAStar
     public class NavMesh : Graph
     {
         /// <summary>
+        /// Helper class for managing preallocated NavMeshTileGraphNode objects.
+        /// </summary>
+        class NavMeshTileGraphNodeFactory
+        {
+            /// <summary>
+            /// A giant list of Nodes which get preallocated on creation.
+            /// </summary>
+            private Queue<NavMeshTileGraphNode> mUnusedNavMeshTileGraphNodes;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            public NavMeshTileGraphNodeFactory()
+            {
+                const Int32 num = 10000;
+
+                mUnusedNavMeshTileGraphNodes = new Queue<NavMeshTileGraphNode>(num);
+
+                for (Int32 i = 0; i < num; i++)
+                {
+                    NavMeshTileGraphNode temp = new NavMeshTileGraphNode();
+
+                    mUnusedNavMeshTileGraphNodes.Enqueue(temp);
+                }
+            }
+
+            /// <summary>
+            /// Returns a NavMeshTileGraphNode reset and ready for use. When no longer needed,
+            /// should be returned to the factory through RecycleNode.
+            /// </summary>
+            /// <returns>A NavMeshTileGraphNode reset and ready for use.</returns>
+            public GraphNode GetNode()
+            {
+                NavMeshTileGraphNode node = mUnusedNavMeshTileGraphNodes.Dequeue();
+#if DEBUG
+                node.mInUse = true;
+#endif // DEBUG
+                return node;
+            }
+
+            /// <summary>
+            /// When finished using a Node which was retrieved from GetNode, pass it back to
+            /// this function for clean up.
+            /// </summary>
+            /// <param name="node"></param>
+            public void RecycleNode(GraphNode node)
+            {
+                node.Reset();
+#if DEBUG
+                node.mInUse = false;
+#endif // DEBUG
+                mUnusedNavMeshTileGraphNodes.Enqueue(node as NavMeshTileGraphNode);
+            }
+
+            /// <summary>
+            /// How many nodes remain (are not in use).
+            /// </summary>
+            public Int32 pUnusedCount
+            {
+                get
+                {
+                    return mUnusedNavMeshTileGraphNodes.Count;
+                }
+            }
+        }
+
+        /// <summary>
         /// The number of Tile objects that make up a single wall of a cluster. Assumes square clusters.
         /// </summary>
         private Int32 mClusterSize;
@@ -26,6 +93,17 @@ namespace MBHEngine.PathFind.HPAStar
         /// Array of all the clusters in this Graph indexed by X, Y value.
         /// </summary>
         private Cluster[,] mClusters;
+
+        /// <summary>
+        /// Used for precomputing the cost of travelling between nodes in the Graph.
+        /// </summary>
+        private GenericAStar.Planner mPlanner;
+
+        /// <summary>
+        /// To avoid allocating Node objects during gameplay (and possibly triggering the GC), this factory
+        /// preallocates a bunch ahead of time.
+        /// </summary>
+        static private NavMeshTileGraphNodeFactory mNodeFactory;
 
         /// <summary>
         /// Preallocated messages to avoid GC.
@@ -43,6 +121,14 @@ namespace MBHEngine.PathFind.HPAStar
             : base()
         {
             mClusterSize = clusterSize;
+
+            mPlanner = new Planner();
+
+            // Remember the factory is static so make sure to only allocate it once.
+            if (null == mNodeFactory)
+            {
+                mNodeFactory = new NavMeshTileGraphNodeFactory();
+            }
 
             mGetMapInfoMsg = new Level.GetMapInfoMessage();
             mGetTileAtPositionMsg = new Level.GetTileAtPositionMessage();
@@ -227,6 +313,9 @@ namespace MBHEngine.PathFind.HPAStar
                                 }
 
                                 // Remove this neighbour from the Graph objects.
+                                //DebugCheckForReferences(neighbourNode);
+
+                                mNodeFactory.RecycleNode(neighbourNode);
                                 RemoveNode(neighbourNode);
                                 neighbourCluster.RemoveNode(neighbourNode);
                             }
@@ -238,11 +327,15 @@ namespace MBHEngine.PathFind.HPAStar
                     // automatically generated.
                     if (!(node as NavMeshTileGraphNode).pIsTemporary)
                     {
+                        //DebugCheckForReferences(node);
+                        mNodeFactory.RecycleNode(node);
                         RemoveNode(node);
                         cluster.RemoveNode(node);
                     }
                 }
             }
+
+            //DebugCheckNodes();
         }
 
         /// <summary>
@@ -273,6 +366,11 @@ namespace MBHEngine.PathFind.HPAStar
                     //AddNode(cluster.pNodes[i]);
                 }
             }
+
+            //if (cluster.pNodes[0] != null)
+            //{
+                //DebugWalkGraphForErrors(cluster.pNodes[0] as NavMeshTileGraphNode);
+            //}
         }
 
         /// <summary>
@@ -284,24 +382,24 @@ namespace MBHEngine.PathFind.HPAStar
         /// <param name="cluster">The cluster containing both nodes.</param>
         private void LinkGraphNodes(GraphNode a, GraphNode b, Cluster cluster, Boolean oneWay = false)
         {
-            GenericAStar.Planner planner = new Planner();
-            planner.SetSource((a.pData as Level.Tile).mGraphNode);
-            planner.SetDestination((b.pData as Level.Tile).mGraphNode);
+            mPlanner.Reset();
+            mPlanner.SetSource((a.pData as Level.Tile).mGraphNode);
+            mPlanner.SetDestination((b.pData as Level.Tile).mGraphNode);
 
             // Do a standard A* search with the adde constraint of staying within the 
             // bounds of this cluster.
-            Planner.Result result = planner.PlanPath(cluster.pBounds, false);
+            Planner.Result result = mPlanner.PlanPath(cluster.pBounds, false);
 
             // Keep searching unti we either fail or succeed.
             while (result != Planner.Result.Failed && result != Planner.Result.Solved)
             {
-                result = planner.PlanPath(cluster.pBounds, false);
+                result = mPlanner.PlanPath(cluster.pBounds, false);
             }
 
             // Only connect the nodes if they can be reached from one another within the same cluster.
             if (result == Planner.Result.Solved)
             {
-                PathNode path = planner.pCurrentBest;
+                PathNode path = mPlanner.pCurrentBest;
 
                 // Link the two neightbours.
                 a.AddNeighbour(b, path.pFinalCost);
@@ -311,7 +409,15 @@ namespace MBHEngine.PathFind.HPAStar
                 }
             }
 
-            planner.ClearDestination();
+            mPlanner.ClearDestination();
+
+            //if (a != null)
+            //{
+                //DebugWalkGraphForErrors(a as NavMeshTileGraphNode);
+            //}
+
+            //DebugCheckNode(a);
+            //DebugCheckNode(b);
         }
 
         /// <summary>
@@ -319,11 +425,18 @@ namespace MBHEngine.PathFind.HPAStar
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
-        private void UnlinkGraphNodes(GraphNode a, GraphNode b)
+        public void UnlinkGraphNodes(GraphNode a, GraphNode b)
         {
             a.RemoveNeighbour(b);
             b.RemoveNeighbour(a);
 
+            //if (a != null)
+            //{
+                //DebugWalkGraphForErrors(a as NavMeshTileGraphNode);
+            //}
+
+            //DebugCheckNode(a);
+            //DebugCheckNode(b);
         }
 
         /// <summary>
@@ -514,7 +627,8 @@ namespace MBHEngine.PathFind.HPAStar
             // If the node isn't already being managed, we need to create a new one.
             if (null == node)
             {
-                node = new NavMeshTileGraphNode(tile);
+                node = mNodeFactory.GetNode();
+                node.pData = tile;
 
                 created = true;
 
@@ -578,65 +692,7 @@ namespace MBHEngine.PathFind.HPAStar
 
             return null;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pos">The position at which to create the GraphNode.</param>
-        /// <returns></returns>
-        public GraphNode CreateOneWayGraphNode(Vector2 pos)
-        {
-            Cluster cluster = GetClusterAtPosition(pos);
-
-            GraphNode node = null;
-
-            if (cluster != null)
-            {
-
-                mGetTileAtPositionMsg.Reset();
-                mGetTileAtPositionMsg.mPosition_In = pos;
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
-
-                node = new NavMeshTileGraphNode(mGetTileAtPositionMsg.mTile_Out);
-
-                (node as NavMeshTileGraphNode).pIsTemporary = true;
-
-                // Iterate throught the nodes of a Cluster 2 at a time, linking each node with all
-                // the nodes that follow it (and back), so by the end of the loop everyone should be
-                // linked to each other.
-                // eg.  A <-> BCD
-                //      B <-> CD
-                //      C <-> D
-                for (Int32 i = 0; i < cluster.pNodes.Count; i++)
-                {
-                    LinkGraphNodes(node, cluster.pNodes[i], cluster, true);
-                }
-
-                // Storing the GraphNode objects in the Cluster is just to make this a little eaiser, but
-                // for the PathPlanner to work, all the GraphNode data needs to be in this Graph.
-                //cluster.AddNode(node);
-                //AddNode(node);
-            }
-
-            return node;
-        }
-
-        /// <summary>
-        /// Counter to CreateOnWayGraphNode. Handles unlinking and freeing up resources.
-        /// </summary>
-        /// <param name="node"></param>
-        public void DestroyOneWayGraphNode(GraphNode node)
-        {
-            // Only perform this operation if the Node was created with CreateOnWayGraphNode.
-            if ((node as NavMeshTileGraphNode).pIsTemporary)
-            {
-                for (Int32 i = node.pNeighbours.Count - 1; i >= 0; i--)
-                {
-                    UnlinkGraphNodes(node, node.pNeighbours[i].mGraphNode);
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Inserts a new GraphNode into the Graph 'after the fact'.
         /// </summary>
@@ -668,7 +724,8 @@ namespace MBHEngine.PathFind.HPAStar
 
                 if (node == null)
                 {
-                    node = new NavMeshTileGraphNode(mGetTileAtPositionMsg.mTile_Out);
+                    node = mNodeFactory.GetNode();
+                    node.pData = mGetTileAtPositionMsg.mTile_Out;
 
                     (node as NavMeshTileGraphNode).pIsTemporary = true;
 
@@ -713,13 +770,20 @@ namespace MBHEngine.PathFind.HPAStar
 
                 for (Int32 i = 0; i < cluster.pNodes.Count; i++)
                 {
-                    UnlinkGraphNodes(node, cluster.pNodes[i]);
+                    if (node != cluster.pNodes[i])
+                    {
+                        UnlinkGraphNodes(node, cluster.pNodes[i]);
+                    }
                 }
 
                 cluster.RemoveNode(node);
             }
 
+            //DebugCheckForReferences(node);
+            mNodeFactory.RecycleNode(node);
             RemoveNode(node);
+
+            //DebugCheckNodes();
         }
 
         /// <summary>
@@ -729,7 +793,9 @@ namespace MBHEngine.PathFind.HPAStar
         /// <param name="showLinks"></param>
         public override void DebugDraw(Boolean showLinks)
         {
-            Color col = Color.BlanchedAlmond;
+            //DebugCheckNodes();
+
+            Color col = Color.Orange;
 
             // How many pixels wide/high is a single cluster? This will be needed to go from
             // screen size, to cluster index.
@@ -783,6 +849,103 @@ namespace MBHEngine.PathFind.HPAStar
             }
 
             return null;
+        }
+
+#if DEBUG
+        /// <summary>
+        /// Checks all Node objects in the Graph to see if they contain any bad data.
+        /// </summary>
+        public void DebugCheckNodes()
+        {
+            for (Int32 i = 0; i < pNodes.Count; i++)
+            {
+                DebugCheckNode(pNodes[i]);
+            }
+        }
+#endif // DEBUG
+
+#if DEBUG
+        /// <summary>
+        /// Checks if a Node and it's neighbours are erronously flagged as being not in use or contain
+        /// null data.
+        /// </summary>
+        /// <param name="node">The node to check. The node assumed to be in use.</param>
+        static public void DebugCheckNode(GraphNode node)
+        {
+            if (node is NavMeshTileGraphNode)
+            {
+                System.Diagnostics.Debug.Assert(node.mInUse, "Node being used but flag as not in use.");
+                System.Diagnostics.Debug.Assert(node.pData != null, "pData is null.");
+
+                for (Int32 j = 0; j < node.pNeighbours.Count; j++)
+                {
+                    System.Diagnostics.Debug.Assert(node.pNeighbours[j].mGraphNode.mInUse, "Node being used but flag as not in use.");
+                    System.Diagnostics.Debug.Assert(node.pNeighbours[j].mGraphNode.pData != null, "pData is null.");
+                }
+            }
+        }
+#endif // DEBUG
+
+#if DEBUG
+        /// <summary>
+        /// Checks if a node is reference by any Node in the Graph and their neighbours.
+        /// </summary>
+        /// <param name="node">The node to search for.</param>
+        public void DebugCheckForReferences(GraphNode node)
+        {
+            for (Int32 i = 0; i < pNodes.Count; i++)
+            {
+                GraphNode next = pNodes[i];
+
+                for (Int32 j = 0; j < next.pNeighbours.Count; j++)
+                {
+                    GraphNode nextNeighbour = next.pNeighbours[j].mGraphNode;
+
+                    System.Diagnostics.Debug.Assert(nextNeighbour != node, "Found node!");
+                }
+            }
+        }
+#endif // DEBUG
+
+#if DEBUG
+        /// <summary>
+        /// Walks the the Graph starting at <paramref name="node"/> and visiting all its neighbours,
+        /// and then their neighbours and so on. Limited recursive depth to avoid blowing the callstack.
+        /// </summary>
+        /// <param name="node">The node to start the search at.</param>
+        /// <param name="depth">The current depth. Leave empty.</param>
+        public void DebugWalkGraphForErrors(NavMeshTileGraphNode node, Int32 depth = 0)
+        {
+            System.Diagnostics.Debug.Assert(node.mInUse, "Node not in use!");
+
+            if (depth >= 1)
+            {
+                return;
+            }
+
+            for (Int32 i = 0; i < node.pNeighbours.Count; i++)
+            {
+                DebugWalkGraphForErrors(node.pNeighbours[i].mGraphNode as NavMeshTileGraphNode, depth + 1);
+            }
+        }
+#endif // DEBUG
+
+        /// <summary>
+        /// Accessor to see how many GraphNode are currently unused.
+        /// </summary>
+        static public Int32 pUnusedGraphNodes
+        {
+            get
+            {
+                if (mNodeFactory != null)
+                {
+                    return mNodeFactory.pUnusedCount;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
         }
     }
 }

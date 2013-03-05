@@ -20,6 +20,13 @@ namespace MBHEngine.PathFind.GenericAStar
         /// </summary>
         static private Queue<Neighbour> mUnusedNeighbours;
 
+#if DEBUG
+        /// <summary>
+        /// Used for debugging to track if a node is actually currently being used (or does it think it is).
+        /// </summary>
+        public Boolean mInUse;
+#endif // DEBUG
+
         /// <summary>
         /// Neighbouring GraphNode objects get stored in this wrapper so that things like
         /// the cost to travel there can be cached.
@@ -79,6 +86,15 @@ namespace MBHEngine.PathFind.GenericAStar
         }
 
         /// <summary>
+        /// Returns a Node back to its default state. Needed for Nodes used in Factory.
+        /// </summary>
+        public virtual void Reset()
+        {
+            System.Diagnostics.Debug.Assert(pNeighbours.Count == 0, "Reseting node without empty Neighbours.");
+            pData = null;
+        }
+
+        /// <summary>
         /// Adds a neighbour to this GraphNode.
         /// </summary>
         /// <param name="node">The neighbouring GraphNode.</param>
@@ -88,8 +104,10 @@ namespace MBHEngine.PathFind.GenericAStar
         /// </param>
         public virtual void AddNeighbour(GraphNode node, Single cost = -1.0f)
         {
+            //HPAStar.NavMesh.DebugCheckNode(node);
+
             // Create a new neighbour to wrap the node passed in.
-            Neighbour temp = mUnusedNeighbours.Dequeue(); //new Neighbour();
+            Neighbour temp = mUnusedNeighbours.Dequeue();
 
             // Put it back into a default state.
             temp.Reset();
@@ -107,20 +125,7 @@ namespace MBHEngine.PathFind.GenericAStar
             }
 
 #if DEBUG
-            /*
-            for (Int32 i = 0; i < mNeighbours.Count; i++)
-            {
-                if (mNeighbours[i].mGraphNode == node)
-                {
-                    //System.Diagnostics.Debug.Assert(false, "Dupe GraphNode added the neighbouring list.");
-                }
-
-                if (mNeighbours[i].mGraphNode.pPosition == node.pPosition)
-                {
-                    //System.Diagnostics.Debug.Assert(false, "GraphNode at dupe position added the neighbouring list.");
-                }
-            }
-            */
+            System.Diagnostics.Debug.Assert(node.pData != null, "Uninitialized node set as neighbour");
 #endif
 
             mNeighbours.Add(temp);
@@ -136,6 +141,8 @@ namespace MBHEngine.PathFind.GenericAStar
             {
                 if (mNeighbours[i].mGraphNode == neighbour)
                 {
+                    //HPAStar.NavMesh.DebugCheckNode(mNeighbours[i].mGraphNode);
+
                     mNeighbours[i].Reset();
                     
                     // Put this Neighbour back into the Queue so others can reuse it.
@@ -201,7 +208,7 @@ namespace MBHEngine.PathFind.GenericAStar
         /// GraphNode objects often wrap a piece of data (eg. a Level.Tile). pData is a generic way
         /// to access that data, where it can then be cast back to the type it is known to be.
         /// </summary>
-        public abstract object pData { get; }
+        public abstract object pData { get; set; }
 
         /// <summary>
         /// Used for debug display.

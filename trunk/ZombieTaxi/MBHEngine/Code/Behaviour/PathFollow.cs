@@ -127,8 +127,6 @@ namespace MBHEngine.Behaviour
             // moving towards the next point on the path.
             if (mGetCurrentBestNodeMsg.mBest_Out != null && mGetCurrentBestNodeMsg.mBest_Out.pPathSolved)
             {
-                //return; 
-
                 // This is the node closest to the destination that we have found.
                 MBHEngine.PathFind.GenericAStar.PathNode p = mGetCurrentBestNodeMsg.mBest_Out;
 
@@ -176,6 +174,7 @@ namespace MBHEngine.Behaviour
                     // that object has moved since we original found this path.
                     if (null != mTarget)
                     {
+                        mParentGOH.OnMessage(mClearDestinationMsg);
                         mSetSourceMsg.mSource_In = mParentGOH.pPosition + mParentGOH.pCollisionRoot;
                         mParentGOH.OnMessage(mSetSourceMsg);
                         mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
@@ -185,7 +184,7 @@ namespace MBHEngine.Behaviour
 
                 //DebugMessageDisplay.pInstance.AddConstantMessage("Moving towards target.");
 
-                if (p.pGraphNode != null)
+                if (p.pGraphNode != null && p.pGraphNode.pData != null)
                 {
                     // Move towards the nodes center point.
                     Vector2 d = p.pGraphNode.pPosition - mParentGOH.pPosition + new Vector2(0.0f, 4.0f);

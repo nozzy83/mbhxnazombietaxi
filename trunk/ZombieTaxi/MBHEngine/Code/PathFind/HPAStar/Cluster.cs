@@ -119,7 +119,10 @@ namespace MBHEngine.PathFind.HPAStar
             {
                 if (pNodes[i].pData as Level.Tile == tile)
                 {
-                    return pNodes[i];
+                    if (!(pNodes[i] as NavMeshTileGraphNode).pIsTemporary)
+                    {
+                        return pNodes[i];
+                    }
                 }
                 else if (pNodes[i].pPosition == tile.mCollisionRect.pCenterPoint)
                 {

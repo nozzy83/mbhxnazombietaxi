@@ -9,6 +9,7 @@ using MBHEngine.Input;
 using System.Diagnostics;
 using MBHEngine.World;
 using MBHEngine.PathFind.GenericAStar;
+using MBHEngine.PathFind.HPAStar;
 
 namespace MBHEngine.Behaviour
 {
@@ -156,7 +157,8 @@ namespace MBHEngine.Behaviour
             WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
             if (mPlannerNavMesh.pStart != null)
             {
-                mGetNavMeshMsg.mNavMesh_Out.DestroyOneWayGraphNode(mPlannerNavMesh.pStart);
+                mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(mPlannerNavMesh.pStart);
+                mPlannerNavMesh.SetSource(null);
             }
             ClearDestination();
         }
@@ -197,6 +199,11 @@ namespace MBHEngine.Behaviour
                 SetSource(mParentGOH.pPosition);
             }
 
+            if (mGetNavMeshMsg.mNavMesh_Out != null)
+            {
+                //mGetNavMeshMsg.mNavMesh_Out.DebugCheckNodes();
+            }
+
             // Plan the path at a high level.
             MBHEngine.PathFind.GenericAStar.Planner.Result res = mPlannerNavMesh.PlanPath();
 
@@ -213,13 +220,33 @@ namespace MBHEngine.Behaviour
 
                 PathNode node = mPlannerNavMesh.pCurrentBest;
 
+                // We need to do more than just walk the list until we hit the mLastHighLevelSearched. There
+                // are cases (such as 2 nodes at the same position) where we don't want to use a Node.
+                // This tracks which was the last VALID node.
+                PathNode lastValid = node;
+
                 // Loop all the way back to one after the starting point avoiding the starting node, as
                 // well as previously searched nodes.
                 // We don't want the starting node because that is where we are likely already standing.
-                while (node != mLastHighLevelSearched && node.pPrevious != mLastHighLevelSearched && node.pPrevious.pPrevious != null)
+                while (
+                    node != mLastHighLevelSearched && // Was the first node actually the one we looked at last Update?
+                    node.pPrevious != mLastHighLevelSearched && // Is the next one the Node looked at last Update?
+                    node.pPrevious.pGraphNode.pPosition != mPlannerTileMap.pStart.pPosition && // Is this Node at the same position as the starting position? We are already there so trying to get there again would cause issues.
+                    node.pPrevious.pPrevious != null)
                 {
                     node = node.pPrevious;
+
+                    // Only choose nodes that are not at the same position as the last valid node. Trying to path find between
+                    // 2 nodes at the TileMap level causes problems. It will solve the path fine, but the issue is when it goes
+                    // back to the HPA level, since it hasn't moved the starting position, HPA will find the exact same path.
+                    // This cycle repeats forever.
+                    if (lastValid.pGraphNode.pPosition != node.pGraphNode.pPosition)
+                    {
+                        lastValid = node;
+                    }
                 }
+
+                node = lastValid;
 
                 // The lower level search uses the Level.Tile Graph, not the NavMesh, so we need to 
                 // use the node in NavMesh to find a node in the main tile map.
@@ -287,7 +314,12 @@ namespace MBHEngine.Behaviour
 
                 // If the low level search hasn't started yet, return the high level one, so that
                 // movement can start as soon as possible.
-                tmp.mBest_Out = mLowLevelBest != null ? mLowLevelBest : mPlannerNavMesh.pCurrentBest;
+                tmp.mBest_Out = mLowLevelBest; // mLowLevelBest != null ? mLowLevelBest : mPlannerNavMesh.pCurrentBest;
+            }
+            else if (msg is Level.OnNavMeshInvalidatedMessage)
+            {
+                mPlannerNavMesh.InvalidateCurrentPath();
+                mPlannerTileMap.InvalidateCurrentPath();
             }
         }
 
@@ -296,11 +328,16 @@ namespace MBHEngine.Behaviour
         /// </summary>
         private void ClearDestination()
         {
-            // If mPlannerNavMesh currently has a destination, that means that we added a temp
+            //MBHEngine.PathFind.HPAStar.NavMesh.DebugCheckNode(mPlannerNavMesh.pStart);
+            
+			WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+            
+			// If mPlannerNavMesh currently has a destination, that means that we added a temp
             // node to the nav mesh as that destination, and it needs to be removed now.
             if (mPlannerNavMesh.pEnd != null)
             {
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+                System.Diagnostics.Debug.Assert(mPlannerNavMesh.pEnd != mPlannerNavMesh.pStart, "End and start are the same.");
+
                 mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(mPlannerNavMesh.pEnd);
             }
 
@@ -311,6 +348,10 @@ namespace MBHEngine.Behaviour
 
             mPlannerNavMesh.ClearDestination();
             mPlannerTileMap.ClearDestination();
+
+            //mGetNavMeshMsg.mNavMesh_Out.DebugCheckNodes();
+
+            //MBHEngine.PathFind.HPAStar.NavMesh.DebugCheckNode(mPlannerNavMesh.pStart);
         }
 
         /// <summary>
@@ -334,6 +375,7 @@ namespace MBHEngine.Behaviour
                 // If the GraphNode was already created, remove it before adding a new one.
                 if (end != null)
                 {
+                    //mGetNavMeshMsg.mNavMesh_Out.UnlinkGraphNodes(end, mPlannerNavMesh.pStart);
                     mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(end);
                 }
 
@@ -343,11 +385,20 @@ namespace MBHEngine.Behaviour
                 // different (and thus changed).
                 if (mPlannerNavMesh.SetDestination(node))
                 {
+                    mLowLevelBest = null;
+                    mLastHighLevelSearched = null;
+
                     // If the destination changes, it means the low level search is no longer valid, and
                     // needs to wait for the high level search to complete first.
                     mPlannerTileMap.ClearDestination();
                 }
             }
+
+            //mGetNavMeshMsg.mNavMesh_Out.DebugCheckNodes();
+
+            //MBHEngine.PathFind.HPAStar.NavMesh.DebugCheckNode(mPlannerNavMesh.pEnd);
+
+            //MBHEngine.PathFind.HPAStar.NavMesh.DebugCheckNode(mPlannerNavMesh.pStart);
         }
 
         /// <summary>
@@ -357,44 +408,13 @@ namespace MBHEngine.Behaviour
         /// <param name="pos">The position at which we wish to travel from.</param>
         private void SetSource(Vector2 pos)
         {
-            WorldManager.pInstance.pCurrentLevel.OnMessage(mGetNavMeshMsg);
+            mGetTileAtPositionMsg.Reset();
+            mGetTileAtPositionMsg.mPosition_In = pos;
+            WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
-            if (mPlannerNavMesh.pStart != null)
-            {
-                mGetNavMeshMsg.mNavMesh_Out.DestroyOneWayGraphNode(mPlannerNavMesh.pStart);
-            }
-
-            // First, check if we are standing on an existing GraphNode. This is best case, 
-            // as it means we don't need to create a new GraphNode (and do the associated
-            // A* search to get cost to all other GraphNode objects in Graph).
-            GraphNode node = mGetNavMeshMsg.mNavMesh_Out.FindNodeAt(pos);
-
-            // If we don't find a GraphNode at the target position, we need to create a new
-            // node to use in ou search.
-            if (null == node)
-            {
-                // Create a node, but only do the links from this node to neighbours (not back
-                // again).
-                node = mGetNavMeshMsg.mNavMesh_Out.CreateOneWayGraphNode(pos); //mGetNavMeshMsg.mNavMesh_Out.GetClostestNode(tmp.mSource_In);//mGetNavMeshMsg.mNavMesh_Out.AddSearchNode(tmp.mSource_In);
-            }
-
-            // If we got a node to target, pass it on to the Planner.
-            if (null != node)
-            {
-                mPlannerNavMesh.SetSource(node);
-
-                // Find the TileGraphNode that maps to the location of node.
-                mGetTileAtPositionMsg.Reset();
-                mGetTileAtPositionMsg.mPosition_In = pos;
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
-
-                mPlannerTileMap.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
-            }
-
-            /*
             GraphNode start = mPlannerNavMesh.pStart;
 
-            // Only set the new source if it is different than the current one (or the current
+            // Only set the new destination if it is different than the current one (or the current
             // one does not exist).
             if (start == null || mGetTileAtPositionMsg.mTile_Out != start.pData)
             {
@@ -403,6 +423,7 @@ namespace MBHEngine.Behaviour
                 // If the GraphNode was already created, remove it before adding a new one.
                 if (start != null)
                 {
+                    //mGetNavMeshMsg.mNavMesh_Out.UnlinkGraphNodes(end, mPlannerNavMesh.pStart);
                     mGetNavMeshMsg.mNavMesh_Out.RemoveTempNode(start);
                 }
 
@@ -410,16 +431,24 @@ namespace MBHEngine.Behaviour
 
                 // Attempt to set a new destination. Returns true in the case where the destination was 
                 // different (and thus changed).
-                mPlannerNavMesh.SetSource(node);
+                if (mPlannerNavMesh.SetSource(node))
+                {
+                    mLowLevelBest = null;
+                    mLastHighLevelSearched = null;
+                    // Find the TileGraphNode that maps to the location of node.
+                    mGetTileAtPositionMsg.Reset();
+                    mGetTileAtPositionMsg.mPosition_In = pos;
+                    WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
 
-                // Find the TileGraphNode that maps to the location of node.
-                mGetTileAtPositionMsg.Reset();
-                mGetTileAtPositionMsg.mPosition_In = pos;
-                WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
-
-                mPlannerTileMap.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+                    mPlannerTileMap.SetSource(mGetTileAtPositionMsg.mTile_Out.mGraphNode);
+                }
             }
-            */
+
+            //mGetNavMeshMsg.mNavMesh_Out.DebugCheckNodes();
+
+            //MBHEngine.PathFind.HPAStar.NavMesh.DebugCheckNode(mPlannerNavMesh.pEnd);
+
+            //MBHEngine.PathFind.HPAStar.NavMesh.DebugCheckNode(mPlannerNavMesh.pStart);            
         }
     }
 }

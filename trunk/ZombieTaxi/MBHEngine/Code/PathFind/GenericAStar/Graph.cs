@@ -82,7 +82,7 @@ namespace MBHEngine.PathFind.GenericAStar
             {
                 for (Int32 j = 0; j < node.pNeighbours.Count; j++)
                 {
-                    Color costColor = Color.Lerp(Color.White, Color.Red, node.pNeighbours[j].mCostToTravel / (5.0f * 11.134f));
+                    Color costColor = Color.Lerp(Color.White, Color.Red, (node.pNeighbours[j].mCostToTravel - 8.0f) / (3.0f * 11.134f));
                     DebugShapeDisplay.pInstance.AddSegment(node.pPosition, node.pNeighbours[j].mGraphNode.pPosition, costColor);
                 }
             }
