@@ -700,19 +700,12 @@ namespace MBHEngine.PathFind.HPAStar
         /// <returns></returns>
         public GraphNode InsertTempNode(Vector2 pos)
         {            
-            // How many pixels wide/high is a single cluster? This will be needed to go from
-            // screen size, to cluster index.
-            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
-            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
-
-            Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
-
             GraphNode node = null;
 
-            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
-            {
-                Cluster cluster = mClusters[index.X, index.Y];
+            Cluster cluster = GetClusterAtPosition(pos);
 
+            if (null != cluster)
+            {
                 mGetTileAtPositionMsg.Reset();
                 mGetTileAtPositionMsg.mPosition_In = pos;
                 WorldManager.pInstance.pCurrentLevel.OnMessage(mGetTileAtPositionMsg);
@@ -756,17 +749,11 @@ namespace MBHEngine.PathFind.HPAStar
         /// </summary>
         /// <param name="node">The GraphNode to remove.</param>
         public void RemoveTempNode(GraphNode node)
-        {            
-            // How many pixels wide/high is a single cluster? This will be needed to go from
-            // screen size, to cluster index.
-            Int32 pixelsPerClusterX = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileWidth;
-            Int32 pixelsPerClusterY = mClusterSize * mGetMapInfoMsg.mInfo_Out.mTileHeight;
+        {
+            Cluster cluster = GetClusterAtPosition(node.pPosition);
 
-            Point index = new Point((Int32)(node.pPosition.X / pixelsPerClusterX), (Int32)(node.pPosition.Y / pixelsPerClusterY));
-
-            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            if (null != cluster)
             {
-                Cluster cluster = mClusters[index.X, index.Y];
 
                 for (Int32 i = 0; i < cluster.pNodes.Count; i++)
                 {
@@ -843,7 +830,7 @@ namespace MBHEngine.PathFind.HPAStar
 
             Point index = new Point((Int32)(pos.X / pixelsPerClusterX), (Int32)(pos.Y / pixelsPerClusterY));
 
-            if (index.X > 0 && index.Y > 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
+            if (index.X >= 0 && index.Y >= 0 && index.X < mClusters.GetLength(0) && index.Y < mClusters.GetLength(1))
             {
                 return mClusters[index.X, index.Y];
             }
