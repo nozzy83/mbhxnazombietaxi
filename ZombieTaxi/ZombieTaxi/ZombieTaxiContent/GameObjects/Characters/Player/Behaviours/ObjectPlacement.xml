@@ -5,6 +5,7 @@
       <Item>DEFAULT</Item>
       <Item>PLACEMENT</Item>
     </mUpdatePasses>
+    <mAbsOffsetRange>9 5</mAbsOffsetRange>
   </Asset>
 </XnaContent>
 
