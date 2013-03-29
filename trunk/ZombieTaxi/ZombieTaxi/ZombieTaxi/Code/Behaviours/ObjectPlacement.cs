@@ -9,6 +9,7 @@ using MBHEngine.Behaviour;
 using MBHEngine.Input;
 using MBHEngineContentDefs;
 using MBHEngine.World;
+using ZombieTaxiContentDefs;
 
 namespace ZombieTaxi.Behaviours
 {
@@ -88,6 +89,12 @@ namespace ZombieTaxi.Behaviours
         private Color mItemColor;
 
         /// <summary>
+        /// The limits of how far the cursor can be offset from the player. These are absolute values, and should
+        /// never be negative.
+        /// </summary>
+        private Point mAbsOffsetRange;
+
+        /// <summary>
         /// Preallocated messages to avoid garbage collection.
         /// </summary>
         private Level.GetTileAtPositionMessage mGetTileAtPositionMsg;
@@ -119,7 +126,7 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
-            //InventoryDefinition def = GameObjectManager.pInstance.pContentManager.Load<InventoryDefinition>(fileName);
+            ObjectPlacementDefinition def = GameObjectManager.pInstance.pContentManager.Load<ObjectPlacementDefinition>(fileName);
 
             mCursor = new GameObject("GameObjects\\Interface\\PlacementCursor\\PlacementCursor");
             mCursor.pPosition = mParentGOH.pPosition;
@@ -130,6 +137,8 @@ namespace ZombieTaxi.Behaviours
             mItemOffset = new Vector2(-4, -4);
             mItemSourceRect = new Rectangle(0, 0, 8, 8);
             mItemColor = new Color(255, 255, 255, 200);
+
+            mAbsOffsetRange = def.mAbsOffsetRange;
 
             mRemoveClassifications = new List<MBHEngineContentDefs.GameObjectDefinition.Classifications>(1);
             mRemoveClassifications.Add(MBHEngineContentDefs.GameObjectDefinition.Classifications.WALL);
@@ -312,21 +321,26 @@ namespace ZombieTaxi.Behaviours
                 InputManager.pInstance.CheckAction(InputManager.InputActions.LA_LEFT, true))
             {
                 mCursorOffset.X -= 1;
+
+                mCursorOffset.X = MathHelper.Max(-mAbsOffsetRange.X, mCursorOffset.X);
             }
             else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_RIGHT, true) ||
                 InputManager.pInstance.CheckAction(InputManager.InputActions.LA_RIGHT, true))
             {
                 mCursorOffset.X += 1;
+                mCursorOffset.X = MathHelper.Min(mAbsOffsetRange.X, mCursorOffset.X);
             }
             else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_UP, true) ||
                 InputManager.pInstance.CheckAction(InputManager.InputActions.LA_UP, true))
             {
                 mCursorOffset.Y -= 1;
+                mCursorOffset.Y = MathHelper.Max(-mAbsOffsetRange.Y, mCursorOffset.Y);
             }
             else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_DOWN, true) ||
                 InputManager.pInstance.CheckAction(InputManager.InputActions.LA_DOWN, true))
             {
                 mCursorOffset.Y += 1;
+                mCursorOffset.Y = MathHelper.Min(mAbsOffsetRange.Y, mCursorOffset.Y);
             }
         }
     }
