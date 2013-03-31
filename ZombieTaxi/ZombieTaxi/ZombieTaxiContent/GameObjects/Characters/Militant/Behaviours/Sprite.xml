@@ -16,22 +16,37 @@
         <mTicksPerFrame>10</mTicksPerFrame>
         <mName>Idle</mName>
         <mStartingFrame>0</mStartingFrame>
-        <mNumFrames>10</mNumFrames>
+        <mNumFrames>4</mNumFrames>
         <mLooping>true</mLooping>
+        <mFrameOverrides>
+          <Item>
+            <Key>0</Key>
+            <Value>
+              <mTicksPerFrame>240</mTicksPerFrame>
+            </Value>
+          </Item>
+        </mFrameOverrides>
       </Item>
       <Item>
         <mTicksPerFrame>10</mTicksPerFrame>
         <mName>Walk</mName>
-        <mStartingFrame>10</mStartingFrame>
+        <mStartingFrame>4</mStartingFrame>
         <mNumFrames>2</mNumFrames>
         <mLooping>true</mLooping>
       </Item>
       <Item>
         <mTicksPerFrame>5</mTicksPerFrame>
         <mName>Run</mName>
-        <mStartingFrame>10</mStartingFrame>
+        <mStartingFrame>4</mStartingFrame>
         <mNumFrames>2</mNumFrames>
         <mLooping>true</mLooping>
+      </Item>
+      <Item>
+        <mTicksPerFrame>1</mTicksPerFrame>
+        <mName>Dead</mName>
+        <mStartingFrame>6</mStartingFrame>
+        <mNumFrames>1</mNumFrames>
+        <mLooping>false</mLooping>
       </Item>
     </mAnimationSets>
   </Asset>

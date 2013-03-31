@@ -45,6 +45,10 @@ namespace ZombieTaxi.Behaviours
             AddState(new FSMStateFollowTarget(), "Follow");
             AddState(new FSMStateStay(), "Stay");
             AddState(new States.Civilian.FSMStateDead(), "Dead");
+            AddState(new States.Civilian.FSMStateGoToStandingPosition(), "GoToStandingPosition");
+            AddState(new States.Civilian.FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
+            AddState(new States.Civilian.FSMStateGoToExtraction(), "GoToExtraction");
+            AddState(new States.Civilian.FSMStateResearchStatBoost(), "ResearchStatBoost");
 
             mParentGOH.pDirection.mSpeed = 0.625f;
         }
