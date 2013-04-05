@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.PointAndShootDefinition">
+    <mFiringDelay>30</mFiringDelay>
+    <mFiringRange>40</mFiringRange>
+    <mBulletSpeed>3.75</mBulletSpeed>
+    <mGunScriptName>GameObjects\Items\Rifle\Rifle</mGunScriptName>
+    <mBulletScriptName>GameObjects\Items\RifleBullet\RifleBullet</mBulletScriptName>
+    <mTargetClassifications>
+      <Item>ENEMY</Item>
+    </mTargetClassifications>
+  </Asset>
+</XnaContent>
+

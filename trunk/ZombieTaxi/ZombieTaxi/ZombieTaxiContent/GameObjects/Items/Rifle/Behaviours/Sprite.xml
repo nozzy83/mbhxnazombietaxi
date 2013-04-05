@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.SpriteRenderDefinition">
+    <mSpriteFileName>Sprites\Items\Rifle</mSpriteFileName>
+    <mHasShadow>true</mHasShadow>
+    <mAttachmentPoints>
+      <Item>
+        <mName>Shadow</mName>
+        <mOffset>0 5</mOffset>
+        <mMoveWithSpriteFacing>true</mMoveWithSpriteFacing>
+      </Item>
+    </mAttachmentPoints>  
+  </Asset>
+</XnaContent>
+
