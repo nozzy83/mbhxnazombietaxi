@@ -116,6 +116,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\WallSteel\\WallSteel", 600);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Environments\\FloorSafeHouse\\FloorSafeHouse", 400);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Bullet\\Bullet", 100);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\RifleBullet\\RifleBullet", 100);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Grenade\\Grenade", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\Flare\\Flare", 10);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Items\\WoodPickup\\WoodPickup", 100);

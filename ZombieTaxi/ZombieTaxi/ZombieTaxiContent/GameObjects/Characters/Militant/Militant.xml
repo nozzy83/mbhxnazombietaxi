@@ -20,6 +20,7 @@
       <Item>PathFollow</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
+      <Item>PointAndShoot</Item>
       <Item>SimpleMomentum</Item>
       <Item>FaceForward</Item>
     </mBehaviourFileNames>
@@ -30,6 +31,7 @@
       <Item>MBHEngine.Behaviour.PathFollow</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>ZombieTaxi.Behaviours.PointAndShoot</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
       <Item>MBHEngine.Behaviour.FaceForward</Item>
     </mBehaviourClassNames>

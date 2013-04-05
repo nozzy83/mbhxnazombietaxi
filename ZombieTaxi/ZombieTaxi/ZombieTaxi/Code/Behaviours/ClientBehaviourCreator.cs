@@ -113,6 +113,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new StrandedPopup(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.PointAndShoot":
+                    {
+                        return new PointAndShoot(go, fileName);
+                    }
                 default:
                     {
                         return null;

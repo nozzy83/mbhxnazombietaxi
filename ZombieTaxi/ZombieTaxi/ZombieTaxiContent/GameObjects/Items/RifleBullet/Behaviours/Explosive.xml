@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.ExplosiveDefinition">
+    <mEffectFileName>GameObjects\Effects\BulletSpark\BulletSpark</mEffectFileName>
+    <mAnimationsToPlay>
+      <Item>Spark1</Item>
+      <Item>Spark2</Item>
+      <Item>Spark3</Item>
+    </mAnimationsToPlay>
+    <mManualExplosion>false</mManualExplosion>
+    <mDamageCaused>5</mDamageCaused>
+    <mDamageAppliedTo>
+      <Item>ENEMY</Item>
+      <Item>WALL</Item>
+    </mDamageAppliedTo>
+    <mDetonationTimerDuration>30</mDetonationTimerDuration>
+  </Asset>
+</XnaContent>
+
