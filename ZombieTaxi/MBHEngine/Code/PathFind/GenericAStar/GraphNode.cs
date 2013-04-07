@@ -124,9 +124,7 @@ namespace MBHEngine.PathFind.GenericAStar
                 temp.mCostToTravel = Vector2.Distance(node.pPosition, pPosition);
             }
 
-#if DEBUG
             System.Diagnostics.Debug.Assert(node.pData != null, "Uninitialized node set as neighbour");
-#endif
 
             mNeighbours.Add(temp);
         }

@@ -257,9 +257,7 @@ namespace MBHEngine.Behaviour
                 }
                 else
                 {
-#if ALLOW_GARBAGE
                     System.Diagnostics.Debug.Assert(false, "FSMState returned a new state which is not managed by this state machine: " + nextState);
-#endif // ALLOW_GARBAGE
                 }
             }
         }

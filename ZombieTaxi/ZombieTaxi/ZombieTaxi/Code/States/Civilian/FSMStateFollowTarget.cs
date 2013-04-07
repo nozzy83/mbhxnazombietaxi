@@ -102,9 +102,8 @@ namespace ZombieTaxi.States.Civilian
                 // This prevents getting points, and then
                 if (CheckForValidSafeHouseTiles())
                 {
-#if ALLOW_GARBAGE
                     DebugMessageDisplay.pInstance.AddConstantMessage("Reached SafeHouse.");
-#endif
+
                     // For every civilian we save, increment the score a little.
                     GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, pParentGOH);
 

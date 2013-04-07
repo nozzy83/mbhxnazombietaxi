@@ -64,10 +64,7 @@ namespace MBHEngine.Behaviour
                 mFrameCounter = 0;
             }
 
-#if ALLOW_GARBAGE
-            string fps = string.Format("FPS: {0}", mFrameRate);
-            DebugMessageDisplay.pInstance.AddDynamicMessage(fps);
-#endif // ALLOW_GARBAGE
+            DebugMessageDisplay.pInstance.AddDynamicMessage(string.Format("FPS: {0}", mFrameRate));
         }
 
         /// <summary>

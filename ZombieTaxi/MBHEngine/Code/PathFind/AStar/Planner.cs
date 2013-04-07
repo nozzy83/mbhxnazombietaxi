@@ -197,11 +197,9 @@ namespace MBHEngine.PathFind.AStar
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public Result Update(GameTime gameTime)
         {
-#if ALLOW_GARBAGE
             //DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Open: " + mOpenNodes.Count);
             //DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Closed: " + mClosedNodes.Count);
             //DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + mUnusedNodes.Count);
-#endif
 
             // Store the current level for easy access throughout algorithm.
             GameObject.GameObject curLvl = World.WorldManager.pInstance.pCurrentLevel;
@@ -300,20 +298,11 @@ namespace MBHEngine.PathFind.AStar
 			
 			// TODO: Configure this from XML script.
             Int32 timeSliceCap = 30;
-
-            Stopwatch sw = Stopwatch.StartNew();
-            Stopwatch sw2 = Stopwatch.StartNew();
-
-            Boolean started = false;
             
             // Continue searching until we hit the destination or run out of open nodes to check against.
             while (!mSolved && mOpenNodes.Count > 0 && timeSliceCount < timeSliceCap)// && InputManager.pInstance.CheckAction(InputManager.InputActions.B, true))
             {
-                started = true;
-
                 timeSliceCount++;
-
-                sw2.Restart();
 
                 // 1. Look for the lowest F cost square on the open list. We refer to this as the current square.
                 mCurBest = mOpenNodes[0];
@@ -324,14 +313,6 @@ namespace MBHEngine.PathFind.AStar
                         mCurBest = mOpenNodes[i];
                     }
                 }
-
-                sw.Stop();
-#if ALLOW_GARBAGE
-                DebugMessageDisplay.pInstance.AddConstantMessage("OPN: " + sw2.Elapsed.ToString());
-#else
-                Console.WriteLine("OPN: " + sw2.Elapsed.ToString());
-#endif
-                sw.Start();
 
                 // 2. Switch it to the closed list.
                 mOpenNodes.Remove(mCurBest);
@@ -345,8 +326,6 @@ namespace MBHEngine.PathFind.AStar
 
                     break;
                 }
-
-                sw2.Restart();
 
                 // 3.  For each of the 8 squares adjacent to this current square...
                 for (Int32 i = 0; i < mCurBest.mTile.mAdjecentTiles.Length; i++)
@@ -503,25 +482,6 @@ namespace MBHEngine.PathFind.AStar
                         }
                     }
                 }
-
-                sw.Stop();
-#if ALLOW_GARBAGE
-                DebugMessageDisplay.pInstance.AddConstantMessage("ADJ: " + sw2.Elapsed.ToString());
-#else
-                Console.WriteLine("ADJ: " + sw2.Elapsed.ToString());
-#endif
-                sw.Start();
-            }
-
-            sw.Stop();
-
-            if (started)
-            {
-#if ALLOW_GARBAGE
-                DebugMessageDisplay.pInstance.AddConstantMessage("FUL: " + sw.Elapsed.ToString());
-#else
-                Console.WriteLine("FUL: " + sw.Elapsed.ToString());
-#endif
             }
 
             // Draw the path.

@@ -1062,9 +1062,7 @@ namespace MBHEngine.Behaviour
                                 }
                             }
 
-#if ALLOW_GARBAGE
                             //DebugMessageDisplay.pInstance.AddDynamicMessage("Collide Dir: " + dir);
-#endif
 
                             // Set the collision type temporarily to 2, to signal that it collided.
                             mCollisionGrid[x, y].SetAttribute(Tile.Attribute.Collision);

@@ -184,11 +184,10 @@ namespace ZombieTaxi.StatBoost.Behaviours
             // Have we finished researching?
             if (mResearchTimer.IsExpired())
             {
-#if DEBUG
                 DebugMessageDisplay.pInstance.AddConstantMessage("Research complete.");
 
                 System.Diagnostics.Debug.Assert(null != mTarget, "Attempting to send message without a target set.");
-#endif // DEBUG
+
                 // Safety check to make sure we don't try to access a null target. This
                 // is possible since the target is set after the fact.
                 if (null != mTarget)

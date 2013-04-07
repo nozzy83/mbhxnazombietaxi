@@ -186,12 +186,9 @@ namespace ZombieTaxi.Behaviours
                 angle += 2 * Math.PI;
             }
 
-#if ALLOW_GARBAGE
-            //Single deg = MathHelper.ToDegrees((Single)angle);
-            //DebugMessageDisplay.pInstance.AddDynamicMessage("Angle: " + deg);
+            //DebugMessageDisplay.pInstance.AddDynamicMessage("Angle: " + MathHelper.ToDegrees((Single)angle);
             //DebugMessageDisplay.pInstance.AddDynamicMessage("X: " + g.ThumbSticks.Right.X);
             //DebugMessageDisplay.pInstance.AddDynamicMessage("Y: " + g.ThumbSticks.Right.Y);
-#endif // ALLOW_GARBAGE
 
             // Determine the direction that right analog stick is pointing (if any).
             Vector2 dir = Vector2.Normalize(padState.Right);
@@ -325,9 +322,7 @@ namespace ZombieTaxi.Behaviours
 
             mGOFloodFill.ProcessFill();
 
-#if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Player Pos: " + mParentGOH.pPosition);
-#endif
             
             CameraManager.pInstance.pTargetPosition = mParentGOH.pPosition;
         }
@@ -340,20 +335,12 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
-        {
-#if ALLOW_GARBAGE            
+        {        
             // Which type of message was sent to us?
             if (msg is Health.OnZeroHealthMessage)
             {
-                DebugMessageDisplay.pInstance.AddConstantMessage("Player Died");
+                DebugMessageDisplay.pInstance.AddConstantMessage("GAME OVER - Player Died");
             }
-            else if (msg is Health.ApplyDamageMessage)
-            {
-                Health.ApplyDamageMessage temp = (Health.ApplyDamageMessage)msg;
-
-                DebugMessageDisplay.pInstance.AddConstantMessage("Player took damage: " + temp.mDamageAmount_In);
-            }
-#endif        
         }
     }
 }
