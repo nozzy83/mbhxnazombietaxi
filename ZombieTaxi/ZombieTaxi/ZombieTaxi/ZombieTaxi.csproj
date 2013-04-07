@@ -155,7 +155,7 @@
     <Compile Include="Code\Behaviours\TilePlacement.cs" />
     <Compile Include="Code\Behaviours\TwinStick.cs" />
     <Compile Include="Code\Behaviours\FSMMilitant.cs" />
-    <Compile Include="Code\PointAndShoot.cs" />
+    <Compile Include="Code\Behaviours\PointAndShoot.cs" />
     <Compile Include="Code\States\Civilian\FSMStateResearchStatBoost.cs" />
     <Compile Include="Code\States\Civilian\FSMStateCower.cs" />
     <Compile Include="Code\States\Civilian\FSMStateDead.cs" />
