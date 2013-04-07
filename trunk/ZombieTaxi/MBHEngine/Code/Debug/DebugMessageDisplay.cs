@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
+using System.Diagnostics;
 
 namespace MBHEngine.Debug
 {
@@ -55,12 +56,10 @@ namespace MBHEngine.Debug
         /// </summary>
         private int mMaxConstMsgs = 10;
 
-#if ALLOW_GARBAGE
         /// <summary>
         /// This will keep track of the current message number.
         /// </summary>
         private int mCurMsgNum = 0;
-#endif // ALLOW_GARBAGE
 
         /// <summary>
         /// The font object we use for rendering.
@@ -192,14 +191,13 @@ namespace MBHEngine.Debug
         /// This function does nothing outside of DEBUG.
         /// </remarks>
         /// <param name="spriteBatch">The sprite batch to render to.</param>
+        [Conditional("ALLOW_GARBAGE")]
         public void Render(SpriteBatch spriteBatch)
         {
-#if ALLOW_GARBAGE
             RenderDynamicMsgs(spriteBatch);
 
             // Draw the constant messages
             RenderConstMsgs(spriteBatch);
-#endif
         }
 
         /// <summary>
@@ -216,14 +214,13 @@ namespace MBHEngine.Debug
             mDynamicMsgs.Add(mDefaultHeader);
         }
 
-        
-#if ALLOW_GARBAGE
         /// <summary>
         /// Interface for adding dynamic messages to the system.  These get cleared every frame
         /// so they need to be re-added every frame.  This is perfect for data that changes constantly,
         /// such as a frame rate counter.
         /// </summary>
         /// <param name="newMsg">The message to display.</param>
+        [Conditional("ALLOW_GARBAGE")]
         public void AddDynamicMessage(String newMsg, String tag = null)
         {
             // TODO: This should probably just keep reusing the same entries rather than reallocating
@@ -234,15 +231,14 @@ namespace MBHEngine.Debug
 
             mDynamicMsgs.Add(d);
         }
-#endif
 
-#if ALLOW_GARBAGE
         /// <summary>
         /// Interface for adding constant messages to the system.  These never get cleared, they are
         /// just concatinated to the end of the list.  This is pefect for data that you want to keep a
         /// record of events on, such as objects being added and removed from the game.
         /// </summary>
         /// <param name="newMsg">The message to display.</param>
+        [Conditional("ALLOW_GARBAGE")]
         public void AddConstantMessage(String newMsg)
         {
             // Start at the last message and copy in the next one
@@ -259,7 +255,6 @@ namespace MBHEngine.Debug
             mConstantMsgs[0].mMessage = mCurMsgNum + ": " + newMsg;
             mConstantMsgs[0].mTag = null;
         }
-#endif
 
         /// <summary>
         /// Access to single static instance of the class.  This is the interface for our singleton.

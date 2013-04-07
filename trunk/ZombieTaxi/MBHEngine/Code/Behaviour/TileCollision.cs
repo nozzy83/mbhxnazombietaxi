@@ -97,16 +97,12 @@ namespace MBHEngine.Behaviour
             // Once we detect a collision, we need to repsond to it.
             if (mLevelCollisionMsg.mCollisionDetected_Out)
             {
-#if ALLOW_GARBAGE
                 //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected");
-#endif
 
                 // Seperate X and Y collision so that they can react seperatly.
                 if (mLevelCollisionMsg.mCollisionDetectedX_Out)
                 {
-#if ALLOW_GARBAGE
                     //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected X");
-#endif
 
                     // If we collided along the x-axis, but the object directly against that collision point.
                     if (mParentGOH.pPosition.X > mPreviousPos.X)
@@ -120,9 +116,7 @@ namespace MBHEngine.Behaviour
                 }
                 if (mLevelCollisionMsg.mCollisionDetectedY_Out)
                 {
-#if ALLOW_GARBAGE
                     //DebugMessageDisplay.pInstance.AddDynamicMessage("Collision Detected Y");
-#endif
 
                     if (mParentGOH.pPosY > mPreviousPos.Y)
                     {

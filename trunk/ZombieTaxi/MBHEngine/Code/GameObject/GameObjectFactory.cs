@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace MBHEngine.GameObject
 {
@@ -131,21 +132,18 @@ namespace MBHEngine.GameObject
 
             Boolean isManaged = mObjects.ContainsKey(fileName);
 
-#if ALLOW_GARBAGE
             // The requested type of GameObject is not managed by the Factory.  For now throw an error,
             // but at some point we may want to change this to allocate some additional ones.
             System.Diagnostics.Debug.Assert(true == isManaged, "Attempted to get template which is not managed by Factory: " + fileName);
-#endif //ALLOW_GARBAGE
 
             // Make sure this type of Object was actually added to the Dictionary at some point.
             if (isManaged)
             {
                 Boolean hasRemaining = (mObjects[fileName].Count > 0);
-#if ALLOW_GARBAGE
+
                 // There are no GameObjects of the requested type available.  For now throw an error,
                 // but at some point we may want to change this to allocate some additional ones.
                 System.Diagnostics.Debug.Assert(hasRemaining, "Ran out of templates of type: " + fileName);
-#endif //ALLOW_GARBAGE
 
                 // Ideally this will never happen in shipped code, but leaving it here as a fail safe since
                 // a lot of clients depend on this function not returning null.
@@ -183,10 +181,8 @@ namespace MBHEngine.GameObject
                 return;
             }
 
-#if DEBUG
             // Sanity check to make sure this object isn't added more than once.
             CheckForDupes(go.pFactoryInfo.pTemplateName);
-#endif // DEBUG
 
             // Push it back onto the appropriate list.
             mObjects[go.pFactoryInfo.pTemplateName].Push(go);
@@ -212,12 +208,12 @@ namespace MBHEngine.GameObject
             }
         }
 
-#if DEBUG
         /// <summary>
         /// Sanity check to make sure the same object isn't Added more than once which
         /// will result in the Factory handing off the same GameObject to different clients.
         /// </summary>
         /// <param name="templateName">The template name.</param>
+        [Conditional("DEBUG")]
         private void CheckForDupes(String templateName)
         {
             List<Int32> ids = new List<int>(1000);
@@ -228,6 +224,5 @@ namespace MBHEngine.GameObject
                 ids.Add(obj.pID);
             }
         }
-#endif // DEBUG
     }
 }

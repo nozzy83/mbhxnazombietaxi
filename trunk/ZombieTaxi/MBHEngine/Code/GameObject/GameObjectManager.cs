@@ -343,9 +343,7 @@ namespace MBHEngine.GameObject
                 }
             }
 
-#if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Updated " + count + " GameObjects");
-#endif
 
             mCurrentUpdateState = UpdatePhase.Remove;
 
@@ -412,9 +410,8 @@ namespace MBHEngine.GameObject
                 // Check if this is a dynamic object which isn't already being managed by this list.
                 if (!mGameObjectsToAdd[i].pIsStatic)
                 {
-#if DEBUG
                     System.Diagnostics.Debug.Assert(!mDynamicGameObjects.Contains(mGameObjectsToAdd[i]), "Attempting to add GameObject already in mDynamicGameObjects.");
-#endif // DEBUG
+
                     mDynamicGameObjects.Add(mGameObjectsToAdd[i]);
                 }
 
@@ -424,9 +421,7 @@ namespace MBHEngine.GameObject
                     // Figure out which cell this object would be in.
                     Vector2 index = CellIndexFromPosition(mGameObjectsToAdd[i].pPosition);
 
-#if DEBUG
                     System.Diagnostics.Debug.Assert(!mStaticGameObjects[(Int32)index.X, (Int32)index.Y].Contains(mGameObjectsToAdd[i]), "Attempting to add GameObject already in mStaticGameObjects.");
-#endif // DEBUG
 
                     mStaticGameObjects[(Int32)index.X, (Int32)index.Y].Add(mGameObjectsToAdd[i]);
                 }
@@ -632,10 +627,7 @@ namespace MBHEngine.GameObject
 
             batch.End();
 
-#if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Objects Rendered: " + objectsRender);
-#endif
-
         }
 
         /// <summary>

@@ -66,9 +66,7 @@ namespace MBHEngine.Math
         /// </summary>
         public void Update()
         {
-#if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddDynamicMessage("Stop Watches (Active): " + mActiveWatches.Count);
-#endif
 
             // Loop through every active StopWatch and increment the frame count.
             for (Int32 i = 0; i < mActiveWatches.Count; i++)

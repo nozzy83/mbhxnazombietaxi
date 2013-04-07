@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MBHEngine.GameObject;
 using MBHEngine.Render;
 using MBHEngine.Math;
+using System.Diagnostics;
 
 namespace MBHEngine.Debug
 {
@@ -57,6 +58,7 @@ namespace MBHEngine.Debug
         /// <param name="vertices">A collection of points defining the shape.</param>
         /// <param name="count">How many verts are in verticies.</param>
         /// <param name="color">The colour of the shape.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddPolygon(Vector2[] vertices, Int32 count, Color color)
         {
             for (int i = 0; i < count - 1; i ++)
@@ -81,6 +83,7 @@ namespace MBHEngine.Debug
         /// <param name="vertices">A collection of points defining the shape.</param>
         /// <param name="count">How many verts are in verticies.</param>
         /// <param name="color">The colour of the shape.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddSolidPolygon(Vector2[] vertices, Int32 count, Color color)
         {
             AddSolidPolygon(vertices, count, color, true);
@@ -93,6 +96,7 @@ namespace MBHEngine.Debug
         /// <param name="count">How many verts are in verticies.</param>
         /// <param name="color">The colour of the shape.</param>
         /// <param name="outline">Whether or not to render the shape with an ouline.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         private void AddSolidPolygon(Vector2[] vertices, int count, Color color, bool outline)
         {
             if (count == 2)
@@ -129,6 +133,7 @@ namespace MBHEngine.Debug
         /// <param name="center">The position of the circle.</param>
         /// <param name="radius">The size of the circle.</param>
         /// <param name="color">Color of the shape.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddCircle(Vector2 center, float radius, Color color)
         {
             int segments = 16;
@@ -157,6 +162,7 @@ namespace MBHEngine.Debug
         /// <param name="radius">The size of the shape.</param>
         /// <param name="axis">Normalized vector defining the orientation of the shape.</param>
         /// <param name="color">The colour of the shape.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddSolidCircle(Vector2 center, float radius, Vector2 axis, Color color)
         {
             int segments = 16;
@@ -197,6 +203,7 @@ namespace MBHEngine.Debug
         /// <param name="p1">The starting position.</param>
         /// <param name="p2">The end of point of the line.</param>
         /// <param name="color">The colour of the line.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddSegment(Vector2 p1, Vector2 p2, Color color)
         {
             mVertsLines[mLineCount * 2].Position = new Vector3(p1, 0.0f);
@@ -210,6 +217,7 @@ namespace MBHEngine.Debug
         /// </summary>
         /// <param name="line">The line to draw.</param>
         /// <param name="color">The color of the line.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddSegment(LineSegment line, Color color)
         {
             AddSegment(line.pPointA, line.pPointB, color);
@@ -219,6 +227,7 @@ namespace MBHEngine.Debug
         /// Draws a simple cross to represent a transform in the world.
         /// </summary>
         /// <param name="rootPosition">Position of the Object.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddTransform(Vector2 rootPosition)
         {
             Single length = 2.0f;
@@ -234,6 +243,7 @@ namespace MBHEngine.Debug
         /// <param name="p">The center point of the dot.</param>
         /// <param name="size">The radius of the dot.</param>
         /// <param name="color">The color of the dot.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddPoint(Vector2 p, float size, Color color)
         {
             Vector2[] verts = new Vector2[8];
@@ -253,6 +263,7 @@ namespace MBHEngine.Debug
         /// <param name="width">The full width of the box from far left to far right.</param>
         /// <param name="height">The full height of the box from the bottom to the top.</param>
         /// <param name="color">The color to use when rendering the box.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddAABB(Vector2 position, Single width, Single height, Color color)
         {
             Single widthHalf = width * 0.5f;
@@ -276,6 +287,7 @@ namespace MBHEngine.Debug
         /// </summary>
         /// <param name="box">Rectangle to render.</param>
         /// <param name="color">The color to render it as.</param>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void AddAABB(Math.Rectangle box, Color color, Boolean isSolid = true)
         {
             Vector2[] verts = new Vector2[8];
@@ -307,6 +319,7 @@ namespace MBHEngine.Debug
         /// <summary>
         /// Call to render all the currently pending debug shapes.
         /// </summary>
+        [Conditional("ALLOW_DEBUG_SHAPES")]
         public void Render()
         {
             GraphicsDevice device = GameObjectManager.pInstance.pGraphicsDevice;

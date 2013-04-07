@@ -97,9 +97,8 @@ namespace MBHEngine.PathFind.GenericAStar
         {
             get
             {
-#if DEBUG
                 System.Diagnostics.Debug.Assert(mTile != null, "Accessing unset pData. Returning default value.");
-#endif
+
                 if (mTile != null)
                 {
                     return mTile.mCollisionRect.pCenterPoint;

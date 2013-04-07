@@ -81,17 +81,5 @@ namespace ZombieTaxi.Behaviours
                 }
             }
         }
-
-#if ALLOW_GARBAGE
-        /// <summary>
-        /// Returns a bunch of information about the behaviour which can be dumped to
-        /// a debug display for debugging at runtime.
-        /// </summary>
-        /// <returns>A formatted string of debug information.</returns>
-        public override String[] GetDebugInfo()
-        {
-            return null;
-        }
-#endif // ALLOW_GARBAGE
     }
 }

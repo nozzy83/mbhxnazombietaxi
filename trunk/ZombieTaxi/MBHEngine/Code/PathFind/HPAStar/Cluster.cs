@@ -78,7 +78,7 @@ namespace MBHEngine.PathFind.HPAStar
         /// <param name="node">The node to add.</param>
         public override void AddNode(GraphNode node)
         {
-#if DEBUG
+            /*
             for(Int32 i = 0; i < pNodes.Count; i++)
             {
                 if (pNodes[i].pPosition == node.pPosition)
@@ -91,7 +91,8 @@ namespace MBHEngine.PathFind.HPAStar
                     //System.Diagnostics.Debug.Assert(false, "Attempting to add Dupe GraphNode.");
                 }
             }
-#endif
+            */
+
             base.AddNode(node);
         }
 

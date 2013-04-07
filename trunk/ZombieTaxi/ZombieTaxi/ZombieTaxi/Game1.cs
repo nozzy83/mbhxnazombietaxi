@@ -208,9 +208,7 @@ namespace ZombieTaxi
             GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\PlayerInventory\\PlayerInventory"));
             GameObjectManager.pInstance.Add(new GameObject("GameObjects\\Interface\\HUD\\MiniMap\\MiniMap"));
 
-#if ALLOW_GARBAGE
             DebugMessageDisplay.pInstance.AddConstantMessage("Game Load Complete.");
-#endif
         }
 
         /// <summary>
@@ -278,12 +276,10 @@ namespace ZombieTaxi
                 DebugMessageDisplay.pInstance.ClearDynamicMessages();
                 DebugShapeDisplay.pInstance.Update();
 
-#if ALLOW_GARBAGE
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Game-Time Delta: " + gameTime.ElapsedGameTime.TotalSeconds);
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + MBHEngine.PathFind.GenericAStar.Planner.pNumUnusedNodes);
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Graph Neighbour - Unused: " + MBHEngine.PathFind.GenericAStar.GraphNode.pNumUnusedNeighbours);
                 DebugMessageDisplay.pInstance.AddDynamicMessage("NavMesh - Unused: " + MBHEngine.PathFind.HPAStar.NavMesh.pUnusedGraphNodes);
-#endif
 
                 mFameSkipCount = 0;
                 StopWatchManager.pInstance.Update();
@@ -303,9 +299,8 @@ namespace ZombieTaxi
 
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
-#if DEBUG
+
             DebugMessageDisplay.pInstance.AddDynamicMessage("Frame Skip: " + mFrameSkip);
-#endif
 
             base.Update(gameTime);
         }

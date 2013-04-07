@@ -15,6 +15,7 @@ using MBHEngine;
 using MBHEngine.Behaviour;
 using System.IO;
 using MBHEngine.Debug;
+using System.Diagnostics;
 
 namespace MBHEngine.GameObject
 {
@@ -522,9 +523,7 @@ namespace MBHEngine.GameObject
                     }
                 default:
                     {
-#if ALLOW_GARBAGE
                         System.Diagnostics.Debug.Assert(false, "Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");
-#endif // ALLOW_GARBAGE
                         return null;
                     }
             }
@@ -577,7 +576,10 @@ namespace MBHEngine.GameObject
             mRenderRectangle.pCenterPoint = pPosition + mCollisionRoot;
         }
 
-#if DEBUG
+        /// <summary>
+        /// Double check that static objects aren't trying to move.
+        /// </summary>
+        [Conditional("DEBUG")]
         private void StaticObjectMovementSafetyCheck()
         {
             if (mIsStatic)
@@ -590,7 +592,6 @@ namespace MBHEngine.GameObject
                 }
             }
         }
-#endif // DEBUG
 
         /// <summary>
         /// The factory information for this game object.
@@ -648,9 +649,8 @@ namespace MBHEngine.GameObject
             get { return mPosition; }
             set 
             { 
-#if DEBUG
                 StaticObjectMovementSafetyCheck();
-#endif // DEBUG
+
                 mPosition = value;
                 UpdateBounds();
             }
@@ -672,9 +672,7 @@ namespace MBHEngine.GameObject
             get { return mPosition.X; }
             set 
             {
-#if DEBUG
                 StaticObjectMovementSafetyCheck();
-#endif // DEBUG
 
                 mPosition.X = value;
 
@@ -690,9 +688,7 @@ namespace MBHEngine.GameObject
             get { return mPosition.Y; }
             set 
             {
-#if DEBUG
                 StaticObjectMovementSafetyCheck();
-#endif // DEBUG
 
                 mPosition.Y = value;
 
