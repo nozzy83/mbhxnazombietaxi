@@ -178,8 +178,10 @@
     <Compile Include="Code\States\Civilian\FSMStateWaitAtStandingPosition.cs" />
     <Compile Include="Code\States\Civilian\FSMStateWaitInSafeHouse.cs" />
     <Compile Include="Code\States\Civilian\FSMStateWanderInSafeHouse.cs" />
+    <Compile Include="Code\States\Militant\FSMStatePatrol.cs" />
     <Compile Include="Code\States\Militant\FSMStateFollowTarget.cs" />
     <Compile Include="Code\States\Militant\FSMStateStay.cs" />
+    <Compile Include="Code\States\Militant\FSMStateWaitAtStandingPosition.cs" />
     <Compile Include="Code\States\Scout\FSMStateWaitAtTarget.cs" />
     <Compile Include="Code\States\Scout\FSMStateBeginSearch.cs" />
     <Compile Include="Code\States\Scout\FSMStateWaitAtStandingPosition.cs" />

@@ -130,6 +130,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\ResearchProgressBar\\ResearchProgressBar", 4);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\StrandedPopup\\StrandedPopup", 1);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\ScoutPopup\\ScoutPopup", 1);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\MilitantPopup\\MilitantPopup", 1);
 
             // The tiled background image that travels will the player creating the illusion of
             // an infinite background image.
