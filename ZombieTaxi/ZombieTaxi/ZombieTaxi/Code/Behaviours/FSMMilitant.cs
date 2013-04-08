@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using MBHEngine.Behaviour;
 using Microsoft.Xna.Framework;
 using MBHEngine.GameObject;
-using MBHEngine.StateMachine;
-using ZombieTaxiContentDefs;
-using Microsoft.Xna.Framework.Graphics;
-using MBHEngineContentDefs;
-using MBHEngine.Debug;
-using MBHEngine.World;
-using MBHEngine.Math;
-using ZombieTaxi.Behaviours.HUD;
-using ZombieTaxi.States.Scout;
 using ZombieTaxi.States.Militant;
 
 namespace ZombieTaxi.Behaviours
@@ -46,7 +34,7 @@ namespace ZombieTaxi.Behaviours
             AddState(new FSMStateStay(), "Stay");
             AddState(new States.Civilian.FSMStateDead(), "Dead");
             AddState(new States.Civilian.FSMStateGoToStandingPosition(), "GoToStandingPosition");
-            AddState(new States.Civilian.FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
+            AddState(new FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
             AddState(new States.Civilian.FSMStateGoToExtraction(), "GoToExtraction");
             AddState(new States.Civilian.FSMStateResearchStatBoost(), "ResearchStatBoost");
 

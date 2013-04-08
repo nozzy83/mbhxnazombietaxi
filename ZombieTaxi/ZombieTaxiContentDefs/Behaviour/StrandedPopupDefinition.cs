@@ -15,8 +15,11 @@ namespace ZombieTaxiContentDefs
         {
             None = 0,       // No Button was selected.
             HpUp,           // Health Level Up.
+            GunUp,          // Gun Level Up.
             MakeScout,      // Morph into Scout.
             ScoutSearch,    // Send the Scout out to search for other Stranded.
+            MilitantPatrol, // Send the Militant out to patrol the surrounding area.
+            MilitantFollow, // Tell the Militant to follow the player.
         }
 
         /// <summary>

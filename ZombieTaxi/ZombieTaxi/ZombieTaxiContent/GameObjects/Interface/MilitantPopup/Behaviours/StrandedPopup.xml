@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.StrandedPopupDefinition">
+    <mUpdatePasses>
+      <Item>POPUP</Item>
+    </mUpdatePasses>
+    <mButtons>
+      <Item>
+        <mIconFileName>GameObjects\Interface\StrandedPopup\IconLevelUp\IconLevelUp</mIconFileName>
+        <mHintText>GUN UP</mHintText>
+        <mButtonType>GunUp</mButtonType>
+      </Item>
+      <Item>
+        <mIconFileName>GameObjects\Interface\StrandedPopup\IconMilitantPatrol\IconMilitantPatrol</mIconFileName>
+        <mHintText>Patrol</mHintText>
+        <mButtonType>MilitantPatrol</mButtonType>
+      </Item>
+      <Item>
+        <mIconFileName>GameObjects\Interface\StrandedPopup\IconMilitantFollow\IconMilitantFollow</mIconFileName>
+        <mHintText>Follow</mHintText>
+        <mButtonType>MilitantFollow</mButtonType>
+      </Item>
+    </mButtons>
+  </Asset>
+</XnaContent>
+

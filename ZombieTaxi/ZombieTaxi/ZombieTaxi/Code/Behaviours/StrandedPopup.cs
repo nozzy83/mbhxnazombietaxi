@@ -226,6 +226,20 @@ namespace ZombieTaxi.Behaviours
 
                         break;
                     }
+
+                    case StrandedPopupDefinition.ButtonTypes.MilitantPatrol:
+                    {
+                        //mDisabledHintText = "NOT IMP";
+                        //mEnabled = false;
+                        break;
+                    }
+
+                    case StrandedPopupDefinition.ButtonTypes.MilitantFollow:
+                    {
+                        //mDisabledHintText = "NOT IMP";
+                        //mEnabled = false;
+                        break;
+                    }
                 }
 
                 return mEnabled;
@@ -321,6 +335,19 @@ namespace ZombieTaxi.Behaviours
                 get
                 {
                     return mEnabled;
+                }
+            }
+
+            /// <summary>
+            /// Special handling for position so that children move with it.
+            /// </summary>
+            public Vector2 pPosition
+            {
+                set
+                {
+                    mObject.pPosition = value;
+                    mBG.pPosition = mObject.pPosition;
+                    mCrossOut.pPosition = mObject.pPosition;
                 }
             }
         }
@@ -431,11 +458,24 @@ namespace ZombieTaxi.Behaviours
 
             mCurrentButton = null;
 
+            // Popups should all be in the same position along with their buttons so just hard code some values.
+            Vector2 center = new Vector2(80.0f, 10.0f);
+
+            // The space between each button.
+            const Single spacing = 11.0f;
+
+            // Calculate the position where the first button should go. We will move right from their\
+            // at a rate of spacing.
+            Single start = center.X - ((def.mButtons.Count - 1) * 0.5f * spacing);
+
             for (Int32 i = 0; i < def.mButtons.Count; i++)
             {
                 // Create all the Buttons.
                 Button temp = new Button(def.mButtons[i]);
                 mButtons.Add(temp);
+
+                // Special property which moves the button and all its children (eg. the background).
+                temp.pPosition = new Vector2(start + (i * spacing), center.Y);
 
                 // Select the first Button by default.
                 if (mCurrentButton == null)
