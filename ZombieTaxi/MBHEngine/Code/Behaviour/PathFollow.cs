@@ -161,7 +161,7 @@ namespace MBHEngine.Behaviour
                 Single minDist = mParentGOH.pDirection.mSpeed * 2.0f;
 
                 // Once we are within one unit of the target consider it reached.
-                if (Vector2.Distance(p.pGraphNode.pPosition + new Vector2(0.0f, 4.0f), mParentGOH.pPosition) <= minDist)
+                if (null != p.pGraphNode && Vector2.Distance(p.pGraphNode.pPosition + new Vector2(0.0f, 4.0f), mParentGOH.pPosition) <= minDist)
                 {
                     // This node has been reached, so next update it will start moving towards the next node.
                     p.pReached = true;

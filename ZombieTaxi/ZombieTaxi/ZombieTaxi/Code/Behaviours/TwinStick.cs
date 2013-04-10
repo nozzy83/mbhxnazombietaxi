@@ -50,7 +50,7 @@ namespace ZombieTaxi.Behaviours
         /// <summary>
         /// Used to fill a structure with SafeHouseFloor objects.
         /// </summary>
-        GameObjectFloodFill mGOFloodFill;
+        private GameObjectFloodFill mGOFloodFill;
 
         /// <summary>
         /// Preallocated messages to avoid GC.
