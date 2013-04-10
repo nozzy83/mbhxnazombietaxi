@@ -167,6 +167,8 @@ namespace ZombieTaxi.States.Militant
                     else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.MilitantPatrol)
                     {
                         DebugMessageDisplay.pInstance.AddConstantMessage("Patrol");
+                        mSetStateMsg.mNextState_In = "Patrol";
+                        pParentGOH.OnMessage(mSetStateMsg);
                     }
                     else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.MilitantFollow)
                     {
