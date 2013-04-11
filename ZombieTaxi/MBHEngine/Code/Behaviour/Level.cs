@@ -672,6 +672,81 @@ namespace MBHEngine.Behaviour
             }
         }
 
+        public override void Update(GameTime gameTime)
+        {
+            // Only render tiles that are within the view area to save significant rendering time.
+            // Convert the camera's view rectangle into tile indexes (by deviding by tile size).
+            // Add +1 for the outsides to account for the fact that this is based on the left size
+            // of the tile.
+            //
+            MBHEngine.Math.Rectangle view = CameraManager.pInstance.pViewRect;
+            Int32 startX = (Int32)MathHelper.Max((Int32)view.pLeft / mMapInfo.mTileWidth, 0);
+            Int32 endX = (Int32)MathHelper.Min((Int32)view.pRight / mMapInfo.mTileWidth + 1, mMapInfo.mMapWidth);
+            Int32 startY = (Int32)MathHelper.Max((Int32)view.pTop / mMapInfo.mTileHeight, 0);
+            Int32 endY = (Int32)MathHelper.Min((Int32)view.pBottom / mMapInfo.mTileHeight + 1, mMapInfo.mMapHeight);
+
+            // Loop through every tile on screen.
+            for (Int32 y = startY; y < endY; y++)
+            {
+                for (Int32 x = startX; x < endX; x++)
+                {
+                    // Is this tile solid?
+                    if (mCollisionGrid[x, y].mType != Level.Tile.TileTypes.Empty)
+                    {
+                        // If a collision was detected on it, render it red.
+                        if (mCollisionGrid[x, y].HasAttribute(Tile.Attribute.Collision))
+                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Red);
+                        // If a collision was even checked for, render it Orange.
+                        else if (mCollisionGrid[x, y].HasAttribute(Tile.Attribute.CollisionChecked))
+                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.OrangeRed);
+                        else
+                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Black);
+
+                        // Clear the temp bits used for rendering collision info.
+                        // TODO: This is not being cleared for tiles not on screen. Does that matter?
+                        mCollisionGrid[x, y].ClearAttribute(Tile.Attribute.Collision | Tile.Attribute.CollisionChecked);
+
+                        // Draw the walls that have been determined to require collision checks.
+                        //
+                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Top) != Tile.WallTypes.None)
+                        {
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
+                                                                   Color.Red);
+                        }
+                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Right) != Tile.WallTypes.None)
+                        {
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
+                                                                   Color.Red);
+                        }
+                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Bottom) != Tile.WallTypes.None)
+                        {
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
+                                                                   Color.Red);
+                        }
+                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Left) != Tile.WallTypes.None)
+                        {
+                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
+                                                                   new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
+                                                                   Color.Red);
+                        }
+                    }
+                    else
+                    {
+                        if (mCollisionGrid[x, y].HasAttribute(Tile.Attribute.Occupied))
+                        {
+                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Pink);
+                        }
+                    }
+                }
+            }
+
+            //mNavMesh.DebugDraw(true);
+            //mGraph.DebugDraw(true);            
+        }
+
         /// <summary>
         /// Called once render cycle by the game object manager.
         /// </summary>
@@ -711,79 +786,16 @@ namespace MBHEngine.Behaviour
             {
                 for (Int32 x = startX; x < endX; x++)
                 {
-                    // Is this tile solid?
-                    if (mCollisionGrid[x, y].mType != Level.Tile.TileTypes.Empty)
-                    {
-                        // If a collision was detected on it, render it red.
-                        if(mCollisionGrid[x, y].HasAttribute(Tile.Attribute.Collision))
-                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Red);
-                        // If a collision was even checked for, render it Orange.
-                        else if (mCollisionGrid[x, y].HasAttribute(Tile.Attribute.CollisionChecked))
-                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.OrangeRed);
-                        else
-                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Black);
-
-                        // Clear the temp bits used for rendering collision info.
-                        // TODO: This is not being cleared for tiles not on screen. Does that matter?
-                        mCollisionGrid[x, y].ClearAttribute(Tile.Attribute.Collision | Tile.Attribute.CollisionChecked);
-
-                        // Render the tile image.
-                        batch.Draw(
-                            mMapInfo.mTileMap,
-                            new Microsoft.Xna.Framework.Rectangle(
-                                x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
-                            new Microsoft.Xna.Framework.Rectangle(
-                                mCollisionGrid[x, y].mImageIndex * mMapInfo.mTileWidth, 0, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
-                            Color.White);
-
-                        // Draw the walls that have been determined to require collision checks.
-                        //
-                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Top) != Tile.WallTypes.None)
-                        {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
-                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
-                                                                   Color.Red);
-                        }
-                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Right) != Tile.WallTypes.None)
-                        {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
-                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
-                                                                   Color.Red);
-                        }
-                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Bottom) != Tile.WallTypes.None)
-                        {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
-                                                                   new Vector2(x * mMapInfo.mTileWidth + mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
-                                                                   Color.Red);
-                        }
-                        if ((mCollisionGrid[x, y].mActiveWalls & Tile.WallTypes.Left) != Tile.WallTypes.None)
-                        {
-                            DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight),
-                                                                   new Vector2(x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight + mMapInfo.mTileHeight),
-                                                                   Color.Red);
-                        }
-                    }
-                    else
-                    {
-                        if (mCollisionGrid[x, y].HasAttribute(Tile.Attribute.Occupied))
-                        {
-                            DebugShapeDisplay.pInstance.AddAABB(mCollisionGrid[x, y].mCollisionRect, Color.Pink);
-                        }
-
-                        // Render the empty tile.
-                        batch.Draw(
-                            mMapInfo.mTileMap,
-                            new Microsoft.Xna.Framework.Rectangle(
-                                x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
-                            new Microsoft.Xna.Framework.Rectangle(
-                                mCollisionGrid[x, y].mImageIndex * mMapInfo.mTileWidth, 0, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
-                            Color.White);
-                    }
+                    // Render the empty tile.
+                    batch.Draw(
+                        mMapInfo.mTileMap,
+                        new Microsoft.Xna.Framework.Rectangle(
+                            x * mMapInfo.mTileWidth, y * mMapInfo.mTileHeight, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
+                        new Microsoft.Xna.Framework.Rectangle(
+                            mCollisionGrid[x, y].mImageIndex * mMapInfo.mTileWidth, 0, mMapInfo.mTileWidth, mMapInfo.mTileHeight),
+                        Color.White);
                 }
             }
-
-            //mNavMesh.DebugDraw(true);
-            //mGraph.DebugDraw(true);
         }
 
         /// <summary>
