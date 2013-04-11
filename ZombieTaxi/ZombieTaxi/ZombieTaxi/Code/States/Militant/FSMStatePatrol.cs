@@ -112,6 +112,12 @@ namespace ZombieTaxi.States.Militant
                 mSetStateMsg.mNextState_In = "PatrolPause";
                 pParentGOH.OnMessage(mSetStateMsg);
             }
+            else if (msg is PathFind.OnPathFindFailedMessage)
+            {
+                // Handle the case where the user places a wall right where the patrol is trying to
+                // reach.
+                FindNextPatrolPoint();
+            }
         }
 
         /// <summary>

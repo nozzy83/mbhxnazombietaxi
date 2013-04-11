@@ -223,6 +223,15 @@ namespace MBHEngine.Behaviour
                     mParentGOH.OnMessage(mSetDestinationMsg);
                 }
             }
+            else if (msg is PathFind.OnPathFindFailedMessage)
+            {
+                // Handle the case were the user places a tile right on top of the destination.
+                if (null != mTarget)
+                {
+                    mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
+                    mParentGOH.OnMessage(mSetDestinationMsg);
+                }
+            }
         }
     }
 }
