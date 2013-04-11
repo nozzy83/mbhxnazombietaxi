@@ -320,6 +320,8 @@ namespace MBHEngine.Behaviour
             {
                 mPlannerNavMesh.InvalidateCurrentPath();
                 mPlannerTileMap.InvalidateCurrentPath();
+
+                SetSource(mParentGOH.pPosition);
             }
         }
 
