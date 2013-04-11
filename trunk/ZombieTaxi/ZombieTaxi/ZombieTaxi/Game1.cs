@@ -33,6 +33,10 @@ namespace ZombieTaxi
         /// </summary>
         private Int32 mFrameSkip = 0;
         private Int32 mFameSkipCount = 0;
+        private Boolean mSkipKeyIncDown = false;
+        private Boolean mSkipKeyDecDown = false;
+        private Boolean mFreeze = false;
+        private Boolean mFreezeKeyDown = false;
 
         /// <summary>
         /// Tracks the object that is spawned through some debug keys.
@@ -260,19 +264,54 @@ namespace ZombieTaxi
                 GameObjectManager.pInstance.Add(mSpawned);
             }
 
-#if DEBUG && false // Temporarily disable this feature while working on tile placement mode.
-            if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_RIGHT, true))
+#if DEBUG
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            if (keyboardState.IsKeyDown(Keys.OemPlus))
             {
-                mFrameSkip = Math.Max(mFrameSkip - 1, 0);
+                if (!mSkipKeyDecDown)
+                {
+                    mFrameSkip = Math.Max(mFrameSkip - 1, 0);
+                }
+
+                mSkipKeyDecDown = true;
             }
-            else if (InputManager.pInstance.CheckAction(InputManager.InputActions.DP_LEFT, true))
+            else
             {
-                mFrameSkip++;
+                mSkipKeyDecDown = false;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.OemMinus))
+            {
+                if (!mSkipKeyIncDown)
+                {
+                    mFrameSkip++;
+                }
+
+                mSkipKeyIncDown = true;
+            }
+            else
+            {
+                mSkipKeyIncDown = false;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.D0))
+            {
+                if (!mFreezeKeyDown)
+                {
+                    mFreeze ^= true;
+                }
+
+                mFreezeKeyDown = true;
+            }
+            else
+            {
+                mFreezeKeyDown = false;
             }
 #endif
 
             // If we are skipping frames, check if enough have passed before doing updates.
-            if (mFameSkipCount >= mFrameSkip)
+            if (mFameSkipCount >= mFrameSkip && !mFreeze)
             {
                 DebugMessageDisplay.pInstance.ClearDynamicMessages();
                 DebugShapeDisplay.pInstance.Update();
@@ -281,6 +320,7 @@ namespace ZombieTaxi
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Path Find - Unused: " + MBHEngine.PathFind.GenericAStar.Planner.pNumUnusedNodes);
                 DebugMessageDisplay.pInstance.AddDynamicMessage("Graph Neighbour - Unused: " + MBHEngine.PathFind.GenericAStar.GraphNode.pNumUnusedNeighbours);
                 DebugMessageDisplay.pInstance.AddDynamicMessage("NavMesh - Unused: " + MBHEngine.PathFind.HPAStar.NavMesh.pUnusedGraphNodes);
+                DebugMessageDisplay.pInstance.AddDynamicMessage("Frame Skip: " + mFrameSkip);
 
                 mFameSkipCount = 0;
                 StopWatchManager.pInstance.Update();
@@ -295,13 +335,11 @@ namespace ZombieTaxi
             if (mDebugDrawEnabled)
             {
                 // This does some pretty expensive stuff, so only do it when it is really useful.
-                GameObjectPicker.pInstance.Update(gameTime);
+                GameObjectPicker.pInstance.Update(gameTime, (mFameSkipCount == 0));
             }
 
             InputManager.pInstance.UpdateEnd();
             CameraManager.pInstance.Update(gameTime);
-
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Frame Skip: " + mFrameSkip);
 
             base.Update(gameTime);
         }
@@ -315,7 +353,7 @@ namespace ZombieTaxi
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // First draw all the objects managed by the game object manager.
-            GameObjectManager.pInstance.Render(mSpriteBatch);
+            GameObjectManager.pInstance.Render(mSpriteBatch, (mFameSkipCount == 0));
 
             if (mDebugDrawEnabled)
             {

@@ -47,7 +47,8 @@ namespace MBHEngine.GameObject
         /// Must be called once every update to check which objects are being picked.
         /// </summary>
         /// <param name="gameTime"></param>
-        public void Update(GameTime gameTime)
+        /// <param name="showDebugInfo">True if debug information should be shown this frame.</param>
+        public void Update(GameTime gameTime, Boolean showDebugInfo)
         {
 #if DEBUG
             // Get the current state of the mouse.
@@ -134,7 +135,7 @@ namespace MBHEngine.GameObject
             // The Behaviour and GameObject classes expose a bunch of debug information through the GetDebugInfo
             // functions. If there is an object currently selected, we want to get that info about the selected
             // object and print it on screen for real-time debugging.
-            if (null != mSelectedGameObject)
+            if (null != mSelectedGameObject && showDebugInfo)
             {
                 // So the user knows what is going on, highlight the object.
                 DebugShapeDisplay.pInstance.AddAABB(mSelectedGameObject.pCollisionRect, Color.Red);

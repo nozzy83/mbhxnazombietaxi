@@ -161,6 +161,12 @@ namespace MBHEngine.GameObject
         private UpdatePhase mCurrentUpdateState;
 
         /// <summary>
+        /// Tracks the number of objects that were rendered last frame. Used for debug display which
+        /// must happen outside the Render loop.
+        /// </summary>
+        private Int32 mLastNumObjectsRendered;
+
+        /// <summary>
         /// We make the constructor private so that no one accidentally creates
         /// an instance of the class.
         /// </summary>
@@ -306,6 +312,8 @@ namespace MBHEngine.GameObject
                 DebugShapeDisplay.pInstance.AddSegment(new Vector2(x * mCellSize, 0), new Vector2(x * mCellSize, size), Color.Black);
             }
 #endif
+            DebugMessageDisplay.pInstance.AddDynamicMessage("Objects Rendered: " + mLastNumObjectsRendered);
+
             mCurrentUpdateState = UpdatePhase.Update;
 
             // Keep track of how many objects were updated this frame.
@@ -528,14 +536,15 @@ namespace MBHEngine.GameObject
         /// Should be called once per render update.
         /// </summary>
         /// <param name="batch">Where sprites will be rendered to.</param>
-        public void Render(SpriteBatch batch)
+        /// <param name="showDebugInfo">True if debug information should be shown this frame.</param>
+        public void Render(SpriteBatch batch, Boolean showDebugInfo)
         {
             mGameObjects.Sort(CompareByRenderPriority);
 
             // Keep track of the blend modes so that we can detect when it needs to change.
             GameObjectDefinition.BlendMode currentBlend = GameObjectDefinition.BlendMode.UNDEFINED;
 
-            Int32 objectsRender = 0;
+            mLastNumObjectsRendered = 0;
 
             for (int i = 0; i < mGameObjects.Count; i++)
             {
@@ -617,17 +626,18 @@ namespace MBHEngine.GameObject
 
                         obj.Render(batch, mDefaultEffect);
 
-                        objectsRender++;
+                        mLastNumObjectsRendered++;
 
-                        DebugShapeDisplay.pInstance.AddAABB(obj.pCollisionRect, Color.Green);
-                        DebugShapeDisplay.pInstance.AddTransform(obj.pPosition);
+                        if (showDebugInfo)
+                        {
+                            DebugShapeDisplay.pInstance.AddAABB(obj.pCollisionRect, Color.Green);
+                            DebugShapeDisplay.pInstance.AddTransform(obj.pPosition);
+                        }
                     }
                 }
             }
 
             batch.End();
-
-            DebugMessageDisplay.pInstance.AddDynamicMessage("Objects Rendered: " + objectsRender);
         }
 
         /// <summary>
