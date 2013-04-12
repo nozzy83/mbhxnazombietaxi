@@ -27,6 +27,13 @@ namespace ZombieTaxi.States.Militant
         private List<GameObjectDefinition.Classifications> mSafeHouseClassifications;
 
         /// <summary>
+        /// The Militant can go to the SafeHouse but then return to this state later by User request.
+        /// When that happens we need to ensure that the Militant does not try to return to the SafeHouse
+        /// until he leaves it.
+        /// </summary>
+        private Boolean mMustLeaveSafeHouse;
+
+        /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
@@ -83,6 +90,14 @@ namespace ZombieTaxi.States.Militant
 
             pParentGOH.OnMessage(mGetSafeHouseScoreMessage);
             mIncrementScoreMsg.mAmount_In = mGetSafeHouseScoreMessage.mSafeHouseScore_Out;
+
+            // If he starts in the SafeHouse he must leave it before trying to return again.
+            mSafeHouseInRange.Clear();
+            GameObjectManager.pInstance.GetGameObjectsInRange(pParentGOH, ref mSafeHouseInRange, mSafeHouseClassifications);
+            if (mSafeHouseInRange.Count != 0)
+            {
+                mMustLeaveSafeHouse = true;
+            }
         }
 
         /// <summary>
@@ -99,8 +114,9 @@ namespace ZombieTaxi.States.Militant
             if (mSafeHouseInRange.Count != 0)
             {
                 // Don't even attempt to enter the SafeHouse unless there are spots available.
-                // This prevents getting points, and then
-                if (CheckForValidSafeHouseTiles())
+                // This prevents getting points, and then not actually staying in the Safe House.
+                // Also make sure that we aren't currently trying to leave the Safe House.
+                if (!mMustLeaveSafeHouse && CheckForValidSafeHouseTiles())
                 {
                     DebugMessageDisplay.pInstance.AddConstantMessage("Reached SafeHouse.");
 
@@ -111,8 +127,13 @@ namespace ZombieTaxi.States.Militant
                     return "GoToStandingPosition";
                 }
             }
+            else
+            {
+                mMustLeaveSafeHouse = false;
+            }
+            
             // Are we close enough that we should just stand still until the player starts moving again.
-            else if (Vector2.DistanceSquared(GameObjectManager.pInstance.pPlayer.pPosition, pParentGOH.pPosition) < 16 * 16)
+            if (Vector2.DistanceSquared(GameObjectManager.pInstance.pPlayer.pPosition, pParentGOH.pPosition) < 16 * 16)
             {
                 return "Stay";
             }
