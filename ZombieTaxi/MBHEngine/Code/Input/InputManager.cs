@@ -479,10 +479,10 @@ namespace MBHEngine.Input
 
         /// <summary>
         /// Gets a custom built GamePadThumbSticks object containing directional information which
-        /// also incorperates keyboard presses as well (although those are always either 0 
-        /// or 1.
+        /// also incorperates keyboard presses as well (although those are either on or off, but the
+        /// value is normalized).
         /// </summary>
-        /// <returns>A GamePadThumbSticks state which contains </returns>
+        /// <returns>A GamePadThumbSticks state which contains directional informatin of both GamePad and Keyboard.</returns>
         public GamePadThumbSticks GetDirectionalInfo()
         {
             KeyboardState keyboardState = Keyboard.GetState();
@@ -510,7 +510,6 @@ namespace MBHEngine.Input
                 leftThumb.Y = 1.0f;
             }
 
-
             // RA as keyboard.
             //
             if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_LEFT]))
@@ -530,6 +529,11 @@ namespace MBHEngine.Input
             {
                 rightThumb.Y = 1.0f;
             }
+
+            // If we got input from the keyboard it may not be normalized (eg. 1,1), which will allow
+            // the player to move faster diagonally then left and right seperatly.
+            if (leftThumb != Vector2.Zero) leftThumb.Normalize();
+            if (rightThumb != Vector2.Zero) rightThumb.Normalize();
 
             return new GamePadThumbSticks(leftThumb, rightThumb);
         }
