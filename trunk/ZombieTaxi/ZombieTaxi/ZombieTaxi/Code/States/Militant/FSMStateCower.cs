@@ -43,6 +43,10 @@ namespace ZombieTaxi.States.Militant
         {
             if (pParentGOH.pCollisionRect.Intersects(GameObjectManager.pInstance.pPlayer.pCollisionRect))
             {
+                // Don't do this OnEnd because we might be leaving here due to dying at which point 
+                // the behaviour would have also been intentionally disabled.
+                pParentGOH.SetBehaviourEnabled<PointAndShoot>(true);
+
                 return "Follow";
             }
 
@@ -55,7 +59,6 @@ namespace ZombieTaxi.States.Militant
         /// </summary>
         public override void OnEnd()
         {
-            pParentGOH.SetBehaviourEnabled<PointAndShoot>(true);
         }
     }
 }

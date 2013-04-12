@@ -173,6 +173,8 @@ namespace ZombieTaxi.States.Militant
                     else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.MilitantFollow)
                     {
                         DebugMessageDisplay.pInstance.AddConstantMessage("Follow");
+                        mSetStateMsg.mNextState_In = "Follow";
+                        pParentGOH.OnMessage(mSetStateMsg);
                     }
 
                     // Popups get recycled so if ours closes, we need to make sure to clear our local 
