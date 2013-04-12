@@ -198,6 +198,7 @@ namespace ZombieTaxi
             // This GO doesn't need to exist beyond creation, so don't bother adding it to the GO Manager.
             new GameObject("GameObjects\\Utils\\RandEnemyGenerator\\RandEnemyGenerator");
             new GameObject("GameObjects\\Utils\\RandCivilianGenerator\\RandCivilianGenerator");
+            new GameObject("GameObjects\\Utils\\RandMilitantGenerator\\RandMilitantGenerator");
             
             // The vingette effect used to dim out the edges of the screen.
             GameObject ving = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");

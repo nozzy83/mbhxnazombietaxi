@@ -30,6 +30,7 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
+            AddState(new FSMStateCower(), "Cower");
             AddState(new FSMStateFollowTarget(), "Follow");
             AddState(new FSMStateStay(), "Stay");
             AddState(new States.Civilian.FSMStateDead(), "Dead");
