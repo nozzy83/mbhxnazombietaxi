@@ -97,7 +97,7 @@ namespace MBHEngine.PathFind.GenericAStar
         {
             get
             {
-                System.Diagnostics.Debug.Assert(mTile != null, "Accessing unset pData. Returning default value.");
+                //System.Diagnostics.Debug.Assert(mTile != null, "Accessing unset pData. Returning default value.");
 
                 if (mTile != null)
                 {
