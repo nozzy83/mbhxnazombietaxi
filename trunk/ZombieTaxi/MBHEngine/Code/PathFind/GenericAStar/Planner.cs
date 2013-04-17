@@ -539,7 +539,7 @@ namespace MBHEngine.PathFind.GenericAStar
         /// <param name="source">The position in the world that the planner will start at.</param>
         public Boolean SetSource(GraphNode source)
         {
-            System.Diagnostics.Debug.Assert(source != mEnd || source == null, "Source and Destination are the same.");
+            //System.Diagnostics.Debug.Assert(source != mEnd || source == null, "Source and Destination are the same.");
 
             //HPAStar.NavMesh.DebugCheckNode(source);
 
