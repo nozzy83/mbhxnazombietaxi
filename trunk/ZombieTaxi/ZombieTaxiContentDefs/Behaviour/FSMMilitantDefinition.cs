@@ -8,5 +8,6 @@ namespace ZombieTaxiContentDefs
 {
     public class FSMMilitantDefinition : BehaviourDefinition
     {
+        public Int32 mSafeHouseScore;
     }
 }
