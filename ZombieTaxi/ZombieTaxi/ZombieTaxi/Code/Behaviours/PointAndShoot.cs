@@ -110,6 +110,13 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         public override void OnAdd()
         {
+            // Most calculations are based on the attachment point of the Gun, rather than the position of
+            // the parent GameObject.
+            mGetAttachmentPointMsg.mName_In = "Gun";
+            mParentGOH.OnMessage(mGetAttachmentPointMsg);
+
+            // Position the gun at the attachment point every frame since we will be moving.
+            mGun.pPosition = mGetAttachmentPointMsg.mPoisitionInWorld_Out;
         }
 
         /// <summary>
