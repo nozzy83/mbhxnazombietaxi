@@ -227,6 +227,13 @@ namespace ZombieTaxi.Behaviours
                         break;
                     }
 
+                    case StrandedPopupDefinition.ButtonTypes.GunUp:
+                    {
+                        mDisabledHintText = "NOT IMP";
+                        mEnabled = false;
+                        break;
+                    }
+
                     case StrandedPopupDefinition.ButtonTypes.MilitantPatrol:
                     {
                         //mDisabledHintText = "NOT IMP";
