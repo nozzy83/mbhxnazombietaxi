@@ -225,8 +225,10 @@ namespace MBHEngine.Behaviour
             }
             else if (msg is PathFind.OnPathFindFailedMessage)
             {
+                PathFind.OnPathFindFailedMessage temp = (PathFind.OnPathFindFailedMessage)msg;
+
                 // Handle the case were the user places a tile right on top of the destination.
-                if (null != mTarget)
+                if (null != mTarget && temp.mReason == PathFind.OnPathFindFailedMessage.Reason.InvalidLocation)
                 {
                     mSetDestinationMsg.mDestination_In = mTarget.pPosition + mParentGOH.pCollisionRoot;
                     mParentGOH.OnMessage(mSetDestinationMsg);

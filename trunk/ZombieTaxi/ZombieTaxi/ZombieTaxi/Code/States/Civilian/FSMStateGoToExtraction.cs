@@ -23,6 +23,7 @@ namespace ZombieTaxi.States.Civilian
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
         private PathFind.ClearDestinationMessage mClearDestinationMsg;
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
+        private FiniteStateMachine.SetStateMessage mSetStateMsg;
 
         /// <summary>
         /// Constructor.
@@ -38,6 +39,7 @@ namespace ZombieTaxi.States.Civilian
             mIncrementScoreMsg.mAmount_In = 500;
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
+            mSetStateMsg = new FiniteStateMachine.SetStateMessage();
         }
 
         /// <summary>
@@ -98,6 +100,12 @@ namespace ZombieTaxi.States.Civilian
                 GameObjectManager.pInstance.BroadcastMessage(mIncrementScoreMsg, pParentGOH);
 
                 GameObjectManager.pInstance.Remove(pParentGOH);
+            }
+            else if (msg is PathFind.OnPathFindFailedMessage)
+            {
+                // Once we reach our destination, sit and wait for a spell.
+                mSetStateMsg.mNextState_In = "Follow";
+                pParentGOH.OnMessage(mSetStateMsg);
             }
         }
     }

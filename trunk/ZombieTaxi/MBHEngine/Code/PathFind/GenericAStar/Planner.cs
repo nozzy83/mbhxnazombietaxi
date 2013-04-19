@@ -19,6 +19,7 @@ namespace MBHEngine.PathFind.GenericAStar
             Failed,
             NotStarted,
             InProgress,
+            InvalidLocation,
         };
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace MBHEngine.PathFind.GenericAStar
             if (null != mEnd && !mEnd.IsEmpty())
             {
                 // We consider this a failure, similar to if a destination was surrounded by solid.
-                return Result.Failed;
+                return Result.InvalidLocation;
             }
 
             // If our source position is not on a tile then there is no path finding to do.
@@ -136,7 +137,7 @@ namespace MBHEngine.PathFind.GenericAStar
             if (mStart != null && !mStart.IsEmpty())
             {
                 // Trying to path find to a solid tile is considered a failure.
-                return Result.Failed;
+                return Result.InvalidLocation;
             }
 
             if (drawDebug)
