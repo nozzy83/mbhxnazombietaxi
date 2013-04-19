@@ -10,6 +10,7 @@ using System.Diagnostics;
 using MBHEngine.World;
 using MBHEngine.PathFind.GenericAStar;
 using MBHEngine.PathFind.HPAStar;
+using MBHEngineContentDefs;
 
 namespace MBHEngine.Behaviour
 {
@@ -95,9 +96,28 @@ namespace MBHEngine.Behaviour
         public class OnPathFindFailedMessage : BehaviourMessage
         {
             /// <summary>
+            /// The different ways that a path find search can fail.
+            /// </summary>
+            public enum Reason
+            {
+                Undefined = -1,
+                Failed = 0,         // Exhusted all posibilities without reaching destination. 
+                InvalidLocation,    // Either the source or destination are on a wall.
+                Timeout,            // Allotted search time exceeded.
+            };
+
+            /// <summary>
+            /// The reason that the search failed.
+            /// </summary>
+            public Reason mReason;
+
+            /// <summary>
             /// Call this to put a message back to its default state.
             /// </summary>
-            public override void Reset() { }
+            public override void Reset() 
+            {
+                mReason = Reason.Undefined;
+            }
         }
 
         /// <summary>
@@ -129,6 +149,17 @@ namespace MBHEngine.Behaviour
         /// current search problem.
         /// </summary>
         private PathNode mLastHighLevelSearched;
+
+        /// <summary>
+        /// How many passes can the path planner make before this search is considered a failure.
+        /// This prevent searches going on for an absurdly long time.
+        /// </summary>
+        private Int32 mSearchPassLimit;
+
+        /// <summary>
+        /// The current number of a passes a given search has gone on.
+        /// </summary>
+        private Int32 mSearchPassCount;
 
         /// <summary>
         /// Preallocated to avoid garbage at runtime.
@@ -171,10 +202,13 @@ namespace MBHEngine.Behaviour
         {
             base.LoadContent(fileName);
 
-            //TimerDefinition def = GameObjectManager.pInstance.pContentManager.Load<TimerDefinition>(fileName);
+            PathFindDefinition def = GameObjectManager.pInstance.pContentManager.Load<PathFindDefinition>(fileName);
 
             // TODO: This should be read in from the xml.
             mUpdateSourceAutomatically = false;
+
+            mSearchPassLimit = def.mSearchPassLimit;
+            mSearchPassCount = 0;
 
             mPlannerNavMesh = new Planner();
             mPlannerTileMap = new Planner();
@@ -207,10 +241,37 @@ namespace MBHEngine.Behaviour
             // Plan the path at a high level.
             MBHEngine.PathFind.GenericAStar.Planner.Result res = mPlannerNavMesh.PlanPath();
 
-            // If the planner failed to find the destination tell the other behaviours.
-            if (res == MBHEngine.PathFind.GenericAStar.Planner.Result.Failed)
+            // If the search is anything but InProgress it is safe to research the pass counter.
+            if (res == Planner.Result.InProgress)
             {
+                mSearchPassCount++;
+            }
+            else
+            {
+                mSearchPassCount = 0;
+            }
+
+            // If the planner failed to find the destination tell the other behaviours.
+            if (res == MBHEngine.PathFind.GenericAStar.Planner.Result.Failed ||
+                res == Planner.Result.InvalidLocation ||
+                mSearchPassCount > mSearchPassLimit)
+            {
+                if (res == Planner.Result.Failed)
+                {
+                    mOnPathFindFailedMsg.mReason = OnPathFindFailedMessage.Reason.Failed;
+                }
+                else if (res == Planner.Result.InvalidLocation)
+                {
+                    mOnPathFindFailedMsg.mReason = OnPathFindFailedMessage.Reason.InvalidLocation;
+                }
+                else if (mSearchPassCount > mSearchPassLimit)
+                {
+                    mOnPathFindFailedMsg.mReason = OnPathFindFailedMessage.Reason.Timeout;
+                }
+
                 mParentGOH.OnMessage(mOnPathFindFailedMsg);
+
+                mSearchPassCount = 0;
             }
             else if (res == Planner.Result.Solved)// && InputManager.pInstance.CheckAction(InputManager.InputActions.B))
             {

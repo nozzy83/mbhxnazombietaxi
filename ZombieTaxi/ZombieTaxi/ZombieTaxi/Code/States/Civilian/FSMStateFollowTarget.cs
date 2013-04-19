@@ -38,6 +38,7 @@ namespace ZombieTaxi.States.Civilian
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
         private ZombieTaxi.Behaviours.Civilian.GetSafeHouseScoreMessage mGetSafeHouseScoreMessage;
+        private FiniteStateMachine.SetStateMessage mSetStateMsg;
 
         /// <summary>
         /// Constructor.
@@ -61,6 +62,7 @@ namespace ZombieTaxi.States.Civilian
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
             mGetSafeHouseScoreMessage = new Behaviours.Civilian.GetSafeHouseScoreMessage();
+            mSetStateMsg = new FiniteStateMachine.SetStateMessage();
         }
 
         /// <summary>
@@ -137,6 +139,30 @@ namespace ZombieTaxi.States.Civilian
             pParentGOH.pDirection.mForward = Vector2.Zero;
 
             pParentGOH.SetBehaviourEnabled<PathFollow>(false);
+        }
+
+        /// <summary>
+        /// The main interface for communicating between behaviours.  Using polymorphism, we
+        /// define a bunch of different messages deriving from BehaviourMessage.  Each behaviour
+        /// can then check for particular upcasted messahe types, and either grab some data 
+        /// from it (set message) or store some data in it (get message).
+        /// </summary>
+        /// <param name="msg">The message being communicated to the behaviour.</param>
+        public override void OnMessage(ref BehaviourMessage msg)
+        {
+            if (msg is PathFind.OnPathFindFailedMessage)
+            {
+                PathFind.OnPathFindFailedMessage temp = (PathFind.OnPathFindFailedMessage)msg;
+
+                // Reason.Blocked is handled by PathFollow Behaviour.
+                if (temp.mReason != PathFind.OnPathFindFailedMessage.Reason.InvalidLocation)
+                {
+                    // Can't do much if we can't reach the destination, so just revert to
+					// cower.
+                    mSetStateMsg.mNextState_In = "Cower";
+                    pParentGOH.OnMessage(mSetStateMsg);
+                }
+            }
         }
 
         /// <summary>

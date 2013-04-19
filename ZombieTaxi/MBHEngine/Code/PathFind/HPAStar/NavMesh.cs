@@ -391,7 +391,7 @@ namespace MBHEngine.PathFind.HPAStar
             Planner.Result result = mPlanner.PlanPath(cluster.pBounds, false);
 
             // Keep searching unti we either fail or succeed.
-            while (result != Planner.Result.Failed && result != Planner.Result.Solved)
+            while(result == Planner.Result.InProgress)
             {
                 result = mPlanner.PlanPath(cluster.pBounds, false);
             }

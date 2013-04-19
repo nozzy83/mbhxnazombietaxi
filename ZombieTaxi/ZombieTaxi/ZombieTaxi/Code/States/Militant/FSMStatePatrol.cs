@@ -114,6 +114,10 @@ namespace ZombieTaxi.States.Militant
             }
             else if (msg is PathFind.OnPathFindFailedMessage)
             {
+                // It may be a while until we find another valid patrol point if the player
+                // has boxed in the Militant. Stop him from sliding.
+                pParentGOH.pDirection.mForward = Vector2.Zero; 
+
                 // Handle the case where the user places a wall right where the patrol is trying to
                 // reach.
                 FindNextPatrolPoint();
