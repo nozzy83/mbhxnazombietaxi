@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.StatBoost.HealthStatBoostResearchDefinition">
+    <mIsEnabled>false</mIsEnabled>
+    <mLevels>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>100</mIntValue>
+      </Item>
+    </mLevels>
+  </Asset>
+</XnaContent>
+

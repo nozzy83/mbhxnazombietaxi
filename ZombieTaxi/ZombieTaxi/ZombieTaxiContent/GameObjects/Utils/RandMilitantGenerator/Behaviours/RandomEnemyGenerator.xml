@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.RandomEnemyGeneratorDefinition">
-    <mNumEnemies>100</mNumEnemies>
+    <mNumEnemies>60</mNumEnemies>
     <mConstraints>0 0 1600 1600</mConstraints>
     <mGameObjectFilePath>GameObjects\Characters\Militant\Militant</mGameObjectFilePath>
   </Asset>

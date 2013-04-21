@@ -19,46 +19,8 @@ namespace ZombieTaxi.Behaviours
     /// <summary>
     /// The civilian type of stranded.
     /// </summary>
-    class FSMCivilian : MBHEngine.Behaviour.FiniteStateMachine
+    class FSMMedic : MBHEngine.Behaviour.FiniteStateMachine
     {
-        /// <summary>
-        /// Get the GameObject representing the current extraction point.
-        /// </summary>
-        public class GetExtractionPointMessage : BehaviourMessage
-        {
-            /// <summary>
-            /// The current extraction point GOH.
-            /// </summary>
-            public GameObject mExtractionPoint_Out;
-
-            /// <summary>
-            /// Call this to put a message back to its default state.
-            /// </summary>
-            public override void Reset()
-            {
-                mExtractionPoint_Out = null;
-            }
-        }
-
-        /// <summary>
-        /// Retrive the score value awarded when this object reaches the SafeHouse.
-        /// </summary>
-        public class GetSafeHouseScoreMessage : BehaviourMessage
-        {
-            /// <summary>
-            /// The score awarded for reaching the SafeHouse.
-            /// </summary>
-            public Int32 mSafeHouseScore_Out;
-
-            /// <summary>
-            /// Call this to put a message back to its default state.
-            /// </summary>
-            public override void Reset()
-            {
-                mSafeHouseScore_Out = 0;
-            }
-        }
-
         /// <summary>
         /// The currently active extraction point.
         /// </summary>
@@ -81,7 +43,7 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         /// <param name="parentGOH">The game object that this behaviour is attached to.</param>
         /// <param name="fileName">The file defining this behaviour.</param>
-        public FSMCivilian(GameObject parentGOH, String fileName)
+        public FSMMedic(GameObject parentGOH, String fileName)
             : base(parentGOH, fileName)
         {
         }
@@ -94,14 +56,14 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
-            FSMCivilianDefinition def = GameObjectManager.pInstance.pContentManager.Load<FSMCivilianDefinition>(fileName);
+            FSMMedicDefinition def = GameObjectManager.pInstance.pContentManager.Load<FSMMedicDefinition>(fileName);
 
             //mFSM = new MBHEngine.StateMachine.FiniteStateMachine(mParentGOH);
             AddState(new States.Common.FSMStateCower("Hide"), "Cower");
             AddState(new States.Common.FSMStateFollowTarget("Run"), "Follow");
             AddState(new States.Common.FSMStateStay(), "Stay");
             AddState(new States.Common.FSMStateGoToStandingPosition(), "GoToStandingPosition");
-            AddState(new States.Common.FSMStateWaitAtStandingPosition("GameObjects\\Interface\\CivilianPopup\\CivilianPopup"), "WaitAtStandingPosition");
+            AddState(new States.Common.FSMStateWaitAtStandingPosition("GameObjects\\Interface\\MedicPopup\\MedicPopup"), "WaitAtStandingPosition");
             AddState(new States.Common.FSMStateDead(), "Dead");
             AddState(new States.Common.FSMStateGoToExtraction(), "GoToExtraction");
             AddState(new States.Common.FSMStateResearchStatBoost(), "ResearchStatBoost");
@@ -156,14 +118,14 @@ namespace ZombieTaxi.Behaviours
                     AdvanceToState("GoToExtraction");
                 }
             }
-            else if (msg is GetExtractionPointMessage)
+            else if (msg is FSMCivilian.GetExtractionPointMessage)
             {
-                GetExtractionPointMessage temp = (GetExtractionPointMessage)msg;
+                FSMCivilian.GetExtractionPointMessage temp = (FSMCivilian.GetExtractionPointMessage)msg;
                 temp.mExtractionPoint_Out = mExtractionPoint;
             }
-            else if (msg is GetSafeHouseScoreMessage)
+            else if (msg is FSMCivilian.GetSafeHouseScoreMessage)
             {
-                GetSafeHouseScoreMessage temp = (GetSafeHouseScoreMessage)msg;
+                FSMCivilian.GetSafeHouseScoreMessage temp = (FSMCivilian.GetSafeHouseScoreMessage)msg;
                 temp.mSafeHouseScore_Out = mSafeHouseScore;
             }
             else if (msg is StrandedPopup.GetIsScoutableMessage)
