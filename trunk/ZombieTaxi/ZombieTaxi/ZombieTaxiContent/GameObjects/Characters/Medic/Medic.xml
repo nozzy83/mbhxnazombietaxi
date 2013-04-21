@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.GameObjectDefinition">
+    <mRenderPriority>50</mRenderPriority>
+    <mDoUpdate>true</mDoUpdate>
+    <mDoRender>true</mDoRender>
+    <mPosition>164 140</mPosition>
+    <mRotation>0</mRotation>
+    <mScale>1 1</mScale>
+    <mCollisionBoxDimensions>8.0 8.0</mCollisionBoxDimensions>
+    <mCollisionRoot>0 -4</mCollisionRoot>
+    <mMotionRoot>4 8</mMotionRoot>
+    <mClassifications>
+      <Item>ALLY</Item>
+    </mClassifications>
+    <mBehaviourFileNames>
+      <Item>Sprite</Item>
+      <Item>FSMMedic</Item>
+      <Item>PathFind</Item>
+      <Item>PathFollow</Item>
+      <Item>Health</Item>
+      <Item>DamageFlash</Item>
+      <Item>SimpleMomentum</Item>
+      <Item>HealthStatBoostResearch</Item>
+      <Item>FaceForward</Item>
+    </mBehaviourFileNames>
+    <mBehaviourClassNames>
+      <Item>MBHEngine.Behaviour.SpriteRender</Item>
+      <Item>ZombieTaxi.Behaviours.FSMMedic</Item>
+      <Item>MBHEngine.Behaviour.PathFind</Item>
+      <Item>MBHEngine.Behaviour.PathFollow</Item>
+      <Item>MBHEngine.Behaviour.Health</Item>
+      <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
+      <Item>ZombieTaxi.Behaviours.StatBoost.HealthStatBoostResearch</Item>
+      <Item>MBHEngine.Behaviour.FaceForward</Item>
+    </mBehaviourClassNames>
+  </Asset>
+</XnaContent>
+

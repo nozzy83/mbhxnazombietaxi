@@ -105,6 +105,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviour\FSMMedicDefinition.cs" />
     <Compile Include="Behaviour\FSMCivilianDefinition.cs" />
     <Compile Include="Behaviour\FSMMilitantDefinition.cs" />
     <Compile Include="Behaviour\FSMScoutDefinition.cs" />
