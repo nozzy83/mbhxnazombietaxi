@@ -7,8 +7,10 @@ using MBHEngine.GameObject;
 using ZombieTaxi.StatBoost.Behaviours;
 using MBHEngineContentDefs;
 using ZombieTaxiContentDefs;
+using MBHEngine.Debug;
+using System;
 
-namespace ZombieTaxi.States.Civilian
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
     /// State where the Game Object stands in place waiting for the target to get far enough away
@@ -26,6 +28,8 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         private GameObject mPopup;
 
+        private String mPopupScript;
+
         /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
@@ -38,8 +42,10 @@ namespace ZombieTaxi.States.Civilian
         /// <summary>
         /// Constructor.
         /// </summary>
-        public FSMStateWaitAtStandingPosition()
+        public FSMStateWaitAtStandingPosition(String popupScript)
         {
+            mPopupScript = popupScript;
+
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
@@ -96,7 +102,7 @@ namespace ZombieTaxi.States.Civilian
                 // asking them what kind of task they wish to assign to this character.
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.X, true))
                 {
-                    mPopup = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Interface\\StrandedPopup\\StrandedPopup");
+                    mPopup = GameObjectFactory.pInstance.GetTemplate(mPopupScript);
                     GameObjectManager.pInstance.Add(mPopup);
 
                     // Switch to a new update pass so that the game essentially pauses.
@@ -158,9 +164,26 @@ namespace ZombieTaxi.States.Civilian
                 {
                     StrandedPopup.OnPopupClosedMessage temp = (StrandedPopup.OnPopupClosedMessage)msg;
 
-                    if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.HpUp)
+                    if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.GunUp)
                     {
                         mSetStateMsg.mNextState_In = "ResearchStatBoost";
+                        pParentGOH.OnMessage(mSetStateMsg);
+                    }
+					else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.HpUp)
+                    {
+                        mSetStateMsg.mNextState_In = "ResearchStatBoost";
+                        pParentGOH.OnMessage(mSetStateMsg);
+                    }
+                    else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.MilitantPatrol)
+                    {
+                        DebugMessageDisplay.pInstance.AddConstantMessage("Patrol");
+                        mSetStateMsg.mNextState_In = "Patrol";
+                        pParentGOH.OnMessage(mSetStateMsg);
+                    }
+                    else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.MilitantFollow)
+                    {
+                        DebugMessageDisplay.pInstance.AddConstantMessage("Follow");
+                        mSetStateMsg.mNextState_In = "Follow";
                         pParentGOH.OnMessage(mSetStateMsg);
                     }
                     else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.MakeScout)
@@ -186,7 +209,11 @@ namespace ZombieTaxi.States.Civilian
 
                         GameObjectManager.pInstance.Remove(pParentGOH);
                     }
-
+					else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.ScoutSearch)
+                    {
+                        mSetStateMsg.mNextState_In = "BeginSearch";
+                        pParentGOH.OnMessage(mSetStateMsg);
+                    }
                     // Popups get recycled so if ours closes, we need to make sure to clear our local 
                     // reference, else the next object to use it might send messages that we react to.
                     mPopup = null;

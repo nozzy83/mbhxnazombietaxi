@@ -105,7 +105,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Behaviour\CivilianDefinition.cs" />
+    <Compile Include="Behaviour\FSMCivilianDefinition.cs" />
     <Compile Include="Behaviour\FSMMilitantDefinition.cs" />
     <Compile Include="Behaviour\FSMScoutDefinition.cs" />
     <Compile Include="Behaviour\HUD\MiniMapDefinition.cs" />

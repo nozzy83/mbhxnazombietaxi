@@ -7,7 +7,7 @@ using MBHEngine.GameObject;
 using MBHEngine.World;
 using ZombieTaxi.StatBoost.Behaviours;
 
-namespace ZombieTaxi.States.Civilian
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
     /// State where the object is researching a stat boost for the player.

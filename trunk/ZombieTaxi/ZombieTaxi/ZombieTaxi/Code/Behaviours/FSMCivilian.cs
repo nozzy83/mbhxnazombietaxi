@@ -13,14 +13,13 @@ using MBHEngine.Debug;
 using MBHEngine.World;
 using MBHEngine.Math;
 using ZombieTaxi.Behaviours.HUD;
-using ZombieTaxi.States.Civilian;
 
 namespace ZombieTaxi.Behaviours
 {
     /// <summary>
     /// The civilian type of stranded.
     /// </summary>
-    class Civilian : MBHEngine.Behaviour.FiniteStateMachine
+    class FSMCivilian : MBHEngine.Behaviour.FiniteStateMachine
     {
         /// <summary>
         /// Get the GameObject representing the current extraction point.
@@ -82,7 +81,7 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         /// <param name="parentGOH">The game object that this behaviour is attached to.</param>
         /// <param name="fileName">The file defining this behaviour.</param>
-        public Civilian(GameObject parentGOH, String fileName)
+        public FSMCivilian(GameObject parentGOH, String fileName)
             : base(parentGOH, fileName)
         {
         }
@@ -95,19 +94,17 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
-            CivilianDefinition def = GameObjectManager.pInstance.pContentManager.Load<CivilianDefinition>(fileName);
+            FSMCivilianDefinition def = GameObjectManager.pInstance.pContentManager.Load<FSMCivilianDefinition>(fileName);
 
             //mFSM = new MBHEngine.StateMachine.FiniteStateMachine(mParentGOH);
-            AddState(new FSMStateCower(), "Cower");
-            AddState(new FSMStateFollowTarget(), "Follow");
-            AddState(new FSMStateStay(), "Stay");
-            //AddState(new FSMStateWaitInSafeHouse(), "WaitInSafeHouse");
-            //AddState(new FSMStateWanderInSafeHouse(), "WanderInSafeHouse");
-            AddState(new FSMStateGoToStandingPosition(), "GoToStandingPosition");
-            AddState(new FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
-            AddState(new FSMStateDead(), "Dead");
-            AddState(new FSMStateGoToExtraction(), "GoToExtraction");
-            AddState(new FSMStateResearchStatBoost(), "ResearchStatBoost");
+            AddState(new States.Common.FSMStateCower("Hide"), "Cower");
+            AddState(new States.Common.FSMStateFollowTarget("Run"), "Follow");
+            AddState(new States.Common.FSMStateStay(), "Stay");
+            AddState(new States.Common.FSMStateGoToStandingPosition(), "GoToStandingPosition");
+            AddState(new States.Common.FSMStateWaitAtStandingPosition("GameObjects\\Interface\\StrandedPopup\\StrandedPopup"), "WaitAtStandingPosition");
+            AddState(new States.Common.FSMStateDead(), "Dead");
+            AddState(new States.Common.FSMStateGoToExtraction(), "GoToExtraction");
+            AddState(new States.Common.FSMStateResearchStatBoost(), "ResearchStatBoost");
 
             mParentGOH.pDirection.mSpeed = 0.5f;
 
@@ -153,8 +150,8 @@ namespace ZombieTaxi.Behaviours
                 // If anyone is in the Safe House, they should make a run for the Extraction point now.
                 if (//curState is FSMStateWaitInSafeHouse ||
                     //curState is FSMStateWanderInSafeHouse ||
-                    curState is FSMStateGoToStandingPosition ||
-                    curState is FSMStateWaitAtStandingPosition)
+                    curState is States.Common.FSMStateGoToStandingPosition ||
+                    curState is States.Common.FSMStateWaitAtStandingPosition)
                 {
                     AdvanceToState("GoToExtraction");
                 }
@@ -174,7 +171,7 @@ namespace ZombieTaxi.Behaviours
                 // Currently the only thing required for a Civilian to be Scoutable, is that
                 // they are currently in the Cower state. This can later be expanded to include
                 // things like distance from the sender.
-                if (GetCurrentState() is FSMStateCower)
+                if (GetCurrentState() is States.Common.FSMStateCower)
                 {
                     StrandedPopup.GetIsScoutableMessage temp = (StrandedPopup.GetIsScoutableMessage)msg;
 

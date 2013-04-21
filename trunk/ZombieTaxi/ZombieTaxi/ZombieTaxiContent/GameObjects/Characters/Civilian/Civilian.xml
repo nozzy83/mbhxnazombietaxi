@@ -15,7 +15,7 @@
     </mClassifications>
     <mBehaviourFileNames>
       <Item>Sprite</Item>
-      <Item>Civilian</Item>
+      <Item>FSMCivilian</Item>
       <Item>PathFind</Item>
       <Item>PathFollow</Item>
       <Item>Health</Item>
@@ -26,7 +26,7 @@
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
-      <Item>ZombieTaxi.Behaviours.Civilian</Item>
+      <Item>ZombieTaxi.Behaviours.FSMCivilian</Item>
       <Item>MBHEngine.Behaviour.PathFind</Item>
       <Item>MBHEngine.Behaviour.PathFollow</Item>
       <Item>MBHEngine.Behaviour.Health</Item>

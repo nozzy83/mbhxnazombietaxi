@@ -9,7 +9,7 @@ using MBHEngine.Math;
 using MBHEngine.World;
 using ZombieTaxi.Behaviours.HUD;
 
-namespace ZombieTaxi.States.Civilian
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
     /// State where the Game Object stands in place waiting for the target to get far enough away
@@ -34,7 +34,7 @@ namespace ZombieTaxi.States.Civilian
         private FiniteStateMachine.SetStateMessage mSetStateMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
-        private ZombieTaxi.Behaviours.Civilian.GetSafeHouseScoreMessage mGetSafeHouseScoreMessage;
+        private ZombieTaxi.Behaviours.FSMCivilian.GetSafeHouseScoreMessage mGetSafeHouseScoreMessage;
 
         /// <summary>
         /// Constructor.
@@ -52,7 +52,7 @@ namespace ZombieTaxi.States.Civilian
             mSetStateMsg = new FiniteStateMachine.SetStateMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
-            mGetSafeHouseScoreMessage = new Behaviours.Civilian.GetSafeHouseScoreMessage();
+            mGetSafeHouseScoreMessage = new Behaviours.FSMCivilian.GetSafeHouseScoreMessage();
         }
 
         /// <summary>

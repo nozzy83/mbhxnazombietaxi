@@ -9,13 +9,15 @@ using Microsoft.Xna.Framework;
 using ZombieTaxi.Behaviours.HUD;
 using MBHEngine.World;
 
-namespace ZombieTaxi.States.Civilian
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
     /// State where the game object follows its target.
     /// </summary>
     class FSMStateFollowTarget : FSMState
     {
+        private String mAnimationName;
+
         /// <summary>
         /// Used to store any safe houses in range.
         /// </summary>
@@ -25,6 +27,13 @@ namespace ZombieTaxi.States.Civilian
         /// A list of the types of objects that this does damage to when exploding.
         /// </summary>
         private List<GameObjectDefinition.Classifications> mSafeHouseClassifications;
+
+        /// <summary>
+        /// The Militant can go to the SafeHouse but then return to this state later by User request.
+        /// When that happens we need to ensure that the Militant does not try to return to the SafeHouse
+        /// until he leaves it.
+        /// </summary>
+        private Boolean mMustLeaveSafeHouse;
 
         /// <summary>
         /// Preallocate messages to avoid GC.
@@ -37,14 +46,16 @@ namespace ZombieTaxi.States.Civilian
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
-        private ZombieTaxi.Behaviours.Civilian.GetSafeHouseScoreMessage mGetSafeHouseScoreMessage;
+        private ZombieTaxi.Behaviours.FSMCivilian.GetSafeHouseScoreMessage mGetSafeHouseScoreMessage;
         private FiniteStateMachine.SetStateMessage mSetStateMsg;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public FSMStateFollowTarget()
+        public FSMStateFollowTarget(String animationName)
         {
+            mAnimationName = animationName;
+
             // We need to detect when the GameObject reaches a safe house and to do so we need
             // to do a collision check against all objects of a particular classification, in this
             // case "SAFE_HOUSE".  We preallocate the two lists needed to do the check to avoid
@@ -61,7 +72,7 @@ namespace ZombieTaxi.States.Civilian
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
             mSetTargetObjectMsg = new PathFollow.SetTargetObjectMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
-            mGetSafeHouseScoreMessage = new Behaviours.Civilian.GetSafeHouseScoreMessage();
+            mGetSafeHouseScoreMessage = new Behaviours.FSMCivilian.GetSafeHouseScoreMessage();
             mSetStateMsg = new FiniteStateMachine.SetStateMessage();
         }
 
@@ -70,7 +81,7 @@ namespace ZombieTaxi.States.Civilian
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName_In = "Run";
+            mSetActiveAnimationMsg.mAnimationSetName_In = mAnimationName;
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
             mSetSourceMsg.mSource_In = pParentGOH.pCollisionRect.pCenterPoint;
@@ -78,13 +89,21 @@ namespace ZombieTaxi.States.Civilian
             mSetDestinationMsg.mDestination_In = GameObjectManager.pInstance.pPlayer.pPosition;
             pParentGOH.OnMessage(mSetDestinationMsg);
 
-            pParentGOH.SetBehaviourEnabled<PathFollow>(true);
-
             mSetTargetObjectMsg.mTarget_In = GameObjectManager.pInstance.pPlayer;
             pParentGOH.OnMessage(mSetTargetObjectMsg);
 
+            pParentGOH.SetBehaviourEnabled<PathFollow>(true);
+
             pParentGOH.OnMessage(mGetSafeHouseScoreMessage);
             mIncrementScoreMsg.mAmount_In = mGetSafeHouseScoreMessage.mSafeHouseScore_Out;
+
+            // If he starts in the SafeHouse he must leave it before trying to return again.
+            mSafeHouseInRange.Clear();
+            GameObjectManager.pInstance.GetGameObjectsInRange(pParentGOH, ref mSafeHouseInRange, mSafeHouseClassifications);
+            if (mSafeHouseInRange.Count != 0)
+            {
+                mMustLeaveSafeHouse = true;
+            }
         }
 
         /// <summary>
@@ -101,8 +120,9 @@ namespace ZombieTaxi.States.Civilian
             if (mSafeHouseInRange.Count != 0)
             {
                 // Don't even attempt to enter the SafeHouse unless there are spots available.
-                // This prevents getting points, and then
-                if (CheckForValidSafeHouseTiles())
+                // This prevents getting points, and then not actually staying in the Safe House.
+                // Also make sure that we aren't currently trying to leave the Safe House.
+                if (!mMustLeaveSafeHouse && CheckForValidSafeHouseTiles())
                 {
                     DebugMessageDisplay.pInstance.AddConstantMessage("Reached SafeHouse.");
 
@@ -113,15 +133,20 @@ namespace ZombieTaxi.States.Civilian
                     return "GoToStandingPosition";
                 }
             }
+            else
+            {
+                mMustLeaveSafeHouse = false;
+            }
+            
+            // Are we close enough that we should just stand still until the player starts moving again.
+            if (Vector2.DistanceSquared(GameObjectManager.pInstance.pPlayer.pPosition, pParentGOH.pPosition) < 16 * 16)
+            {
+                return "Stay";
+            }
             // Has the Player run too far away causing us to get scared?
             else if (Vector2.DistanceSquared(GameObjectManager.pInstance.pPlayer.pPosition, pParentGOH.pPosition) > 64 * 64)
             {
                 return "Cower";
-            }
-            // Are we close enough that we should just stand still until the player starts moving again.
-            else if (Vector2.DistanceSquared(GameObjectManager.pInstance.pPlayer.pPosition, pParentGOH.pPosition) < 16 * 16)
-            {
-                return "Stay";
             }
 
             return null;

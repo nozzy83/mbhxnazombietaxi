@@ -437,8 +437,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameObjects\Characters\Civilian\Behaviours\Civilian.xml">
-      <Name>Civilian</Name>
+    <Compile Include="GameObjects\Characters\Civilian\Behaviours\FSMCivilian.xml">
+      <Name>FSMCivilian</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>

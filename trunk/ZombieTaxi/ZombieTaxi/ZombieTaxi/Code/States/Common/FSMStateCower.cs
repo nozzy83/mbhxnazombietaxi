@@ -4,13 +4,15 @@ using MBHEngine.Behaviour;
 using MBHEngine.GameObject;
 using ZombieTaxi.Behaviours;
 
-namespace ZombieTaxi.States.Militant
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
     /// State where the Game Object sits in a cowering pose.
     /// </summary>
     class FSMStateCower : FSMState
     {
+        private String mAnimationName;
+
         /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
@@ -19,8 +21,10 @@ namespace ZombieTaxi.States.Militant
         /// <summary>
         /// Constructor.
         /// </summary>
-        public FSMStateCower()
+        public FSMStateCower(String animName)
         {
+            mAnimationName = animName;
+
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
         }
 
@@ -29,7 +33,7 @@ namespace ZombieTaxi.States.Militant
         /// </summary>
         public override void OnBegin()
         {
-            mSetActiveAnimationMsg.mAnimationSetName_In = "Idle";
+            mSetActiveAnimationMsg.mAnimationSetName_In = mAnimationName;
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
             pParentGOH.SetBehaviourEnabled<PointAndShoot>(false);
@@ -51,14 +55,6 @@ namespace ZombieTaxi.States.Militant
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Called once when leaving this state.  Called the frame after the Update which returned
-        /// a valid state to transition to.  This is a chance to do any clean up needed.
-        /// </summary>
-        public override void OnEnd()
-        {
         }
     }
 }

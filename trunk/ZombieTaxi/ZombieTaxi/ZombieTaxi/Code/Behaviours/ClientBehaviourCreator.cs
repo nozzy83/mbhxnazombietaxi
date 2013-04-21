@@ -45,9 +45,9 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new RandomEnemyGenerator(go, fileName);
                     }
-                case "ZombieTaxi.Behaviours.Civilian":
+                case "ZombieTaxi.Behaviours.FSMCivilian":
                     {
-                        return new Civilian(go, fileName);
+                        return new FSMCivilian(go, fileName);
                     }
                 case "ZombieTaxi.Behaviours.FSMScout":
                     {
