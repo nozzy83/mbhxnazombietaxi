@@ -6,7 +6,7 @@ using MBHEngineContentDefs;
 
 namespace ZombieTaxiContentDefs
 {
-    public class CivilianDefinition : BehaviourDefinition
+    public class FSMCivilianDefinition : BehaviourDefinition
     {
         public Int32 mSafeHouseScore;
     }

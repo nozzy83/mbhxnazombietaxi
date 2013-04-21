@@ -1,7 +1,7 @@
 ﻿using MBHEngine.StateMachine;
 using MBHEngine.Behaviour;
 
-namespace ZombieTaxi.States.Civilian
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
     /// State where the Game Object stands in place waiting for the target to get far enough away

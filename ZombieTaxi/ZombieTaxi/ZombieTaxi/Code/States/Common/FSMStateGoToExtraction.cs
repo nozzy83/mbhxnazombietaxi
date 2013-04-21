@@ -5,7 +5,7 @@ using MBHEngine.GameObject;
 using Microsoft.Xna.Framework;
 using ZombieTaxi.Behaviours.HUD;
 
-namespace ZombieTaxi.States.Civilian
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
     /// State where the game object follows its target.
@@ -19,7 +19,7 @@ namespace ZombieTaxi.States.Civilian
         private PathFind.SetDestinationMessage mSetDestinationMsg;
         private PathFind.SetSourceMessage mSetSourceMsg;
         private PathFind.GetCurrentBestNodeMessage mGetCurrentBestNodeMsg;
-        private ZombieTaxi.Behaviours.Civilian.GetExtractionPointMessage mGetExtractionPointMsg;
+        private ZombieTaxi.Behaviours.FSMCivilian.GetExtractionPointMessage mGetExtractionPointMsg;
         private PlayerScore.IncrementScoreMessage mIncrementScoreMsg;
         private PathFind.ClearDestinationMessage mClearDestinationMsg;
         private PathFollow.SetTargetObjectMessage mSetTargetObjectMsg;
@@ -34,7 +34,7 @@ namespace ZombieTaxi.States.Civilian
             mSetDestinationMsg = new PathFind.SetDestinationMessage();
             mSetSourceMsg = new PathFind.SetSourceMessage();
             mGetCurrentBestNodeMsg = new PathFind.GetCurrentBestNodeMessage();
-            mGetExtractionPointMsg = new ZombieTaxi.Behaviours.Civilian.GetExtractionPointMessage();
+            mGetExtractionPointMsg = new ZombieTaxi.Behaviours.FSMCivilian.GetExtractionPointMessage();
             mIncrementScoreMsg = new PlayerScore.IncrementScoreMessage();
             mIncrementScoreMsg.mAmount_In = 500;
             mClearDestinationMsg = new PathFind.ClearDestinationMessage();

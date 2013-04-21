@@ -1,22 +1,17 @@
 ﻿using System;
 using MBHEngine.StateMachine;
 using MBHEngine.Behaviour;
-using MBHEngine.Math;
+using MBHEngine.GameObject;
+using Microsoft.Xna.Framework;
 
-namespace ZombieTaxi.States.Civilian
+namespace ZombieTaxi.States.Common
 {
     /// <summary>
-    /// State where the Game Object has reached the safehouse and should now wait there for
-    /// extraction.
+    /// State where the Game Object stands in place waiting for the target to get far enough away
+    /// to trigger a transition back to the follow state.
     /// </summary>
-    class FSMStateWaitInSafeHouse : FSMState
+    class FSMStateStay : FSMState
     {
-        /// <summary>
-        /// Waiting in the safe house cycles between this state and FSMStateWanderInSafeHouse.  In this state
-        /// we stand around for a set period of time.  This is that time.
-        /// </summary>
-        private StopWatch mWatch;
-
         /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
@@ -25,20 +20,9 @@ namespace ZombieTaxi.States.Civilian
         /// <summary>
         /// Constructor.
         /// </summary>
-        public FSMStateWaitInSafeHouse()
+        public FSMStateStay()
         {
-            mWatch = StopWatchManager.pInstance.GetNewStopWatch();
-            mWatch.pLifeTime = 90;
-
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
-        }
-
-        /// <summary>
-        /// Destrucor.
-        /// </summary>
-        ~FSMStateWaitInSafeHouse()
-        {
-            StopWatchManager.pInstance.RecycleStopWatch(mWatch);
         }
 
         /// <summary>
@@ -48,8 +32,6 @@ namespace ZombieTaxi.States.Civilian
         {
             mSetActiveAnimationMsg.mAnimationSetName_In = "Idle";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
-
-            mWatch.Restart();
         }
 
         /// <summary>
@@ -58,10 +40,10 @@ namespace ZombieTaxi.States.Civilian
         /// <returns>Identifier of a state to transition to.</returns>
         public override String OnUpdate()
         {
-            // Has enough time passed that we should try moving to a new space?
-            if (mWatch.IsExpired())
+            // Has the player moved far enough that we should start moving again?
+            if (Vector2.DistanceSquared(GameObjectManager.pInstance.pPlayer.pPosition, pParentGOH.pPosition) > 24 * 24)
             {
-                return "WanderInSafeHouse";
+                return "Follow";
             }
 
             return null;

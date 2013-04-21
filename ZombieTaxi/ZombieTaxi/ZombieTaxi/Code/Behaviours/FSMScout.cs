@@ -41,10 +41,10 @@ namespace ZombieTaxi.Behaviours
         {
             base.LoadContent(fileName);
 
-            AddState(new FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
+            AddState(new States.Common.FSMStateWaitAtStandingPosition("GameObjects\\Interface\\ScoutPopup\\ScoutPopup"), "WaitAtStandingPosition");
             AddState(new FSMStateBeginSearch(), "BeginSearch");
             AddState(new FSMStateWaitAtTarget(), "WaitAtTarget");
-            AddState(new States.Civilian.FSMStateDead(), "Dead");
+            AddState(new States.Common.FSMStateDead(), "Dead");
         }
 
         /// <summary>

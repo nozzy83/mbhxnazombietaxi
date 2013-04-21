@@ -45,14 +45,14 @@ namespace ZombieTaxi.Behaviours
 
             FSMMilitantDefinition def = GameObjectManager.pInstance.pContentManager.Load<FSMMilitantDefinition>(fileName);
 
-            AddState(new FSMStateCower(), "Cower");
-            AddState(new FSMStateFollowTarget(), "Follow");
-            AddState(new FSMStateStay(), "Stay");
-            AddState(new States.Civilian.FSMStateDead(), "Dead");
-            AddState(new States.Civilian.FSMStateGoToStandingPosition(), "GoToStandingPosition");
-            AddState(new FSMStateWaitAtStandingPosition(), "WaitAtStandingPosition");
-            AddState(new States.Civilian.FSMStateGoToExtraction(), "GoToExtraction");
-            AddState(new States.Civilian.FSMStateResearchStatBoost(), "ResearchStatBoost");
+            AddState(new States.Common.FSMStateCower("Idle"), "Cower");
+            AddState(new States.Common.FSMStateFollowTarget("Run"), "Follow");
+            AddState(new States.Common.FSMStateStay(), "Stay");
+            AddState(new States.Common.FSMStateDead(), "Dead");
+            AddState(new States.Common.FSMStateGoToStandingPosition(), "GoToStandingPosition");
+            AddState(new States.Common.FSMStateWaitAtStandingPosition("GameObjects\\Interface\\MilitantPopup\\MilitantPopup"), "WaitAtStandingPosition");
+            AddState(new States.Common.FSMStateGoToExtraction(), "GoToExtraction");
+            AddState(new States.Common.FSMStateResearchStatBoost(), "ResearchStatBoost");
             AddState(new FSMStatePatrol(), "Patrol");
             AddState(new FSMStatePauseAtPatrolPoint(), "PatrolPause");
 
@@ -94,22 +94,22 @@ namespace ZombieTaxi.Behaviours
                 FSMState curState = GetCurrentState();
 
                 // If anyone is in the Safe House, they should make a run for the Extraction point now.
-                if (curState is States.Civilian.FSMStateGoToStandingPosition ||
-                    curState is FSMStateWaitAtStandingPosition ||
+                if (curState is States.Common.FSMStateGoToStandingPosition ||
+                    curState is States.Common.FSMStateWaitAtStandingPosition ||
                     curState is FSMStatePatrol ||
                     curState is FSMStatePauseAtPatrolPoint)
                 {
                     AdvanceToState("GoToExtraction");
                 }
             }
-            else if (msg is Civilian.GetExtractionPointMessage)
+            else if (msg is FSMCivilian.GetExtractionPointMessage)
             {
-                Civilian.GetExtractionPointMessage temp = (Civilian.GetExtractionPointMessage)msg;
+                FSMCivilian.GetExtractionPointMessage temp = (FSMCivilian.GetExtractionPointMessage)msg;
                 temp.mExtractionPoint_Out = mExtractionPoint;
             }
-            else if (msg is Civilian.GetSafeHouseScoreMessage)
+            else if (msg is FSMCivilian.GetSafeHouseScoreMessage)
             {
-                Civilian.GetSafeHouseScoreMessage temp = (Civilian.GetSafeHouseScoreMessage)msg;
+                FSMCivilian.GetSafeHouseScoreMessage temp = (FSMCivilian.GetSafeHouseScoreMessage)msg;
                 temp.mSafeHouseScore_Out = mSafeHouseScore;
             }
             else if (msg is StrandedPopup.GetIsScoutableMessage)
@@ -117,7 +117,7 @@ namespace ZombieTaxi.Behaviours
                 // Currently the only thing required for a Stranded to be Scoutable, is that
                 // they are currently in the Cower state. This can later be expanded to include
                 // things like distance from the sender.
-                if (GetCurrentState() is FSMStateCower)
+                if (GetCurrentState() is States.Common.FSMStateCower)
                 {
                     StrandedPopup.GetIsScoutableMessage temp = (StrandedPopup.GetIsScoutableMessage)msg;
 
