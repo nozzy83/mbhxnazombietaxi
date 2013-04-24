@@ -74,6 +74,8 @@ namespace ZombieTaxi.States.Common
 
             mButtonHint = null;
             mPopup = null;
+
+            pParentGOH.SetBehaviourEnabled<HealNearby>(true);
         }
 
         /// <summary>
@@ -143,6 +145,8 @@ namespace ZombieTaxi.States.Common
             }
 
             mPopup = null;
+
+            pParentGOH.SetBehaviourEnabled<HealNearby>(false);
         }
 
         /// <summary>

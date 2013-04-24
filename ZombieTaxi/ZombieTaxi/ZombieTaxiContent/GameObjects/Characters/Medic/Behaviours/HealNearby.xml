@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="MBHEngineContentDefs.HealNearbyDefinition">
+    <mIsEnabled>false</mIsEnabled>
+    <mAppliedTo>
+      <Item>ALLY</Item>
+      <Item>PLAYER</Item>
+    </mAppliedTo>
+    <mHealRate>1.0</mHealRate>
+    <mHealRange>30.0</mHealRange>
+  </Asset>
+</XnaContent>
+

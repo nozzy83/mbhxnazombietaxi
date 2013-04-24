@@ -19,6 +19,7 @@
       <Item>PathFind</Item>
       <Item>PathFollow</Item>
       <Item>Health</Item>
+      <Item>HealNearby</Item>
       <Item>DamageFlash</Item>
       <Item>SimpleMomentum</Item>
       <Item>HealthStatBoostResearch</Item>
@@ -30,6 +31,7 @@
       <Item>MBHEngine.Behaviour.PathFind</Item>
       <Item>MBHEngine.Behaviour.PathFollow</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
+      <Item>MBHEngine.Behaviour.HealNearby</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
       <Item>ZombieTaxi.Behaviours.StatBoost.HealthStatBoostResearch</Item>
