@@ -35,6 +35,26 @@ namespace MBHEngine.Behaviour
             }
         }
 
+
+        /// <summary>
+        /// Gives a specified amount of health back to the target.
+        /// </summary>
+        public class IncrementHealthMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The amount of health to add to the current health.
+            /// </summary>
+            public Single mIncrementAmount_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mIncrementAmount_In = 0.0f;
+            }
+        }
+
         /// <summary>
         /// Sent when the health reaches zero.
         /// </summary>
@@ -180,6 +200,12 @@ namespace MBHEngine.Behaviour
                 ApplyDamageMessage temp = (ApplyDamageMessage)msg;
 
                 ApplyDamage(temp.mDamageAmount_In);
+            }
+            else if (msg is IncrementHealthMessage)
+            {
+                IncrementHealthMessage temp = (IncrementHealthMessage)msg;
+
+                mCurrentHealth = System.Math.Min(mMaxHealth, mCurrentHealth + temp.mIncrementAmount_In);
             }
             else if (msg is GetHealthMessage)
             {

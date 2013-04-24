@@ -521,6 +521,10 @@ namespace MBHEngine.GameObject
                     {
                         return new MBHEngine.Behaviour.FaceForward(this, fileName);
                     }
+                case "MBHEngine.Behaviour.HealNearby":
+                    {
+                        return new MBHEngine.Behaviour.HealNearby(this, fileName);
+                    }
                 default:
                     {
                         System.Diagnostics.Debug.Assert(false, "Attempting to create unknown behaviour type, " + behaviourType + " linked to file " + fileName + "!");

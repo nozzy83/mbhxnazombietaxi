@@ -58,7 +58,6 @@ namespace ZombieTaxi.Behaviours
 
             FSMMedicDefinition def = GameObjectManager.pInstance.pContentManager.Load<FSMMedicDefinition>(fileName);
 
-            //mFSM = new MBHEngine.StateMachine.FiniteStateMachine(mParentGOH);
             AddState(new States.Common.FSMStateCower("Hide"), "Cower");
             AddState(new States.Common.FSMStateFollowTarget("Run"), "Follow");
             AddState(new States.Common.FSMStateStay(), "Stay");
