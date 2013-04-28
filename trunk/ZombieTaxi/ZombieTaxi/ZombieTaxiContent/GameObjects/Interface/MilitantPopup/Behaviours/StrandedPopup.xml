@@ -6,11 +6,6 @@
     </mUpdatePasses>
     <mButtons>
       <Item>
-        <mIconFileName>GameObjects\Interface\StrandedPopup\IconLevelUp\IconLevelUp</mIconFileName>
-        <mHintText>GUN UP</mHintText>
-        <mButtonType>GunUp</mButtonType>
-      </Item>
-      <Item>
         <mIconFileName>GameObjects\Interface\StrandedPopup\IconMilitantPatrol\IconMilitantPatrol</mIconFileName>
         <mHintText>Patrol</mHintText>
         <mButtonType>MilitantPatrol</mButtonType>
