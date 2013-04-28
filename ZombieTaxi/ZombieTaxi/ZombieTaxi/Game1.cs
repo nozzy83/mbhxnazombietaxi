@@ -136,6 +136,7 @@ namespace ZombieTaxi
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\ScoutPopup\\ScoutPopup", 1);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\MilitantPopup\\MilitantPopup", 1);
             GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\MedicPopup\\MedicPopup", 1);
+            GameObjectFactory.pInstance.AddTemplate("GameObjects\\Interface\\EngineerPopup\\EngineerPopup", 1);
 
             // The tiled background image that travels will the player creating the illusion of
             // an infinite background image.
@@ -201,6 +202,7 @@ namespace ZombieTaxi
             new GameObject("GameObjects\\Utils\\RandCivilianGenerator\\RandCivilianGenerator");
             new GameObject("GameObjects\\Utils\\RandMilitantGenerator\\RandMilitantGenerator");
             new GameObject("GameObjects\\Utils\\RandMedicGenerator\\RandMedicGenerator");
+            new GameObject("GameObjects\\Utils\\RandEngineerGenerator\\RandEngineerGenerator");
             
             // The vingette effect used to dim out the edges of the screen.
             GameObject ving = new GameObject("GameObjects\\Interface\\Vingette\\Vingette");
@@ -262,7 +264,8 @@ namespace ZombieTaxi
                 //mSpawned = new GameObject("GameObjects\\Characters\\Civilian\\Civilian");
                 //mSpawned = new GameObject("GameObjects\\Characters\\Militant\\Militant");
                 //mSpawned = new GameObject("GameObjects\\Characters\\Kamikaze\\Kamikaze");
-                mSpawned = new GameObject("GameObjects\\Characters\\Medic\\Medic");
+                //mSpawned = new GameObject("GameObjects\\Characters\\Medic\\Medic");
+                mSpawned = new GameObject("GameObjects\\Characters\\Engineer\\Engineer");
                 mSpawned.pPosition = GameObjectManager.pInstance.pPlayer.pPosition;
                 mSpawned.pPosX += 64;
                 GameObjectManager.pInstance.Add(mSpawned);
