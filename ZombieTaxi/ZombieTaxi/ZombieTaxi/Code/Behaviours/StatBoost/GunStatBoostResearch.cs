@@ -6,13 +6,14 @@ using MBHEngine.GameObject;
 using MBHEngine.Math;
 using MBHEngine.Debug;
 using ZombieTaxiContentDefs.StatBoost;
+using ZombieTaxi.Behaviours;
 
 namespace ZombieTaxi.StatBoost.Behaviours
 {
     /// <summary>
     /// Researchs an upgrade to a stat over time.
     /// </summary>
-    class HealthStatBoostResearch : ZombieTaxi.StatBoost.Behaviours.StatBoostResearch
+    class GunStatBoostResearch : ZombieTaxi.StatBoost.Behaviours.StatBoostResearch
     {
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// every object in the game, so it cannot be handled properly by the base class
         /// level.
         /// </remarks>
-        public class GetHealthLevelsRemainingMessage : BehaviourMessage
+        public class GetGunLevelsRemainingMessage : BehaviourMessage
         {
             /// <summary>
             /// The number of levels still available for upgrading to.
@@ -44,7 +45,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// Store the definition for later use since it stores the leveling information in a
         /// nice clean way.
         /// </summary>
-        private HealthStatBoostResearchDefinition mDef;
+        private GunStatBoostResearchDefinition mDef;
 
         /// <summary>
         /// The current level of this type of research. Static since there can be many instances of this
@@ -60,7 +61,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// </summary>
         /// <param name="parentGOH">The game object that this behaviour is attached to.</param>
         /// <param name="fileName">The file defining this behaviour.</param>
-        public HealthStatBoostResearch(GameObject parentGOH, String fileName)
+        public GunStatBoostResearch(GameObject parentGOH, String fileName)
             : base(parentGOH, fileName)
         {
         }
@@ -73,9 +74,9 @@ namespace ZombieTaxi.StatBoost.Behaviours
         {
             base.LoadContent(fileName);
 
-            mDef = GameObjectManager.pInstance.pContentManager.Load<HealthStatBoostResearchDefinition>(fileName);
+            mDef = GameObjectManager.pInstance.pContentManager.Load<GunStatBoostResearchDefinition>(fileName);
 
-            mMessageOnComplete = new Health.IncrementMaxHealthMessage();
+            mMessageOnComplete = new TwinStick.IncrementGunLevelMessage();
         }
 
         /// <summary>
@@ -87,9 +88,9 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// <param name="msg">The message being communicated to the behaviour.</param>
         public override void OnMessage(ref BehaviourMessage msg)
         {
-            if (msg is GetHealthLevelsRemainingMessage)
+            if (msg is GetGunLevelsRemainingMessage)
             {
-                GetHealthLevelsRemainingMessage temp = (GetHealthLevelsRemainingMessage)msg;
+                GetGunLevelsRemainingMessage temp = (GetGunLevelsRemainingMessage)msg;
 
                 temp.mLevelsRemaining = mDef.mLevels.Length - pNextLevel;
             }
@@ -105,7 +106,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// </summary>
         protected override void FillOnResearchCompleteMessage()
         {
-            Health.IncrementMaxHealthMessage temp = (Health.IncrementMaxHealthMessage)mMessageOnComplete;
+            TwinStick.IncrementGunLevelMessage temp = (TwinStick.IncrementGunLevelMessage)mMessageOnComplete;
 
             temp.mIncrementAmount_In = mDef.mLevels[mNextLevel].mIntValue;
         }

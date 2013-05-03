@@ -28,6 +28,22 @@ namespace ZombieTaxi.Behaviours
         }
 
         /// <summary>
+        /// Allows the damage modifier for this explosive to be set.
+        /// </summary>
+        public class SetDamageMultiplierMessage : BehaviourMessage
+        {
+            public Single mDamageMod_In = 1.0f;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset() 
+            {
+                mDamageMod_In = 1.0f;
+            }
+        }
+
+        /// <summary>
         /// When an explosive explodes there is an explosion effect that needs to be shown.  This is it.
         /// </summary>
         private String mExplosionEffect;
@@ -52,6 +68,11 @@ namespace ZombieTaxi.Behaviours
         /// The amount of damage this explosive causes when exploding.
         /// </summary>
         private Single mDamagedCaused;
+
+        /// <summary>
+        /// A changing multiply to allow bullets to upgrade over time.
+        /// </summary>
+        private Single mDamageMod;
 
         /// <summary>
         /// Used to store all the objects in range of this explosion so that it can
@@ -168,12 +189,30 @@ namespace ZombieTaxi.Behaviours
         public override void Reset()
         {
             mExploded = false;
+            mDamageMod = 1.0f;
 
             if (null != mDetonationTimer)
             {
                 mDetonationTimer.Restart();
             }
         }
+
+#if ALLOW_GARBAGE
+        /// <summary>
+        /// Returns a bunch of information about the behaviour which can be dumped to
+        /// a debug display for debugging at runtime.
+        /// </summary>
+        /// <returns>A formatted string of debug information.</returns>
+        public override String[] GetDebugInfo()
+        {
+            String [] info = new String[2];
+
+            info[0] = "Dam: " + mDamagedCaused;
+            info[1] = "Mod: " + mDamageMod;
+
+            return info;
+        }
+#endif // ALLOW_GARBAGE
 
         /// <summary>
         /// The main interface for communicating between behaviours.  Using polymorphism, we
@@ -195,6 +234,12 @@ namespace ZombieTaxi.Behaviours
                 {
                     Detonate();
                 }
+            }
+
+            if (msg is SetDamageMultiplierMessage)
+            {
+                SetDamageMultiplierMessage temp = (SetDamageMultiplierMessage)msg;
+                mDamageMod = temp.mDamageMod_In;
             }
         }
 
@@ -222,6 +267,7 @@ namespace ZombieTaxi.Behaviours
             // Find all the objects near by and apply some damage to them.
             mObjectsInRange.Clear();
             GameObjectManager.pInstance.GetGameObjectsInRange(mParentGOH, ref mObjectsInRange, mDamageAppliedTo);
+            mApplyDamageMsg.mDamageAmount_In = mDamagedCaused * mDamageMod;
             for (Int32 i = 0; i < mObjectsInRange.Count; i++)
             {
                 mObjectsInRange[i].OnMessage(mApplyDamageMsg);

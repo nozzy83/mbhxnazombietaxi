@@ -1951,8 +1951,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameObjects\Characters\Engineer\Behaviours\HealthStatBoostResearch.xml">
-      <Name>HealthStatBoostResearch</Name>
+    <Compile Include="GameObjects\Characters\Engineer\Behaviours\GunStatBoostResearch.xml">
+      <Name>GunStatBoostResearch</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
     </Compile>

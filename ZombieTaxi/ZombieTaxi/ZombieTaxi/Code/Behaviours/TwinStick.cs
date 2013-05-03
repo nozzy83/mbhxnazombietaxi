@@ -23,6 +23,65 @@ namespace ZombieTaxi.Behaviours
     class TwinStick : MBHEngine.Behaviour.Behaviour
     {
         /// <summary>
+        /// Increase the level of weapon used by the player.
+        /// </summary>
+        public class IncrementGunLevelMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// How many levels to increment.
+            /// </summary>
+            public Int32 mIncrementAmount_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mIncrementAmount_In = 0;
+            }
+        }
+
+        /// <summary>
+        /// Retrive how many levels are still possible to upgrade the weapon.
+        /// </summary>
+        public class GetGunLevelsRemainingMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// How many more levels of upgrades are available.
+            /// </summary>
+            public Int32 mLevelRemaining_In;
+
+            /// <summary>
+            /// Call this to put a message back to its default state.
+            /// </summary>
+            public override void Reset()
+            {
+                mLevelRemaining_In = 0;
+            }
+        }
+
+        /// <summary>
+        /// Upgrades are defined in script as just levels. What each level is gets defined by these
+        /// structures.
+        /// </summary>
+        public struct GunLevelInfo
+        {
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="damageMod">How much the base damage will be multiplied by.</param>
+            public GunLevelInfo(Single damageMod)
+            {
+                mDamageMod = damageMod;
+            }
+
+            /// <summary>
+            /// How much the base damage will be multiplied by.
+            /// </summary>
+            public Single mDamageMod;
+        }
+
+        /// <summary>
         /// The speed at which the GOH is moved when the user presses the dpad.
         /// </summary>
         private Single mMoveSpeed;
@@ -53,6 +112,16 @@ namespace ZombieTaxi.Behaviours
         private GameObjectFloodFill mGOFloodFill;
 
         /// <summary>
+        /// The current upgrade level of the gun.
+        /// </summary>
+        private Int32 mGunLevel;
+
+        /// <summary>
+        /// A list of all the possible gun levels.
+        /// </summary>
+        private GunLevelInfo[] mGunLevelInfo;
+
+        /// <summary>
         /// Preallocated messages to avoid GC.
         /// </summary>
         private SpriteRender.SetSpriteEffectsMessage mSpriteFxMsg;
@@ -61,6 +130,7 @@ namespace ZombieTaxi.Behaviours
         private ExtractionPoint.SetExtractionPointActivateMessage mSetExtractionPointActivateMsg;
         private SpriteRender.GetAttachmentPointMessage mGetAttachmentPointMsg;
         private Level.GetTileAtObjectMessage mGetTileAtObjectMsg;
+        private Explosive.SetDamageMultiplierMessage mSetDamageModifierMessage;
 
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
@@ -108,7 +178,19 @@ namespace ZombieTaxi.Behaviours
 
             mSafeHousePlaced = false;
 
+            mGunLevel = 0;
+
             mGOFloodFill = new GameObjectFloodFill();
+
+            mGunLevelInfo = new GunLevelInfo[] 
+            {
+                new GunLevelInfo(1.0f),
+                new GunLevelInfo(2.0f),
+                new GunLevelInfo(4.0f),
+                new GunLevelInfo(7.0f),
+                new GunLevelInfo(11.0f),
+                new GunLevelInfo(16.0f),
+            };
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
             mGetSpriteFxMsg = new SpriteRender.GetSpriteEffectsMessage();
@@ -116,6 +198,7 @@ namespace ZombieTaxi.Behaviours
             mSetExtractionPointActivateMsg = new ExtractionPoint.SetExtractionPointActivateMessage();
             mGetAttachmentPointMsg = new SpriteRender.GetAttachmentPointMessage();
             mGetTileAtObjectMsg = new Level.GetTileAtObjectMessage();
+            mSetDamageModifierMessage = new Explosive.SetDamageMultiplierMessage();
         }
 
         /// <summary>
@@ -265,10 +348,13 @@ namespace ZombieTaxi.Behaviours
                         // The screen's y direction is opposite the controller.
                         bullet.pDirection.mForward.Y *= -1;
 
+                        // Use our current gun level to upgrade the bullet.
+                        mSetDamageModifierMessage.mDamageMod_In = mGunLevelInfo[mGunLevel].mDamageMod;
+                        bullet.OnMessage(mSetDamageModifierMessage);
+
                         GameObjectManager.pInstance.Add(bullet);
                     }
                 }
-
 
                 if (InputManager.pInstance.CheckAction(InputManager.InputActions.R1, true))
                 {
@@ -340,6 +426,17 @@ namespace ZombieTaxi.Behaviours
             if (msg is Health.OnZeroHealthMessage)
             {
                 DebugMessageDisplay.pInstance.AddConstantMessage("GAME OVER - Player Died");
+            }
+            else if (msg is IncrementGunLevelMessage)
+            {
+                IncrementGunLevelMessage temp = (IncrementGunLevelMessage)msg;
+
+                mGunLevel = System.Math.Min(mGunLevelInfo.Length - 1, mGunLevel + temp.mIncrementAmount_In);
+            }
+            else if (msg is GetGunLevelsRemainingMessage)
+            {
+                GetGunLevelsRemainingMessage temp = (GetGunLevelsRemainingMessage)msg;
+                temp.mLevelRemaining_In = (mGunLevelInfo.Length - 1) - mGunLevel;
             }
         }
     }

@@ -163,6 +163,7 @@
     <Compile Include="Code\Behaviours\HUD\PlayerHealthBar.cs" />
     <Compile Include="Code\Behaviours\Projectile.cs" />
     <Compile Include="Code\Behaviours\RandomEnemyGenerator.cs" />
+    <Compile Include="Code\Behaviours\StatBoost\GunStatBoostResearch.cs" />
     <Compile Include="Code\Behaviours\StatBoost\HealthStatBoostResearch.cs" />
     <Compile Include="Code\Behaviours\StatBoost\StatBoostResearch.cs" />
     <Compile Include="Code\Behaviours\StrandedPopup.cs" />

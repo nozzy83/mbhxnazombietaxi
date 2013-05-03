@@ -21,7 +21,7 @@
       <Item>Health</Item>
       <Item>DamageFlash</Item>
       <Item>SimpleMomentum</Item>
-      <Item>HealthStatBoostResearch</Item>
+      <Item>GunStatBoostResearch</Item>
       <Item>FaceForward</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
@@ -32,7 +32,7 @@
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
-      <Item>ZombieTaxi.Behaviours.StatBoost.HealthStatBoostResearch</Item>
+      <Item>ZombieTaxi.Behaviours.StatBoost.GunStatBoostResearch</Item>
       <Item>MBHEngine.Behaviour.FaceForward</Item>
     </mBehaviourClassNames>
   </Asset>

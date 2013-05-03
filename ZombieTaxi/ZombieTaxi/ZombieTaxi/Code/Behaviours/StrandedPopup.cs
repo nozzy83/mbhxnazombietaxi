@@ -74,7 +74,8 @@ namespace ZombieTaxi.Behaviours
             /// Prealloced messages to avoid GC.
             /// </summary>
             private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
-            private StatBoostResearch.GetLevelsRemainingMessage mGetLevelsRemainingMsg;
+            private GunStatBoostResearch.GetGunLevelsRemainingMessage mGetGunLevelsRemainingMsg;
+            private HealthStatBoostResearch.GetHealthLevelsRemainingMessage mGetHealthLevelsRemainingMsg;
             private GetIsScoutableMessage mGetIsScoutableMsg;
 
             /// <summary>
@@ -104,7 +105,8 @@ namespace ZombieTaxi.Behaviours
                 mEnabled = true;
 
                 mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
-                mGetLevelsRemainingMsg = new StatBoostResearch.GetLevelsRemainingMessage();
+                mGetGunLevelsRemainingMsg = new GunStatBoostResearch.GetGunLevelsRemainingMessage();
+                mGetHealthLevelsRemainingMsg = new HealthStatBoostResearch.GetHealthLevelsRemainingMessage();
                 mGetIsScoutableMsg = new GetIsScoutableMessage();
             }
 
@@ -186,9 +188,9 @@ namespace ZombieTaxi.Behaviours
                     case StrandedPopupDefinition.ButtonTypes.HpUp:
                     {
                         // For this upgrade there needs to be some levels left to upgrade to.
-                        GameObjectManager.pInstance.BroadcastMessage(mGetLevelsRemainingMsg);
+                        GameObjectManager.pInstance.BroadcastMessage(mGetHealthLevelsRemainingMsg);
 
-                        if (mGetLevelsRemainingMsg.mLevelsRemaining <= 0)
+                        if (mGetHealthLevelsRemainingMsg.mLevelsRemaining <= 0)
                         {
                             mDisabledHintText = "MAXED";
 
@@ -197,6 +199,22 @@ namespace ZombieTaxi.Behaviours
 
                         break;
                     }
+
+                    case StrandedPopupDefinition.ButtonTypes.GunUp:
+                    {
+                        // For this upgrade there needs to be some levels left to upgrade to.
+                        GameObjectManager.pInstance.BroadcastMessage(mGetGunLevelsRemainingMsg);
+
+                        if (mGetGunLevelsRemainingMsg.mLevelsRemaining <= 0)
+                        {
+                            mDisabledHintText = "MAXED";
+
+                            mEnabled = false;
+                        }
+
+                        break;
+                    }
+
                     case StrandedPopupDefinition.ButtonTypes.ScoutSearch:
                     {
                         // Find all the objects that are Allies.
@@ -224,13 +242,6 @@ namespace ZombieTaxi.Behaviours
                         // and as a result, this button should be disabled.
                         mEnabled = false;
 
-                        break;
-                    }
-
-                    case StrandedPopupDefinition.ButtonTypes.GunUp:
-                    {
-                        mDisabledHintText = "NOT IMP";
-                        mEnabled = false;
                         break;
                     }
 

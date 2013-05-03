@@ -47,26 +47,6 @@ namespace ZombieTaxi.StatBoost.Behaviours
         }
 
         /// <summary>
-        /// Allows clients to check if there are any levels actually available, prior 
-        /// showing the user a prompt.
-        /// </summary>
-        public class GetLevelsRemainingMessage : BehaviourMessage
-        {
-            /// <summary>
-            /// The number of levels still available for upgrading to.
-            /// </summary>
-            public Int32 mLevelsRemaining;
-
-            /// <summary>
-            /// Call this to put a message back to its default state.
-            /// </summary>
-            public override void Reset()
-            {
-                mLevelsRemaining = 0;
-            }
-        }
-
-        /// <summary>
         /// Store the definition since it stores the leveling information in a convienient package.
         /// </summary>
         StatBoostResearchDefinition mDef;
@@ -85,12 +65,6 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// Sprite used to show progress of research.
         /// </summary>
         private GameObject mProgressBar;
-
-        /// <summary>
-        /// The current level of this type of research. Static since there can be many instances of this
-        /// Behaviour and they should all be at the same level.
-        /// </summary>
-        protected static Int32 mNextLevel = 0;
 
         /// <summary>
         /// Preallocated messages to avoid GC.
@@ -157,7 +131,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
                 GameObjectManager.pInstance.Add(mProgressBar);
             }
 
-            mResearchTimer.pLifeTime = mDef.mLevels[mNextLevel].mFramesToComplete;
+            mResearchTimer.pLifeTime = mDef.mLevels[pNextLevel].mFramesToComplete;
         }
 
         /// <summary>
@@ -203,7 +177,7 @@ namespace ZombieTaxi.StatBoost.Behaviours
                 // Announce that the research has been completed.
                 mParentGOH.OnMessage(mOnResearchCompleteMsg);
 
-                mNextLevel++;
+                pNextLevel++;
             }
         }
 
@@ -224,12 +198,6 @@ namespace ZombieTaxi.StatBoost.Behaviours
 
                 mResearchTimer.Restart();
             }
-            else if (msg is GetLevelsRemainingMessage)
-            {
-                GetLevelsRemainingMessage temp = (GetLevelsRemainingMessage)msg;
-
-                temp.mLevelsRemaining = mDef.mLevels.Length - mNextLevel;
-            }
         }
 
         /// <summary>
@@ -237,5 +205,12 @@ namespace ZombieTaxi.StatBoost.Behaviours
         /// the derived class to use this chance to populate the message with up to date data.
         /// </summary>
         protected abstract void FillOnResearchCompleteMessage();
+
+        /// <summary>
+        /// Each type of StatBoostResearch shares a "Next Level" but that level should not be shared
+        /// between different types of StatBoostResearch. As a result, that level must be tracked in a
+        /// static at the derived class level, but used at the StatBoostResearch level.
+        /// </summary>
+        protected abstract Int32 pNextLevel { get; set; }
     }
 }
