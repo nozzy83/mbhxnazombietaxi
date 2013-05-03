@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent>
+  <Asset Type="ZombieTaxiContentDefs.StatBoost.GunStatBoostResearchDefinition">
+    <mIsEnabled>false</mIsEnabled>
+    <mLevels>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>1</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>1</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>1</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>1</mIntValue>
+      </Item>
+      <Item>
+        <mFramesToComplete>120</mFramesToComplete>
+        <mIntValue>1</mIntValue>
+      </Item>
+    </mLevels>
+  </Asset>
+</XnaContent>
+

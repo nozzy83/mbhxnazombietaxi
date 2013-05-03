@@ -114,6 +114,7 @@
     <Compile Include="Behaviour\HUD\PlayerInventoryDefinition.cs" />
     <Compile Include="Behaviour\MarkOnMiniMapDefinition.cs" />
     <Compile Include="Behaviour\PointAndShootDefinition.cs" />
+    <Compile Include="Behaviour\StatBoost\GunStatBoostResearchDefinition.cs" />
     <Compile Include="Behaviour\StatBoost\HealthStatBoostResearchDefinition.cs" />
     <Compile Include="Behaviour\StatBoost\StatBoostResearchDefinition.cs" />
     <Compile Include="Behaviour\StrandedPopupDefinition.cs" />
