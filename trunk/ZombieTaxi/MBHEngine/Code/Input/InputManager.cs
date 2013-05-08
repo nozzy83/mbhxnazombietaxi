@@ -487,53 +487,82 @@ namespace MBHEngine.Input
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
-            Vector2 leftThumb = mCurrentGamePadState.ThumbSticks.Left;
-            Vector2 rightThumb = mCurrentGamePadState.ThumbSticks.Right;
+            Vector2 leftThumb = Vector2.Zero;
+            Vector2 rightThumb = Vector2.Zero;
+
+            Boolean keyboard_used = false;
 
             // LA as Keyboard.
             //
             if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_LEFT]))
             {
                 leftThumb.X = -1.0f;
+                keyboard_used = true;
             }
             else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_RIGHT]))
             {
                 leftThumb.X = 1.0f;
+                keyboard_used = true;
             }
 
             if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_DOWN]))
             {
                 leftThumb.Y = -1.0f;
+                keyboard_used = true;
             }
             else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.LA_UP]))
             {
                 leftThumb.Y = 1.0f;
+                keyboard_used = true;
             }
+
+            if (keyboard_used)
+            {
+                // If we got input from the keyboard it may not be normalized (eg. 1,1), which will allow
+                // the player to move faster diagonally then left and right seperatly.
+                if (leftThumb != Vector2.Zero) leftThumb.Normalize();
+            }
+            else
+            {
+                leftThumb = mCurrentGamePadState.ThumbSticks.Left;
+            }
+
+            keyboard_used = false;
 
             // RA as keyboard.
             //
             if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_LEFT]))
             {
                 rightThumb.X = -1.0f;
+                keyboard_used = true;
             }
             else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_RIGHT]))
             {
                 rightThumb.X = 1.0f;
+                keyboard_used = true;
             }
 
             if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_DOWN]))
             {
                 rightThumb.Y = -1.0f;
+                keyboard_used = true;
             }
             else if (keyboardState.IsKeyDown(mKeyboardActionMap[(int)InputActions.RA_UP]))
             {
                 rightThumb.Y = 1.0f;
+                keyboard_used = true;
             }
 
-            // If we got input from the keyboard it may not be normalized (eg. 1,1), which will allow
-            // the player to move faster diagonally then left and right seperatly.
-            if (leftThumb != Vector2.Zero) leftThumb.Normalize();
-            if (rightThumb != Vector2.Zero) rightThumb.Normalize();
+            if (keyboard_used)
+            {
+                // If we got input from the keyboard it may not be normalized (eg. 1,1), which will allow
+                // the player to move faster diagonally then left and right seperatly.
+                if (rightThumb != Vector2.Zero) rightThumb.Normalize();
+            }
+            else
+            {
+                rightThumb = mCurrentGamePadState.ThumbSticks.Right;
+            }
 
             return new GamePadThumbSticks(leftThumb, rightThumb);
         }
