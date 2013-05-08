@@ -8,5 +8,7 @@ namespace MBHEngineContentDefs
 {
     public class SimpleMomentumDefinition : BehaviourDefinition
     {
+        [ContentSerializer(Optional = true)]
+        public Single mAcceleration = -1.0f;
     }
 }

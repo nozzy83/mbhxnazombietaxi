@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using MBHEngineContentDefs;
+using MBHEngine.GameObject;
 
 namespace MBHEngine.Behaviour
 {
@@ -11,6 +13,16 @@ namespace MBHEngine.Behaviour
     /// </summary>
     public class SimpleMomentum : Behaviour
     {
+        /// <summary>
+        /// The actual speed the object is moving right now.
+        /// </summary>
+        private Single mSpeedActual;
+
+        /// <summary>
+        /// The rate at which the object will speed up.
+        /// </summary>
+        private Single mAcceleration;
+
         /// <summary>
         /// Constructor which also handles the process of loading in the Behaviour
         /// Definition information.
@@ -29,6 +41,12 @@ namespace MBHEngine.Behaviour
         public override void LoadContent(String fileName)
         {
             base.LoadContent(fileName);
+
+            SimpleMomentumDefinition def = GameObjectManager.pInstance.pContentManager.Load<SimpleMomentumDefinition>(fileName);
+
+            mSpeedActual = 0.0f;
+
+            mAcceleration = def.mAcceleration;
         }
 
         /// <summary>
@@ -37,7 +55,27 @@ namespace MBHEngine.Behaviour
         /// <param name="gameTime">The amount of time that has passed this frame.</param>
         public override void PostUpdate(GameTime gameTime)
         {
-            mParentGOH.pPosition += mParentGOH.pDirection.mForward * mParentGOH.pDirection.mSpeed;
+            Single speedWanted = mParentGOH.pDirection.mSpeed;
+
+            if (mAcceleration > 0.0f)
+            {
+                if (speedWanted < mSpeedActual || mParentGOH.pDirection.mForward == Vector2.Zero)
+                {
+                    mSpeedActual -= mAcceleration;
+                }
+                else if (speedWanted > mSpeedActual)
+                {
+                    mSpeedActual += mAcceleration;
+                }
+            }
+            else
+            {
+                mSpeedActual = speedWanted;
+            }
+
+            mSpeedActual = MathHelper.Clamp(mSpeedActual, 0.0f, speedWanted);
+
+            mParentGOH.pPosition += mParentGOH.pDirection.mForward * mSpeedActual;
         }
     }
 }
