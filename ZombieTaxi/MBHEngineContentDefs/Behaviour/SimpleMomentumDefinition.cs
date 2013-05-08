@@ -8,6 +8,9 @@ namespace MBHEngineContentDefs
 {
     public class SimpleMomentumDefinition : BehaviourDefinition
     {
+        /// <summary>
+        /// The rate at which the object will speed up.
+        /// </summary>
         [ContentSerializer(Optional = true)]
         public Single mAcceleration = -1.0f;
     }
