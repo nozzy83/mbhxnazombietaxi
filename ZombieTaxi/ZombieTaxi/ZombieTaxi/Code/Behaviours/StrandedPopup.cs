@@ -258,6 +258,11 @@ namespace ZombieTaxi.Behaviours
                         //mEnabled = false;
                         break;
                     }
+
+                    case StrandedPopupDefinition.ButtonTypes.EngineerRepair:
+                    {
+                        break;
+                    }
                 }
 
                 return mEnabled;

@@ -218,6 +218,13 @@ namespace ZombieTaxi.States.Common
                         mSetStateMsg.mNextState_In = "BeginSearch";
                         pParentGOH.OnMessage(mSetStateMsg);
                     }
+                    else if (temp.mSelection_In == StrandedPopupDefinition.ButtonTypes.EngineerRepair)
+                    {
+                        DebugMessageDisplay.pInstance.AddConstantMessage("Repair");
+                        mSetStateMsg.mNextState_In = "Repair";
+                        pParentGOH.OnMessage(mSetStateMsg);
+                    }
+
                     // Popups get recycled so if ours closes, we need to make sure to clear our local 
                     // reference, else the next object to use it might send messages that we react to.
                     mPopup = null;
