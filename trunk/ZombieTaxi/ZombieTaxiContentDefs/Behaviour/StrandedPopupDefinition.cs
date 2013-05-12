@@ -20,6 +20,7 @@ namespace ZombieTaxiContentDefs
             ScoutSearch,    // Send the Scout out to search for other Stranded.
             MilitantPatrol, // Send the Militant out to patrol the surrounding area.
             MilitantFollow, // Tell the Militant to follow the player.
+            EngineerRepair, // Send the Engineer out to repair nearby walls.
         }
 
         /// <summary>

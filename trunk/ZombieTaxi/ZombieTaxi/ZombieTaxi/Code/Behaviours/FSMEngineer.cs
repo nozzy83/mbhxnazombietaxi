@@ -66,6 +66,8 @@ namespace ZombieTaxi.Behaviours
             AddState(new States.Common.FSMStateDead(), "Dead");
             AddState(new States.Common.FSMStateGoToExtraction(), "GoToExtraction");
             AddState(new States.Common.FSMStateResearchStatBoost(), "ResearchStatBoost");
+            AddState(new States.Engineer.FSMStateRepair(), "Repair");
+            AddState(new States.Engineer.FSMStateDoRepair(), "DoRepair");
 
             mParentGOH.pDirection.mSpeed = 0.5f;
 

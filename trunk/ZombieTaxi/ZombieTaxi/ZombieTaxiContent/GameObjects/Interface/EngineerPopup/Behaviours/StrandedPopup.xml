@@ -10,6 +10,11 @@
         <mHintText>GUN UP</mHintText>
         <mButtonType>GunUp</mButtonType>
       </Item>
+      <Item>
+        <mIconFileName>GameObjects\Interface\StrandedPopup\IconMilitantPatrol\IconMilitantPatrol</mIconFileName>
+        <mHintText>Repair</mHintText>
+        <mButtonType>EngineerRepair</mButtonType>
+      </Item>
     </mButtons>
   </Asset>
 </XnaContent>
