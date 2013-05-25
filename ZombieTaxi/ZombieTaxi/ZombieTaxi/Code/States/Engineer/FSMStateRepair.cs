@@ -8,6 +8,7 @@ using MBHEngine.Debug;
 using MBHEngine.World;
 using System.Collections.Generic;
 using MBHEngineContentDefs;
+using ZombieTaxi.Behaviours;
 
 namespace ZombieTaxi.States.Engineer
 {
@@ -55,6 +56,7 @@ namespace ZombieTaxi.States.Engineer
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
         private FiniteStateMachine.SetStateMessage mSetStateMsg;
         private Health.GetHealthMessage mGetHealthMsg;
+        private FSMEngineer.SetTileToRepairMessage mSetTileToRepairMsg;
 
         /// <summary>
         /// Constructor.
@@ -73,6 +75,7 @@ namespace ZombieTaxi.States.Engineer
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
             mSetStateMsg = new FiniteStateMachine.SetStateMessage();
             mGetHealthMsg = new Health.GetHealthMessage();
+            mSetTileToRepairMsg = new FSMEngineer.SetTileToRepairMessage();
         }
 
         /// <summary>
@@ -80,18 +83,23 @@ namespace ZombieTaxi.States.Engineer
         /// </summary>
         public override void OnBegin()
         {
-            // When patrolling the characters moves a lot slower, so the animation needs to match.
-            mSetActiveAnimationMsg.mAnimationSetName_In = "Walk";
-            pParentGOH.OnMessage(mSetActiveAnimationMsg);
-
             mNoValidTargets = false;
 
             // Figure out where we are going this time.
             FindNextRepairPoint();
 
-            // FindNextPatrolPoint will have set all the PathFollow and PathFind data, now it
-            // just needs to be re-enabled.
-            pParentGOH.SetBehaviourEnabled<PathFollow>(true);
+            // This state is basically going to exit the moment it hits OnUpdate if a repair point
+            // wasn't found, so avoid glitches like starting a new animation for 1 frame.
+            if (!mNoValidTargets)
+            {
+                // When patrolling the characters moves a lot slower, so the animation needs to match.
+                mSetActiveAnimationMsg.mAnimationSetName_In = "Walk";
+                pParentGOH.OnMessage(mSetActiveAnimationMsg);
+
+                // FindNextPatrolPoint will have set all the PathFollow and PathFind data, now it
+                // just needs to be re-enabled.
+                pParentGOH.SetBehaviourEnabled<PathFollow>(true);
+            }
         }
 
         /// <summary>
@@ -102,7 +110,7 @@ namespace ZombieTaxi.States.Engineer
         {
             if (mNoValidTargets)
             {
-                FindNextRepairPoint();
+                return "WaitForRepairChance";
             }
             else
             {
@@ -258,6 +266,18 @@ namespace ZombieTaxi.States.Engineer
                         // Store for debug drawing.
                         mDebugStart = pParentGOH.pPosition;
                         mDebugEnd = nearby.mCollisionRect.pCenterPoint;
+
+                        mFoundTileObjects.Clear();
+                        GameObjectManager.pInstance.GetGameObjectsInRange(chosenTile.mCollisionRect.pCenterPoint, 1.0f, ref mFoundTileObjects, mTileClassifications);
+
+                        System.Diagnostics.Debug.Assert(mFoundTileObjects.Count == 1, "Unexpected number of objects at tile position: " + mFoundTileObjects.Count);
+
+                        // This should never happen.
+                        if (null != mFoundTileObjects[0])
+                        {
+                            mSetTileToRepairMsg.mTile_In = mFoundTileObjects[0];
+                            pParentGOH.OnMessage(mSetTileToRepairMsg);
+                        }
 
                         tileFound = true;
                     }

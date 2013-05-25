@@ -13,6 +13,14 @@
         <mLooping>false</mLooping>
         <mRemoveGameObjectOnComplete>true</mRemoveGameObjectOnComplete>
       </Item>
+      <Item>
+        <mTicksPerFrame>5</mTicksPerFrame>
+        <mName>Repair</mName>
+        <mStartingFrame>0</mStartingFrame>
+        <mNumFrames>3</mNumFrames>
+        <mLooping>true</mLooping>
+        <mRemoveGameObjectOnComplete>false</mRemoveGameObjectOnComplete>
+      </Item>
     </mAnimationSets>
   </Asset>
 </XnaContent>
