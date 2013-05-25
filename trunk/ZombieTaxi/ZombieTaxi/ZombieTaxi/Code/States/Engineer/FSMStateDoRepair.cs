@@ -4,6 +4,7 @@ using MBHEngine.Behaviour;
 using MBHEngine.GameObject;
 using Microsoft.Xna.Framework;
 using MBHEngine.Math;
+using ZombieTaxi.Behaviours;
 
 namespace ZombieTaxi.States.Engineer
 {
@@ -14,21 +15,34 @@ namespace ZombieTaxi.States.Engineer
     class FSMStateDoRepair : FSMState
     {
         /// <summary>
-        /// Tracks how long we have been waiting at the Patrol Point.
+        /// Animated sprite used to indicate that the tile is being repaired.
         /// </summary>
-        private StopWatch mWait;
+        private GameObject mDust;
+
+        /// <summary>
+        /// The number of HP a damaged tile will regen per frame when being repaired.
+        /// </summary>
+        private Single mHpRepairRate;
 
         /// <summary>
         /// Preallocate messages to avoid GC.
         /// </summary>
         private SpriteRender.SetActiveAnimationMessage mSetActiveAnimationMsg;
+        private FSMEngineer.GetTileToRepairMessage mGetTileToRepairMsg;
+        private Health.IncrementHealthMessage mIncrementHealthMsg;
+        private Health.GetHealthMessage mGetHealthMsg;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public FSMStateDoRepair()
         {
+            mHpRepairRate = 0.01f;
+
             mSetActiveAnimationMsg = new SpriteRender.SetActiveAnimationMessage();
+            mGetTileToRepairMsg = new FSMEngineer.GetTileToRepairMessage();
+            mIncrementHealthMsg = new Health.IncrementHealthMessage();
+            mGetHealthMsg = new Health.GetHealthMessage();
         }
 
         /// <summary>
@@ -39,8 +53,23 @@ namespace ZombieTaxi.States.Engineer
             mSetActiveAnimationMsg.mAnimationSetName_In = "Idle";
             pParentGOH.OnMessage(mSetActiveAnimationMsg);
 
-            mWait = StopWatchManager.pInstance.GetNewStopWatch();
-            mWait.pLifeTime = 60 * 4; // 4 seconds (assuming 60fps)
+            pParentGOH.OnMessage(mGetTileToRepairMsg);
+
+            if (mGetTileToRepairMsg.mTile_Out != null)
+            {
+                // Spawn some smoke to be more ninja like.
+                mDust = GameObjectFactory.pInstance.GetTemplate("GameObjects\\Effects\\Dust\\Dust");
+
+                // Put the smoke at the right position relative to the Scout.
+                mDust.pPosition = mGetTileToRepairMsg.mTile_Out.pPosition;
+
+                mSetActiveAnimationMsg.mAnimationSetName_In = "Repair";
+                mDust.OnMessage(mSetActiveAnimationMsg);
+
+                // The Smoke gets pushed onto the GameObjectManager and will delete itself when
+                // it finishes the animation.
+                GameObjectManager.pInstance.Add(mDust);
+            }
         }
 
         /// <summary>
@@ -49,10 +78,21 @@ namespace ZombieTaxi.States.Engineer
         /// <returns>Identifier of a state to transition to.</returns>
         public override String OnUpdate()
         {
-            // Have we been waiting long enough yet?
-            if (mWait.IsExpired())
+            GameObject tile = mGetTileToRepairMsg.mTile_Out;
+            
+            if (null != tile)
             {
-                return "Repair";
+                tile.OnMessage(mGetHealthMsg);
+
+                if (mGetHealthMsg.mCurrentHealth_Out < mGetHealthMsg.mMaxHealth_Out)
+                {
+                    mIncrementHealthMsg.mIncrementAmount_In = mHpRepairRate;
+                    tile.OnMessage(mIncrementHealthMsg);
+                }
+                else
+                {
+                    return "Repair";
+                }
             }
 
             return null;
@@ -64,7 +104,11 @@ namespace ZombieTaxi.States.Engineer
         /// </summary>
         public override void OnEnd()
         {
-            StopWatchManager.pInstance.RecycleStopWatch(mWait);
+            if (null != mDust)
+            {
+                GameObjectManager.pInstance.Remove(mDust);
+                mDust = null;
+            }
         }
     }
 }

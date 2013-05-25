@@ -22,6 +22,44 @@ namespace ZombieTaxi.Behaviours
     class FSMEngineer : MBHEngine.Behaviour.FiniteStateMachine
     {
         /// <summary>
+        /// Used for passing which Tile is being repaired between states.
+        /// </summary>
+        public class SetTileToRepairMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The Tile being repaired.
+            /// </summary>
+            public GameObject mTile_In;
+
+            /// <summary>
+            /// Put this message back to its initial state.
+            /// </summary>
+            public override void Reset()
+            {
+                mTile_In = null;
+            }
+        }
+
+        /// <summary>
+        /// Used for passing which Tile is being repaired between states.
+        /// </summary>
+        public class GetTileToRepairMessage : BehaviourMessage
+        {
+            /// <summary>
+            /// The Tile being repaired.
+            /// </summary>
+            public GameObject mTile_Out;
+
+            /// <summary>
+            /// Put this message back to its initial state.
+            /// </summary>
+            public override void Reset()
+            {
+                mTile_Out = null;
+            }
+        }
+
+        /// <summary>
         /// The currently active extraction point.
         /// </summary>
         private GameObject mExtractionPoint;
@@ -31,6 +69,11 @@ namespace ZombieTaxi.Behaviours
         /// at a SafeHouse.
         /// </summary>
         private Int32 mSafeHouseScore;
+
+        /// <summary>
+        /// The Tile that this guy is currently trying to repair.
+        /// </summary>
+        private GameObject mTileToRepair;
 
         /// <summary>
         /// Preallocate messages to avoid GC.
@@ -68,6 +111,7 @@ namespace ZombieTaxi.Behaviours
             AddState(new States.Common.FSMStateResearchStatBoost(), "ResearchStatBoost");
             AddState(new States.Engineer.FSMStateRepair(), "Repair");
             AddState(new States.Engineer.FSMStateDoRepair(), "DoRepair");
+            AddState(new States.Engineer.FSMStateWaitForRepairChance(), "WaitForRepairChance");
 
             mParentGOH.pDirection.mSpeed = 0.5f;
 
@@ -138,6 +182,20 @@ namespace ZombieTaxi.Behaviours
 
                     temp.mIsScoutable_Out = true;
                 }
+            }
+            else if (msg is SetTileToRepairMessage)
+            {
+                SetTileToRepairMessage temp = (SetTileToRepairMessage)msg;
+
+                mTileToRepair = temp.mTile_In;
+            }
+            else if (msg is GetTileToRepairMessage)
+            {
+                System.Diagnostics.Debug.Assert(mTileToRepair != null, "Getting mTileToRepair when it has not yet been set.");
+
+                GetTileToRepairMessage temp = (GetTileToRepairMessage)msg;
+
+                temp.mTile_Out = mTileToRepair;
             }
         }
     }

@@ -181,6 +181,7 @@
     <Compile Include="Code\States\Common\FSMStateWaitAtStandingPosition.cs" />
     <Compile Include="Code\States\Engineer\FSMStateDoRepair.cs" />
     <Compile Include="Code\States\Engineer\FSMStateRepair.cs" />
+    <Compile Include="Code\States\Engineer\FSMWaitForRepairChance.cs" />
     <Compile Include="Code\States\Militant\FSMStatePauseAtPatrolPoint.cs" />
     <Compile Include="Code\States\Militant\FSMStatePatrol.cs" />
     <Compile Include="Code\States\Scout\FSMStateWaitAtTarget.cs" />
