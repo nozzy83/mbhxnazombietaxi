@@ -719,6 +719,14 @@ namespace MBHEngine.GameObject
         }
 
         /// <summary>
+        /// Scale the object uniformly.
+        /// </summary>
+        public Single pScaleXY
+        {
+            set { pScaleX = value; pScaleY = value; }
+        }
+
+        /// <summary>
         /// The Scale's X value.
         /// </summary>
         public Single pScaleX

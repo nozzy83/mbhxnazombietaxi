@@ -141,6 +141,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\Behaviours\DamageWobble.cs" />
     <Compile Include="Code\Behaviours\FSMEngineer.cs" />
     <Compile Include="Code\Behaviours\FSMMedic.cs" />
     <Compile Include="Code\Behaviours\FSMCivilian.cs" />

@@ -20,6 +20,7 @@
       <Item>Explosive</Item>
       <Item>Health</Item>
       <Item>DamageFlash</Item>
+      <Item>DamageWobble</Item>
       <Item>Kamikaze</Item>
       <Item>SimpleMomentum</Item>
       <Item>TileCollision</Item>
@@ -32,6 +33,7 @@
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
       <Item>MBHEngine.Behaviour.Health</Item>
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>ZombieTaxi.Behaviours.DamageWobble</Item>
       <Item>ZombieTaxi.Behaviours.Kamikaze</Item>
       <Item>MBHEngine.Behaviour.SimpleMomentum</Item>
       <Item>MBHEngine.Behaviour.TileCollision</Item>

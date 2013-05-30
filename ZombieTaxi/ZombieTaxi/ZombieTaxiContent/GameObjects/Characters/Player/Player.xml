@@ -22,6 +22,7 @@
       <Item>TwinStick</Item>
       <!--<Item>PathFind</Item>-->
       <Item>DamageFlash</Item>
+      <Item>DamageWobble</Item>
       <Item>Inventory</Item>
       <Item>ObjectPlacement</Item>
     </mBehaviourFileNames>
@@ -33,6 +34,7 @@
       <Item>ZombieTaxi.Behaviours.TwinStick</Item>
       <!--<Item>MBHEngine.Behaviour.PathFind</Item>-->
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
+      <Item>ZombieTaxi.Behaviours.DamageWobble</Item>
       <Item>ZombieTaxi.Behaviours.Inventory</Item>
       <Item>ZombieTaxi.Behaviours.ObjectPlacement</Item>
     </mBehaviourClassNames>
