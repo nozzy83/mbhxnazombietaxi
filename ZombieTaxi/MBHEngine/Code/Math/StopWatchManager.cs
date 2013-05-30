@@ -38,7 +38,7 @@ namespace MBHEngine.Math
         {
             // How many watches this manager creates.  If we go over this limit, the game will 
             // throw an exception.
-            Int32 numWatches = 8192;
+            Int32 numWatches = 8192 * 2;
 
             // The active list starts empty and will become populated as clients request new StopWatch objects.
             mActiveWatches = new List<StopWatch>(numWatches);

@@ -53,8 +53,8 @@ namespace ZombieTaxi.Behaviours
             DamageWobbleDefinition def = GameObjectManager.pInstance.pContentManager.Load<DamageWobbleDefinition>(fileName);
 
             StopWatch watch = StopWatchManager.pInstance.GetNewStopWatch();
-            watch.pLifeTime = 10.0f;
-            mScaleTween = new Tween(watch, 1.0f, 1.2f);
+            watch.pLifeTime = 4.0f;
+            mScaleTween = new Tween(watch, 0.8f, 1.2f);
             
             watch = StopWatchManager.pInstance.GetNewStopWatch();
             watch.pLifeTime = 2.0f;
@@ -63,6 +63,15 @@ namespace ZombieTaxi.Behaviours
             mDamageCooldown = StopWatchManager.pInstance.GetNewStopWatch();
             mDamageCooldown.pLifeTime = def.mFramesToReset;
             mDamageCooldown.ForceExpire();
+        }
+
+        /// <summary>
+        /// Destructor.
+        /// </summary>
+        ~DamageWobble()
+        {
+            StopWatchManager.pInstance.RecycleStopWatch(mScaleTween.mWatch);
+            StopWatchManager.pInstance.RecycleStopWatch(mRotationTween.mWatch);
         }
 
         /// <summary>
@@ -78,8 +87,6 @@ namespace ZombieTaxi.Behaviours
         /// </summary>
         public override void OnRemove()
         {
-            StopWatchManager.pInstance.RecycleStopWatch(mScaleTween.mWatch);
-            StopWatchManager.pInstance.RecycleStopWatch(mRotationTween.mWatch);
         }
 
         /// <summary>
