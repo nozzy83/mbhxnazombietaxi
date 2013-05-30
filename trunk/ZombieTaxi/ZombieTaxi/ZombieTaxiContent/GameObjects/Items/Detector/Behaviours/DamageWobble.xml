@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent>
   <Asset Type="ZombieTaxiContentDefs.DamageWobbleDefinition">
-    <mFramesToReset>15</mFramesToReset>
+    <mFramesToReset>5</mFramesToReset>
   </Asset>
 </XnaContent>
 

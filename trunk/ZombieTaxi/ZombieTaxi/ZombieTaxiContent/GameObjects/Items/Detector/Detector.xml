@@ -21,6 +21,7 @@
       <Item>DamageFlash</Item>
       <Item>Explosive</Item>
       <Item>TilePlacement</Item>
+      <Item>DamageWobble</Item>
     </mBehaviourFileNames>
     <mBehaviourClassNames>
       <Item>MBHEngine.Behaviour.SpriteRender</Item>
@@ -30,6 +31,7 @@
       <Item>ZombieTaxi.Behaviours.DamageFlash</Item>
       <Item>ZombieTaxi.Behaviours.Explosive</Item>
       <Item>ZombieTaxi.Behaviours.TilePlacement</Item>
+      <Item>ZombieTaxi.Behaviours.DamageWobble</Item>
     </mBehaviourClassNames>
   </Asset>
 </XnaContent>
