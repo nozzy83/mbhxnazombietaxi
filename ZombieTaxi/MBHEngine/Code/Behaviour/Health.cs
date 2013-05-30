@@ -35,7 +35,6 @@ namespace MBHEngine.Behaviour
             }
         }
 
-
         /// <summary>
         /// Gives a specified amount of health back to the target.
         /// </summary>
