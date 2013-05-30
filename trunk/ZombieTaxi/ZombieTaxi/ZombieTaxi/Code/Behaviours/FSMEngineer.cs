@@ -156,7 +156,10 @@ namespace ZombieTaxi.Behaviours
 
                 // If anyone is in the Safe House, they should make a run for the Extraction point now.
                 if (curState is States.Common.FSMStateGoToStandingPosition ||
-                    curState is States.Common.FSMStateWaitAtStandingPosition)
+                    curState is States.Common.FSMStateWaitAtStandingPosition ||
+                    curState is States.Engineer.FSMStateDoRepair ||
+                    curState is States.Engineer.FSMStateRepair ||
+                    curState is States.Engineer.FSMStateWaitForRepairChance)
                 {
                     AdvanceToState("GoToExtraction");
                 }
