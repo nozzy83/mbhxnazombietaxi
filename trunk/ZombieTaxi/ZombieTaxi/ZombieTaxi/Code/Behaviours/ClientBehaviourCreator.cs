@@ -129,6 +129,10 @@ namespace ZombieTaxi.Behaviours
                     {
                         return new PointAndShoot(go, fileName);
                     }
+                case "ZombieTaxi.Behaviours.DamageWobble":
+                    {
+                        return new DamageWobble(go, fileName);
+                    }
                 default:
                     {
                         return null;

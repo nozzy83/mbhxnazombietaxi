@@ -105,6 +105,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviour\DamageWobbleDefinition.cs" />
     <Compile Include="Behaviour\FSMEngineerDefinition.cs" />
     <Compile Include="Behaviour\FSMMedicDefinition.cs" />
     <Compile Include="Behaviour\FSMCivilianDefinition.cs" />

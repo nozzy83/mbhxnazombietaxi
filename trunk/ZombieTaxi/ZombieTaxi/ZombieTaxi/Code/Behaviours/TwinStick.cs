@@ -70,15 +70,27 @@ namespace ZombieTaxi.Behaviours
             /// Constructor.
             /// </summary>
             /// <param name="damageMod">How much the base damage will be multiplied by.</param>
-            public GunLevelInfo(Single damageMod)
+            public GunLevelInfo(Single damageMod, Single scaleMod, Single speedMod)
             {
                 mDamageMod = damageMod;
+                mScaleMod = scaleMod;
+                mSpeedMod = speedMod;
             }
 
             /// <summary>
             /// How much the base damage will be multiplied by.
             /// </summary>
             public Single mDamageMod;
+
+            /// <summary>
+            /// How much to scale up the bullet based on level.
+            /// </summary>
+            public Single mScaleMod;
+
+            /// <summary>
+            /// How much faster should the bullet move based on level.
+            /// </summary>
+            public Single mSpeedMod;
         }
 
         /// <summary>
@@ -184,12 +196,12 @@ namespace ZombieTaxi.Behaviours
 
             mGunLevelInfo = new GunLevelInfo[] 
             {
-                new GunLevelInfo(1.0f),
-                new GunLevelInfo(2.0f),
-                new GunLevelInfo(4.0f),
-                new GunLevelInfo(7.0f),
-                new GunLevelInfo(11.0f),
-                new GunLevelInfo(16.0f),
+                new GunLevelInfo(1.0f, 1.0f, 1.0f),
+                new GunLevelInfo(2.0f, 1.5f, 1.1f),
+                new GunLevelInfo(4.0f, 1.5f, 1.2f),
+                new GunLevelInfo(7.0f, 1.5f, 1.3f),
+                new GunLevelInfo(11.0f, 1.5f, 1.4f),
+                new GunLevelInfo(16.0f, 2.0f, 1.5f),
             };
 
             mSpriteFxMsg = new SpriteRender.SetSpriteEffectsMessage();
@@ -334,7 +346,7 @@ namespace ZombieTaxi.Behaviours
                         // up for the grenade afterwards.
                         Vector2 bulletDir = finalDir;
 
-                        bullet.pDirection.mSpeed = 1.75f;
+                        bullet.pDirection.mSpeed = 1.75f * mGunLevelInfo[mGunLevel].mSpeedMod;
 
                         // Update the game object with all the new data.
                         bullet.pPosition = mGun.pPosition;
@@ -351,6 +363,8 @@ namespace ZombieTaxi.Behaviours
                         // Use our current gun level to upgrade the bullet.
                         mSetDamageModifierMessage.mDamageMod_In = mGunLevelInfo[mGunLevel].mDamageMod;
                         bullet.OnMessage(mSetDamageModifierMessage);
+
+                        bullet.pScaleX = mGunLevelInfo[mGunLevel].mScaleMod;
 
                         GameObjectManager.pInstance.Add(bullet);
                     }

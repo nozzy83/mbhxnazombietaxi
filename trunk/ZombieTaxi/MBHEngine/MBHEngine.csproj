@@ -164,6 +164,7 @@
     <Compile Include="Code\Math\Rectangle.cs" />
     <Compile Include="Code\Math\StopWatch.cs" />
     <Compile Include="Code\Math\StopWatchManager.cs" />
+    <Compile Include="Code\Math\Tween.cs" />
     <Compile Include="Code\Math\Util.cs" />
     <Compile Include="Code\PathFind\AStar\Planner.cs" />
     <Compile Include="Code\PathFind\GenericAStar\Graph.cs" />
